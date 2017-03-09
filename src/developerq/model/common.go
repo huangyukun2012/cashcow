@@ -1,6 +1,7 @@
 package model
 
 import (
+//	"fmt"
 	"time"
 	"errors"
 	"database/sql"
@@ -25,7 +26,9 @@ type Article struct {
 	OriginalURL      string  `json:"orignal_url"`
 	Source           string  `json:"source"`
 	ViewCount        int64   `json:"view_count"`
+	ViewCountStr     string
 	VoteCount        int64   `json:"vote_count"`
+	VoteCountStr     string
 	TitleCN           string `json:"title_cn"`
 	QuestionCN string `json:"question_cn"`
 	AnswerCN   string `json:"answer_cn"`
@@ -59,8 +62,6 @@ var MinArticle int
 
 //running
 func (article * Article) FillHtml()*Article {
-
-
 	//replace < /
 	article.QuestionCN = strings.Replace(article.QuestionCN, "</ ", "</", -1)
 	article.TitleCN = strings.Replace(article.TitleCN, "</ ", "</", -1)
@@ -103,6 +104,11 @@ func (article * Article) FillHtml()*Article {
 			article.SeoKeywords = append(article.SeoKeywords, keyword)
 		}
 	}
+
+	//convert viewcount/voteconnt
+	article.VoteCountStr = u.ConvertNumber(article.VoteCount)
+	article.ViewCountStr = u.ConvertNumber(article.ViewCount)
+
 	//Logger.Info("keyword = ", article.SeoKeywords)
 	return article
 }

@@ -37,8 +37,16 @@ var redis_Database int
 var ConfError error
 var esclient *es.Client
 var cfg *goconfig.ConfigFile
-var templateContent *template.Template
 var Logger *logging.Logger
+
+//all the templates
+var listArticleTemplate *template.Template
+var searchArticleTemplate *template.Template
+var tagArticleTemplate *template.Template
+var listTagTemplate *template.Template
+var showArticleTemplate *template.Template
+var notFoundTemplate *template.Template
+
 
 //Mysql Redis ES init
 func Init() {
@@ -107,15 +115,63 @@ func Init() {
 	}
 	m.MaxArticle, m.MinArticle = m.GetArticleMaxMinID(db)
 	u.InitRedis()
-
-	templ, err := ioutil.ReadFile("resource/developerq/templates/index.html")
-	if err == nil {
-		templateContent = template.Must(template.New("tmp").Parse(string(templ)))
-	} else {
-		Logger.Error("failed to open template")
-	}
 	u.InitJieba()
 
+	InitTemplates()
+
+}
+
+func InitTemplates() {
+
+	header, err := ioutil.ReadFile("resource/developerq/templates/header.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
+	list, err := ioutil.ReadFile("resource/developerq/templates/list.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
+	search, err := ioutil.ReadFile("resource/developerq/templates/search.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
+	show, err := ioutil.ReadFile("resource/developerq/templates/show.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
+	tag, err := ioutil.ReadFile("resource/developerq/templates/tag.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
+	listtag, err := ioutil.ReadFile("resource/developerq/templates/listtag.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
+
+	foot, err := ioutil.ReadFile("resource/developerq/templates/foot.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
+
+	notfound, err := ioutil.ReadFile("resource/developerq/templates/notfound.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
+
+	listArticleTemplate = template.Must(template.New("tmp").Parse(string(header) + string(list) + string(foot)))
+	searchArticleTemplate = template.Must(template.New("tmp").Parse(string(header) + string(search) + string(foot)))
+	showArticleTemplate = template.Must(template.New("tmp").Parse(string(header) + string(show) + string(foot)))
+	tagArticleTemplate = template.Must(template.New("tmp").Parse(string(header) + string(tag) + string(foot)))
+	listTagTemplate = template.Must(template.New("tmp").Parse(string(header) + string(listtag) + string(foot)))
+	notFoundTemplate = template.Must(template.New("tmp").Parse(string(header) + string(notfound) + string(foot)))
 }
 
 
@@ -147,11 +203,11 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
 	pv, err := GetURL("home")
 	if err == nil && pv != nil {
-		render(w, pv)
+		render(w, listArticleTemplate, pv)
 	} else {
 		pv := m.GenerateListArticlePageVar(esclient, 1)
 		SetURL("home", pv)
-		render(w, pv)
+		render(w, listArticleTemplate, pv)
 	}
 }
 
@@ -163,7 +219,7 @@ func ListArticle(w http.ResponseWriter, r *http.Request) {
 	pv, err := GetURL(r.URL.Path)
 	if err == nil && pv != nil {
 		Logger.Info("load %s from cache", url)
-		render(w, pv)
+		render(w, listArticleTemplate, pv)
 		return
 	}
 
@@ -181,7 +237,7 @@ func ListArticle(w http.ResponseWriter, r *http.Request) {
 	pv = m.GenerateListArticlePageVar(esclient, pp)
 
 	if pv != nil {
-		render(w, pv)
+		render(w, listArticleTemplate, pv)
 	}
 
 	SetURL(r.URL.Path, pv)
@@ -194,19 +250,19 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 	pv.Type = "lost"
 	w.WriteHeader(http.StatusNotFound)
 	if pv != nil {
-		render(w, pv)
+		render(w, notFoundTemplate, pv)
 	}
 	SetURL(r.URL.Path, pv)
 }
 
 
 
-func ListTagArticle(w http.ResponseWriter, r *http.Request) {
+func TagArticle(w http.ResponseWriter, r *http.Request) {
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
 	pv, err := GetURL(r.URL.Path)
 	if err == nil && pv != nil {
 		Logger.Info("load %s from cache", url)
-		render(w, pv)
+		render(w, tagArticleTemplate, pv)
 		return
 	}
 
@@ -224,7 +280,7 @@ func ListTagArticle(w http.ResponseWriter, r *http.Request) {
 	}
 	pv = m.GenerateListTagArticlePageVar(esclient, tag,  pp)
 	if pv != nil {
-		render(w, pv)
+		render(w, tagArticleTemplate, pv)
 	}
 	SetURL(r.URL.Path, pv)
 
@@ -239,7 +295,7 @@ func SearchArticle(w http.ResponseWriter, r *http.Request) {
 	pv, err := GetURL(r.URL.Path + "###" + keyword + "###" + page)
 	if err == nil && pv != nil {
 		Logger.Info("load %s from cache", url)
-		render(w, pv)
+		render(w, searchArticleTemplate, pv)
 		return
 	}
 
@@ -254,7 +310,7 @@ func SearchArticle(w http.ResponseWriter, r *http.Request) {
 	m.KeywordHit(db,keyword)
 	pv = m.GenerateSearchArticlePageVar(esclient, keyword, pp)
 	if pv != nil {
-		render(w, pv)
+		render(w, searchArticleTemplate, pv)
 	}
 	SetURL(r.URL.Path + "###" + keyword + "###" + page, pv)
 
@@ -266,7 +322,7 @@ func ShowArticle(w http.ResponseWriter, r *http.Request) {
 	pv, err := GetURL(r.URL.Path)
 	if err == nil && pv != nil {
 		Logger.Info("load %s from cache", url )
-		render(w, pv)
+		render(w, showArticleTemplate, pv)
 		return
 	}
 
@@ -283,17 +339,18 @@ func ShowArticle(w http.ResponseWriter, r *http.Request) {
 	//update viewcount
 	m.ViewArticle(db, int64(uk))
 	if pv != nil {
-		render(w, pv)
+		render(w, showArticleTemplate, pv)
 	}
 	SetURL(r.URL.Path, pv)
 }
 
-func render(w http.ResponseWriter, data interface{}) {
+func render(w http.ResponseWriter, t *template.Template, data interface{}) {
 	/*if err != nil {
 		Logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}*/
-	if err := templateContent.Execute(w, data); err != nil {
+
+	if err := t.Execute(w, data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -317,10 +374,10 @@ func Start(mx *mux.Router) {
 
 
 	//tag
-	mx.HandleFunc("/tag/{tag}", ListTagArticle)
-	mx.HandleFunc("/tag/{tag}/", ListTagArticle)
-	mx.HandleFunc("/tag/{tag}/{page}", ListTagArticle)
-	mx.HandleFunc("/tag/{tag}/{page}/", ListTagArticle)
+	mx.HandleFunc("/tag/{tag}", TagArticle)
+	mx.HandleFunc("/tag/{tag}/", TagArticle)
+	mx.HandleFunc("/tag/{tag}/{page}", TagArticle)
+	mx.HandleFunc("/tag/{tag}/{page}/", TagArticle)
 
 	//search
 	mx.HandleFunc("/search", SearchArticle)

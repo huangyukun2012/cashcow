@@ -376,5 +376,5 @@ func Start(mx *mux.Router) {
 	//not found
 	mx.NotFoundHandler = http.HandlerFunc(NotFound)
 
-	c.Start()
+	go c.Start()
 }

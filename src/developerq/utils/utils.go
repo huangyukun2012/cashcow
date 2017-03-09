@@ -94,7 +94,6 @@ func ReplaceCNPunctuation(input string) string {
 		}
 	}
 	return string(rs)
-
 }
 
 
@@ -191,4 +190,17 @@ func GetCategoryFromName(name string) int {
 var Jb * gojieba.Jieba
 func InitJieba() {
 	Jb = gojieba.NewJieba()
+}
+
+
+func ConvertNumber(n int64) string {
+	var str string
+	if n < 10000 {
+		str = fmt.Sprintf("%d", n)
+	} else if n < 1000000 {
+		str = fmt.Sprintf("%.0f", float64(n)/float64(1000)) + "k"
+	} else {
+		str = fmt.Sprintf("%.1f", float64(n)/float64(1000000)) + "m"
+	}
+	return str
 }

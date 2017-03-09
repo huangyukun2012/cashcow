@@ -4,7 +4,6 @@ import (
 	//	"fmt"
 	es "gopkg.in/olivere/elastic.v3"
 	"encoding/json"
-	"github.com/siddontang/go/log"
 	t "html/template"
 //	u "utils"
 	"strings"
@@ -28,7 +27,7 @@ func SearchArticle(esclient *es.Client, query es.Query, start int, size int, sor
 
 			err := json.Unmarshal(*hit.Source, &article)
 			if err != nil {
-				log.Error("Failed to read search result", err)
+				Logger.Error("Failed to read search result, %s", err.Error())
 			}
 
 			if hit.Highlight != nil && len(hit.Highlight) != 0 {
@@ -85,7 +84,7 @@ func SearchKeyword(esclient *es.Client, query es.Query, start int, size int)([]K
 			k := Keyword{}
 			err := json.Unmarshal(*hit.Source, &k)
 			if err != nil {
-				log.Error("Failed to read search result", err)
+				Logger.Error("Failed to read search result, %s", err.Error())
 			}
 			keywords = append(keywords, k)
 		}
@@ -122,13 +121,13 @@ func Search(esclient *es.Client, index string,  query es.Query, start int, size 
 
 	searchResult, err := searchService.Do()                // execute
 	if err != nil {
-		log.Info(err)
+		Logger.Info(err.Error())
 		return nil
 	}
 
-	log.Info("Query took ", searchResult.TookInMillis, " msec")
+	Logger.Info("Query took %d msec", searchResult.TookInMillis)
 	// Here's how you iterate through the search results with full control over each step.
-	log.Info("Found a total of ", searchResult.Hits.TotalHits)
+	Logger.Info("Found a total of %d", searchResult.Hits.TotalHits)
 	return searchResult
 }
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
 	ds "developerq"
@@ -22,7 +23,7 @@ func main() {
 	ds.Start(dmx)
 	//start bilisou
 	bs.Start(bmx)
+	fmt.Println("start listening at *:8080")
 	http.ListenAndServe("0.0.0.0:8080", mx)
-
 
 }
