@@ -1,0 +1,410 @@
+<html>
+
+<head>
+    {{if eq .Type  "show"}}
+    <title>{{.Article.TitleCNRaw}} - IT问题网 - Wenti.info - 解决IT问题上IT问题网</title>
+    {{else if eq .Type  "tag"}}
+    <title>标记有{{.Tag}}的问题 - IT问题网 - Wenti.info - 解决IT问题上IT问题网</title>
+    {{else}}
+    <title>IT问题网 - Wenti.info - 解决IT问题上IT问题网</title>
+    {{end}}
+
+    {{if eq .Type  "show"}}
+    <meta name="Description" content="{{.Article.TitleCNRaw}} - 遇到IT问题上it问题网，海量问题解决方法，高效技术文档搜索引擎">
+    <meta name="Keywords" content="{{ range $i, $k := .Article.SeoKeywords}}{{$k}}, {{end}}" />
+    {{else if eq .Type  "tag"}}
+    <meta name="Description" content="标记有{{.Tag}}的问题，遇到IT问题上it问题网，海量问题解决方法，高效技术文档搜索引擎">
+    <meta name="Keywords" content="{{.Tag}},IT问题,黑客,IT技术社区,编程社区,技术问答,技术文章,技术笔记,技术博客,技术活动,程序员,开发者,程序员,极客,编程,代码,开源" />
+    {{end}}
+    <link rel="shortcut icon" href="/static/img/wenti.ico">
+    <!--<link rel="search" type="application/opensearchdescription+xml" title="Stack Overflow" href="/opensearch.xml">-->
+    <script src="/static/js/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/all.css">
+    <link rel="alternate" type="application/atom+xml" title="Feed of recent questions" href="/feeds">
+    <meta name="baidu-site-verification" content="OqoHCM1aj1" />
+
+
+</head>
+
+
+<body class="home-page new-topbar" data-gr-c-s-loaded="true">
+<script>(function () { var old = $.fn.contents; $.fn.contents = function () { try { return old.apply(this, arguments); } catch (e) { return $([]); } } })()</script>
+<script>
+    function search() {
+        var si = document.getElementById("searchinput");
+        window.location.href="/search?q=" + si.value;
+    }
+</script>
+
+<script>
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        }
+        else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+
+<header class="so-header js-so-header _fixed _scrolling">
+    <div class="-container">
+        <div class="-main">
+            <a href="/">
+                <img src="/static/img/logo_pic.png" alt="wenti.info">
+            </a>
+            <a href="/">
+                <img src="/static/img/logo.png" alt="wenti.info">
+            </a>
+
+            <form id="search" action="/search" method="get" class="searchbar" autocomplete="off">
+                <input id="searchinput" name="q" type="text" placeholder="搜索..." value="" tabindex="1" autocomplete="off" maxlength="240" class="f-input js-search-field">
+                <button type="submit" class="btn js-search-submit" onclick="search()">
+                    <svg onclick="search()" viewBox="0 0 18 18" width="18" height="18" role="icon"><path fill-rule="evenodd" d="M12.864 11.32h-.813l-.288-.277A6.66 6.66 0 0 0 13.38 6.69a6.69 6.69 0 1 0-6.69 6.69 6.66 6.66 0 0 0 4.354-1.617l.278.288v.813L16.467 18 18 16.467l-5.136-5.146zm-6.174 0a4.625 4.625 0 0 1-4.632-4.63A4.625 4.625 0 0 1 6.69 2.058a4.625 4.625 0 0 1 4.63 4.632 4.625 4.625 0 0 1-4.63 4.63z"></path></svg>
+                </button>
+            </form>
+
+        </div>
+        <div class="-actions">
+
+            <div class="-ctas">
+                <a href="/" class="login-link btn-clear" rel="nofollow">登陆</a>
+                <a href="/" class="login-link btn" rel="nofollow">注册</a>
+
+            </div>
+        </div>
+
+
+    </div>
+</header>
+
+
+
+<div class="container">
+
+    {{if or (eq .Type  "list") (eq .Type  "tag") }}
+    <div id="content" class="snippet-hidden">
+
+
+        <div id="mainbar">
+
+            <div class="subheader">
+                {{if eq .Type "list"}}
+                <h1 id="h-top-questions">
+                    热点问题
+                </h1>
+                {{else}}
+                <h1 id="h-top-questions">
+                    共找到 <b>{{.TotalFound}}</b> 条标记有 "<b>{{.Tag}}"</b> 的问题。
+                </h1>
+                {{end}}
+                
+            </div>
+            <div id="qlist-wrapper">
+                <div id="question-mini-list">
+                  
+
+                    {{ range $i, $a := .ListArticle}}
+                    <div class="question-summary narrow">
+                        <div onclick="window.location.href='/article/{{$a.UK}}'" class="cp">
+                            <div class="views">
+                                <div class="mini-counts"><span title="8 views">{{$a.ViewCount}}</span></div>
+                                <div>访问</div>
+                            </div>
+                            <div class="votes">
+                                <div class="mini-counts"><span title="0 votes">{{$a.VoteCount}}</span></div>
+                                <div>采纳</div>
+                            </div>
+                        </div>
+
+                        <div class="summary">
+
+                            <h3><a href="/article/{{$a.UK}}" class="question-hyperlink" title="$a.QuestionCNRaw">{{$a.TitleCN}}</a></h3>
+                            <div class="tags t-jquery t-css t-jquery-ui">
+                              {{ range $i, $t := $a.TagsList}}
+                                <a href="/tag/{{$t}}" class="post-tag">{{$t}}</a>
+                                {{end}}
+                            </div>
+                            <div class="started">
+                                <a class="started-link">更新时间 <span class="relativetime">{{$a.UpdateTime}}</span></a>
+                            </div>
+                        </div>
+                    </div>
+                    {{end}}
+
+
+
+                </div>
+            </div>
+
+            <div class="pager fl">
+
+                <a href="/list/1"> <span class="page-numbers">首页</span> </a>
+                <a href="/list/{{.Previous}}"> <span class="page-numbers">上一页</span> </a>
+
+                {{ range $i, $b := .Before }}
+                <a href="/list/{{$b}}"> <span class="page-numbers">{{$b}}</span> </a>
+                {{end}}
+
+                <span class="page-numbers current">{{.Current}}</span>
+
+                {{ range $i, $b := .After }}
+                <a href="/list/{{$b}}"> <span class="page-numbers">{{$b}}</span> </a>
+                {{end}}
+
+                <a href="/list/{{.Next}}"> <span class="page-numbers">下一页</span> </a>
+
+                <a href="/list/{{.End}}"> <span class="page-numbers">末页</span> </a>
+
+            </div>
+
+        </div>
+
+    </div>
+    {{end}}
+
+
+    {{if eq .Type "show"}}
+    <div id="content" class="snippet-hidden">
+
+        <div itemscope="" itemtype="http://schema.org/Question">
+            <div id="question-header">
+                <div>
+                    <h1 itemprop="name"><a href="/article/{{.Article.UK}}" class="question-hyperlink">{{.Article.TitleCN}}</a></h1>
+
+                </div>
+
+                <div class="tags user-tags">
+                    {{ range $i, $t := .Article.TagsList}}
+                    <a href="/tag/{{$t}}" class="post-tag" rel="tag">{{$t}}</a>
+                    {{end}}
+                </div>
+
+            </div>
+            <div id="mainbar">
+
+
+                <div class="question"  id="question">
+
+                    <table>
+                        <tbody>
+                        <tr>
+                            <td class="votecell">
+                                <div class="vote">
+                                    <b> 问题</b>
+                                </div>
+
+                            </td>
+
+                            <td class="postcell">
+                                <div>
+                                    {{.Article.HQuestionCN}}
+                                    <div>
+                            </td>
+
+                        </tr>
+                        </tbody></table>
+                </div>
+                <br class="cbt">
+                <hr>
+                <div id="answers">
+
+                    <div class="answer accepted-answer" data-answerid="32908448" itemscope="" itemtype="http://schema.org/Answer" itemprop="acceptedAnswer">
+                        <table>
+                            <tbody><tr>
+                                <td class="votecell">
+                                    <div class="vote">
+                                        <b>解决方法</b>
+                                    </div>
+
+                                </td>
+                                <td class="answercell">
+                                    {{.Article.HAnswerCN}}
+                                </td>
+                            </tr>
+
+                            </tbody></table>
+                    </div>
+
+
+
+                </div>
+                <br class="cbt">
+                <br class="cbt">
+
+                <hr>
+                <div>
+                <h2>相关问题推荐</h2>
+                {{ range $i, $a := .RandomArticle}}
+                <div class="summary">
+                    <h3><a href="/article/{{$a.UK}}" class="question-hyperlink" title="$a.QuestionCNRaw">{{$a.TitleCN}}</a></h3>
+                </div>
+                {{end}}
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    {{end}}
+
+    {{if eq .Type "search"}}
+    <div class="container">
+
+
+        <div id="content" class="snippet-hidden">
+
+            <div id="mainbar">
+                <div class="subheader results-header">
+                    <h2>
+                        "<b>{{.Keyword}}</b>" 共找到 {{.TotalFound}} <span class="results-label">搜索结果</span>
+                    </h2>
+
+                </div>
+
+
+                <div class="search-results js-search-results">
+
+                    {{if eq .TotalFound 0}}
+                    <h1>抱歉，没有找到相关的问题……</h1>
+                    <iframe scrolling='no' frameborder='0' src='http://yibo.iyiyun.com/Home/Distribute/ad404/key/1249334' width='654' height='470' style='display:block;'></iframe>
+
+                    <h2>您可以关注一下如下内容</h2>
+                    {{ range $i, $a := .RandomArticle}}
+                        <div class="summary">
+                            <h3><a href="/article/{{$a.UK}}" class="question-hyperlink" title="$a.QuestionCNRaw">{{$a.TitleCN}}</a></h3>
+                        </div>
+                    {{end}}
+
+                    {{end}}
+
+
+                    {{ range $i, $a := .SearchArticle}}
+
+                    <div class="question-summary search-result"  data-position="48">
+                        <div class="statscontainer">
+                            <div class="statsarrow"></div>
+                            <div class="stats">
+                                <div class="vote">
+                                    <div class="votes ">
+                                        <span class="vote-count-post "><strong>{{$a.ViewCount}}</strong></span>
+                                        <div class="viewcount">访问</div>
+                                    </div>
+                                </div>
+                                <div class="status answered-accepted">
+                                    <strong>{{$a.VoteCount}}</strong>采纳
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="summary">
+                            <div class="result-link">
+                               <span>
+                                <a href="/article/{{$a.UK}}">{{$a.HTitleHighlight}}</a>
+                             </span>
+                            </div>
+                            <div class="excerpt">
+                               {{$a.HQuestionHighlight}}
+                            </div>
+                            <div class="tags user-tags">
+                                {{ range $i, $t := $a.TagsList}}
+                                <a href="/tag/{{$t}}" class="post-tag" rel="tag">{{$t}}</a>
+                                {{end}}
+                            </div>
+                            <div class="started fr">
+                                更新时间 <span class="relativetime">{{$a.UpdateTime}}</span>         </div>
+                            </div>
+                    </div>
+                    {{end}}
+
+
+                </div>
+                <br class="cbt">
+                <div class="pager fl">
+
+                    <a href="/search?page=1&q={{.Keyword}}"> <span class="page-numbers">首页</span> </a>
+                    <a href="/search?page={{.Previous}}&q={{.Keyword}}"> <span class="page-numbers">上一页</span> </a>
+
+                    {{ range $i, $b := .Before }}
+                    <a href="/search?page={{$b}}&q={{$.Keyword}}"> <span class="page-numbers">{{$b}}</span> </a>
+                    {{end}}
+
+                    <span class="page-numbers current">{{.Current}}</span>
+
+                    {{ range $i, $b := .After }}
+                    <a href="/search?page={{$b}}&q={{$.Keyword}}"> <span class="page-numbers">{{$b}}</span> </a>
+                    {{end}}
+
+                    <a href="/search?page={{.Next}}&q={{.Keyword}}"> <span class="page-numbers">下一页</span> </a>
+
+                    <a href="/search?page={{.End}}&q={{.Keyword}}"> <span class="page-numbers">末页</span> </a>
+
+                </div>
+            </div>
+
+        </div>
+
+
+
+    </div>
+    {{end}}
+
+
+    {{if eq .Type  "lost"}}
+    <div id="content" class="snippet-hidden">
+
+        <div id="mainbar">
+
+
+            <div id="qlist-wrapper">
+                <div id="question-mini-list">
+
+
+                    <h1>抱歉，没有找到相关的内容……</h1>
+                    <iframe scrolling='no' frameborder='0' src='http://yibo.iyiyun.com/Home/Distribute/ad404/key/1249334' width='654' height='470' style='display:block;'></iframe>
+                    <h2>您可以关注一下如下内容</h2>
+
+                    {{ range $i, $a := .RandomArticle}}
+                    <div class="summary">
+                        <h3><a href="/article/{{$a.UK}}" class="question-hyperlink" title="$a.QuestionCNRaw">{{$a.TitleCN}}</a></h3>
+                    </div>
+                    {{end}}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    {{end}}
+
+
+<div id="footer" class="categories">
+    <div class="footerwrap">
+        <div id="footer-menu">
+            <div class="top-footer-links">
+                <a href="http://bilisou.com">哔哩搜</a>
+                <a href="http://linuxman.com">Linuxman</a>
+                <a href="http://piansousou.com">片搜搜</a>
+
+            </div>
+        </div>
+        <div id="copyright">
+            本站提供技术问题解决文档，知识文档搜索服务。 遇到IT问题上it问题网，海量问题解决方法，高效技术文档搜索引擎
+        </div>
+        <div id="svnrev">
+            0.1
+        </div>
+    </div>
+</div>
+
+</div>
+
+</body>
+
+</html>
