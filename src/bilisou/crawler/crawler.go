@@ -10,15 +10,11 @@ import (
 	"encoding/json"
 	"time"
 	"database/sql"
-	"github.com/garyburd/redigo/redis"
 	"github.com/Unknwon/goconfig"
 	"strconv"
 	"bytes"
-	"os"
-	"bufio"
-	"io"
 	"strings"
-	u "utils"
+	u "bilisou/utils"
 	//"model"
 )
 
@@ -30,7 +26,6 @@ var ConfError error
 var cfg *goconfig.ConfigFile
 var Logger *logging.Logger
 
-//Mysql Redis初始化
 func init() {
 
 	logSvc := logging.NewLogServcie()
@@ -87,93 +82,14 @@ func init() {
 	}
 	db.SetMaxOpenConns(50)
 	db.SetMaxIdleConns(30)
-	initRedisPool()
-	initWriteHasIndexKey();
 }
 
 var hasIndexKeys []string
-//Redis
-var redisPool *redis.Pool
-
-func initRedisPool() {
-	defer func() {
-		if err := recover(); err != nil {
-			Logger.Error("run time panic: %s", err.Error())
-			hasIndexKeys = make([]string, 0)
-			file, err := os.OpenFile("hasIndexKeys.txt", os.O_CREATE | os.O_RDONLY, 0666)
-			defer file.Close()
-			if err == nil {
-				reader := bufio.NewReader(file)
-				for {
-					buf, _, err := reader.ReadLine()
-					if err != io.EOF {
-						setKeyVal(string(buf), "")
-					} else {
-						break
-					}
-				}
-				preIndexKeySize = len(hasIndexKeys)
-			}
-
-		}
-	}()
-	redisPool = &redis.Pool{
-		MaxIdle:100,
-		IdleTimeout: time.Second * 300,
-		Dial: func() (redis.Conn, error) {
-			var conn redis.Conn
-			var cErr error
-			if len(redis_Pwd) == 0 {
-				conn, cErr = redis.Dial("tcp", address)
-				if cErr != nil {
-					Logger.Error("Redis初始化失败,请检查配置是否填写正确,key存储切换到文件模式")
-					return nil, cErr
-				}
-			} else {
-				conn, cErr = redis.Dial("tcp", address, redis.DialPassword(redis_Pwd), redis.DialDatabase(redis_Database))
-				if cErr != nil {
-					Logger.Error("Redis初始化失败,请检查配置是否填写正确,key存储切换到文件模式")
-					return nil, cErr
-				}
-			}
-
-			return conn, nil
-		},
-	}
-	DoRedis()
-}
 
 const intervalTime = time.Second * 5
 
 var hasIndexKeySize int
 var preIndexKeySize int
-
-func initWriteHasIndexKey() {
-	if hasIndexKeys != nil {
-		go func() {
-			ch := time.NewTicker(intervalTime).C
-			for {
-				<-ch;
-				hasIndexKeySize = len(hasIndexKeys)
-				tempKeys := hasIndexKeys[preIndexKeySize:hasIndexKeySize]
-				preIndexKeySize = hasIndexKeySize
-				if len(tempKeys) != 0 {
-					file, err := os.OpenFile("hasIndexKeys.txt", os.O_WRONLY | os.O_CREATE | os.O_APPEND, 0666)
-					if err != nil {
-						Logger.Error(err.Error())
-					}
-					defer file.Close()
-					outputWriter := bufio.NewWriter(file)
-					for _, v := range tempKeys {
-						outputWriter.WriteString(v + "\n")
-					}
-					outputWriter.Flush()
-				}
-
-			}
-		}()
-	}
-}
 
 type sharedata struct {
 	Id      int64
@@ -182,21 +98,15 @@ type sharedata struct {
 	Shareid string
 }
 
-func main() {
+func Start() {
 	var id int64
 	var flag int
 	var uk int64
 
-	//set init header
 	headers = headers3
 	currentheaders = 3
 
-	//GetFollow(2736848922, 0)
-	//可以先存几个热门的用户到数据库表avaiuk中 也可以直接GetFollow(2736848922, 0)爬取
 	mode, ConfError = cfg.GetValue("Mode", "mode")
-
-	//m.UpdateCategory(db)
-	//m.UpdateUKUname(db)
 
 	if ConfError != nil {
 		panic("读取mode错误")
@@ -244,16 +154,6 @@ func checkKeyExist(key interface{}) bool {
 		flag = false
 	}
 	return flag
-/*
-	if hasIndexKeys != nil {
-		if ok := sliceKeyExist(hasIndexKeys, fmt.Sprintf("%v", key)); ok {
-			return true
-		} else {
-			return false
-		}
-	} else {
-		return RedisKeyExists(key)
-	}*/
 }
 func sliceKeyExist(s []string, key string) bool {
 	for _, v := range s {
@@ -264,14 +164,7 @@ func sliceKeyExist(s []string, key string) bool {
 	return false
 }
 
-func setKeyVal(key, val interface{}) {
-	if hasIndexKeys != nil {
-		hasIndexKeys = append(hasIndexKeys, fmt.Sprintf("%v", key))
-	} else {
-		RedisSetKV(key, val)
-	}
-}
-
+/*
 func record(rows *sql.Rows) map[string]interface{} {
 	columns, _ := rows.Columns()
 	scanArgs := make([]interface{}, len(columns))
@@ -280,7 +173,6 @@ func record(rows *sql.Rows) map[string]interface{} {
 		scanArgs[i] = &values[i]
 	}
 	for rows.Next() {
-		//将行数据保存到record字典
 		err = rows.Scan(scanArgs...)
 		record := make(map[string]interface{})
 		for i, col := range values {
@@ -293,46 +185,10 @@ func record(rows *sql.Rows) map[string]interface{} {
 	}
 	return nil
 }
+*/
 
-func DoRedis() interface{} {
-	rdsConn := redisPool.Get()
-	result, error := rdsConn.Do("ping")
-	if error != nil {
-		Logger.Error(error.Error())
-		return err.Error()
-	}
-	return result
-}
-func RedisSetKV(key interface{}, value interface{}) {
-	conn := redisPool.Get()
-	defer conn.Close()
-	_, error := conn.Do("set", key, value)
-	if error != nil {
-		Logger.Error(error.Error())
-	}
-}
-//redis中键是否存在
-func RedisKeyExists(key interface{}) bool {
-	conn := redisPool.Get()
-	defer conn.Close()
-	result, error := conn.Do("exists", key)
-
-	return false
-
-	if error != nil {
-		Logger.Error(error.Error())
-		return true
-	}
-	if result == int64(1) {
-		return true
-	}
-	return false
-}
-
-
-//获取订阅用户
 func GetFollow(uk int64, start int, index bool) {
-	Logger.Info("Into uk: %s start: %d", uk, start)
+	Logger.Info("Into uk: %d start: %d", uk, start)
 
 	flag := checkKeyExist(uk)
 
@@ -340,14 +196,12 @@ func GetFollow(uk int64, start int, index bool) {
 	stmt.Exec(uk)
 
 	if (!flag) {
-		setKeyVal(uk, "")
 		if (index) {
 			IndexResource(uk)
 		}
 		RecursionFollow(uk, start, true)
 	} else {
 		if start > 0 {
-//			RecursionFollow(uk, start, false)
 		} else {
 			Logger.Warn("Has index UK: %s", uk)
 		}
@@ -422,28 +276,6 @@ var headers3 = map[string]string{
 }
 
 
-func NextHeaders() {
-	if currentheaders == 1 {
-		headers = headers2
-		currentheaders = 2
-		log.Info("change header to ", currentheaders)
-		return
-	}
-	if currentheaders == 2 {
-		headers = headers3
-		currentheaders = 3
-		log.Info("change header to ", currentheaders)
-		return
-	}
-	if currentheaders == 3 {
-		headers = headers1
-		currentheaders = 1
-		log.Info("change header to ", currentheaders)
-		return
-	}
-}
-
-
 func HttpGet(url string, headers map[string]string) (result string, err error) {
 
 	client := &http.Client{}
@@ -464,7 +296,7 @@ func HttpGet(url string, headers map[string]string) (result string, err error) {
 	body, err = ioutil.ReadAll(resp.Body)
 
 	if err != nil {
-		log.Fatal("数据读取异常")
+		Logger.Error("数据读取异常")
 		return "", err
 	}
 	defer resp.Body.Close()
@@ -514,17 +346,16 @@ func IndexResource(uk int64) {
 		real_url := fmt.Sprintf(url, uk, 0)
 
 		result, _ := HttpGet(real_url, nil)
-		//result, _ := HttpGet(real_url, headers)
 
 		yd, err := GetData(result)
 		u.CheckErr(err)
 		if yd == nil {
-			log.Warn("No Data for URL ", real_url)
-			//NextHeaders()
+			Logger.Warn("No Data for URL ", real_url)
+
 			temp := nullstart
 			nullstart = time.Now().Unix()
 			if nullstart - temp < 2 {
-				log.Warn("被百度限制了 休眠50s")
+				Logger.Warn("被百度限制了 休眠50s")
 				time.Sleep(50 * time.Second)
 			}
 		} else {
@@ -535,7 +366,7 @@ func IndexResource(uk int64) {
 			if share_count > 0 || album_count > 0 {
 				res, err := db.Exec("INSERT into uinfo(uk,uname,avatar_url, pubshare_count, fans_count, follow_count) values(?,?,?,?,?,?)", uk, yd.Uinfo.Uname, yd.Uinfo.Avatar_url, yd.Uinfo.Pubshare_count, yd.Uinfo.Fans_count, yd.Uinfo.Follow_count)
 				if err != nil {
-					log.Warn("Failed to insert user ", uk, err)
+					Logger.Warn("Failed to insert user %d, %s", uk, err.Error())
 					return
 				}
 
@@ -543,7 +374,7 @@ func IndexResource(uk int64) {
 
 				uinfoId = id
 				checkErr(err)
-				log.Info("insert uinfo，uk:", uk, ",uinfoId:", uinfoId)
+				Logger.Info("insert uinfo，uk: %d, uinfo id %s", uk, uinfoId)
 				ok := InsertShare(yd, uk, yd.Uinfo.Uname)
 				if !ok {
 					return
@@ -567,13 +398,13 @@ func IndexResource(uk int64) {
 					}
 				} else {
 					i--
-					log.Warn("No Data for URL ", real_url)
+					Logger.Warn("No Data for URL %s", real_url)
 					//NextHeaders()
 					temp := nullstart
 					nullstart = time.Now().Unix()
 					//2次异常小于2s 被百度限制了 休眠50s
 					if nullstart - temp < 2 {
-						log.Warn("被百度限制了 休眠50s")
+						Logger.Warn("被百度限制了 休眠50s")
 						time.Sleep(50 * time.Second)
 					}
 				}
@@ -606,35 +437,35 @@ func InsertShare(yd *yundata, uk int64, uname interface{}) bool{
 			_, err := db.Exec("insert into sharedata(title,share_id,uinfo_id,category, data_id, filenames, feed_time, file_count, size, last_scan, uk, uname) values(?,?,?,?,?,?,?,?,?,?,?,?)", v.Title, v.Shareid, uinfoId, v.Category, v.Data_id, filenames, v.Feed_time, len(v.Filelist), size, ls, uk, uname)
 			u.CheckErr(err)
 			if err != nil {
-				log.Warn("Failed to insert data", v.Data_id, err)
+				Logger.Warn("Failed to insert data %s, %s", v.Data_id, err.Error())
 				return false
 			}
-			log.Info("insert share ", v.Data_id)
+			Logger.Info("insert share %s", v.Data_id)
 		} else if strings.Compare(v.Feed_type, "album") == 0 {
 			_, err := db.Exec("insert into sharedata(title,album_id,uinfo_id,category, data_id, filenames, feed_time, file_count, size, last_scan) values(?,?,?,?,?,?,?,?,?,?)", v.Title, v.Album_id, uinfoId, v.Category, v.Data_id, filenames, v.Feed_time, len(v.Filelist), size, ls)
 			u.CheckErr(err)
 			if err != nil {
-				log.Warn("Failed to insert data", v.Data_id, err)
+				Logger.Warn("Failed to insert data, %s, %s", v.Data_id, err.Error())
 				return false
 			}
-			log.Info("insert album", v.Data_id)
+			Logger.Info("insert album %s", v.Data_id)
 		}
 	}
 	return true
 }
 
 func GetData(res string)(*yundata, error) {
-	//log.Error(res)
+	//Logger.Error(res)
 	r, _ := regexp.Compile("window.yunData = (.*})")
 	match := r.FindStringSubmatch(res)
 	if len(match) < 1 {
-		log.Warn("No match ")
+		Logger.Warn("No match")
 		return nil, nil
 	}
 	var yd yundata
 	err := json.Unmarshal([]byte(match[1]), &yd)
 	if err != nil {
-		log.Error(err)
+		Logger.Error(err.Error())
 		return nil, err
 	}
 	return &yd, nil
@@ -642,7 +473,7 @@ func GetData(res string)(*yundata, error) {
 
 func checkErr(err error) {
 	if err != nil {
-		log.Error(err)
+		Logger.Error(err.Error())
 		panic(err.Error())
 	}
 }

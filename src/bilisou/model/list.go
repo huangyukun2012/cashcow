@@ -24,7 +24,7 @@ func GenerateListPageVar(esclient *es.Client, category int,  page int) *PageVar 
 	pv.Type = "list"
 
 	boolQuery := es.NewBoolQuery()
-	query := es.NewTermQuery("search", 1)
+	query := es.NewMatchAllQuery()
 	boolQuery.Should(query)
 	if category != 0 {
 		boolQuery.Must(es.NewTermQuery("category", category))

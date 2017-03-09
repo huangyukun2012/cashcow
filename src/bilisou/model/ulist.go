@@ -16,8 +16,7 @@ func GenerateUlistPageVar(esclient *es.Client, page int) *PageVar {
 	pv := PageVar{}
 	pv.Type = "ulist"
 
-
-	query := es.NewTermQuery("search", 1)
+	query := es.NewMatchAllQuery()
 
 	start := u.PAGEMAX * (page - 1)
 	if start <= 0 {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"flag"
 	"runtime"
-	"time"
+//	"time"
 	"github.com/juju/errors"
 	"github.com/siddontang/go-mysql-elasticsearch/river"
 )
@@ -68,5 +68,6 @@ func main() {
 	}
 	fmt.Println("running")
 	r.Run()
-	time.Sleep(1*time.Hour)
+	select{}
+	//time.Sleep(1*time.Hour)
 }

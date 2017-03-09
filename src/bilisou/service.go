@@ -23,6 +23,7 @@ import (
 	"logging"
 	m "bilisou/model"
 	u "bilisou/utils"
+	c "bilisou/crawler"
 	es "gopkg.in/olivere/elastic.v3"
 	"io/ioutil"
 )
@@ -375,4 +376,5 @@ func Start(mx *mux.Router) {
 	//not found
 	mx.NotFoundHandler = http.HandlerFunc(NotFound)
 
+	c.Start()
 }
