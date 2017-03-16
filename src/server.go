@@ -25,8 +25,8 @@ func main() {
 	ds.Start(dmx)
 	//start bilisou
 	bs.Start(bmx)
-	fmt.Println("start listening at *:8080")
-	http.ListenAndServe("0.0.0.0:8080", mx)
+	fmt.Println("start listening at *:80")
+	http.ListenAndServe("0.0.0.0:80", mx)
 	select{}
 
 }
