@@ -27,7 +27,7 @@ CREATE TABLE `avaiuk` (
   `uk` bigint(20) DEFAULT NULL,
   `flag` int(1) DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -43,7 +43,7 @@ CREATE TABLE `keyword` (
   `count` int(11) DEFAULT '1',
   `search` int(11) DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=95 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -55,6 +55,8 @@ DROP TABLE IF EXISTS `sharedata`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `sharedata` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `uk` bigint(100) DEFAULT NULL,
+  `data_id` varchar(100) DEFAULT NULL,
   `title` varchar(255) DEFAULT '',
   `share_id` varchar(100) DEFAULT '',
   `uinfo_id` bigint(20) DEFAULT '0',
@@ -66,15 +68,41 @@ CREATE TABLE `sharedata` (
   `like_count` int(11) DEFAULT '0',
   `file_count` int(11) DEFAULT '0',
   `filenames` varchar(1000) DEFAULT '',
-  `data_id` varchar(100) DEFAULT '',
   `feed_time` bigint(11) DEFAULT '0',
   `uname` varchar(100) DEFAULT '',
-  `uk` varchar(100) DEFAULT '',
   `search` int(11) DEFAULT '1',
   PRIMARY KEY (`id`),
-  KEY `uinfoid` (`uinfo_id`),
-  CONSTRAINT `uinfoid` FOREIGN KEY (`uinfo_id`) REFERENCES `uinfo` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=13101 DEFAULT CHARSET=utf8;
+  KEY `data_id` (`data_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1810 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `sharedata1`
+--
+
+DROP TABLE IF EXISTS `sharedata1`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sharedata1` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `uk` bigint(100) DEFAULT NULL,
+  `data_id` varchar(100) DEFAULT NULL,
+  `title` varchar(255) DEFAULT '',
+  `share_id` varchar(100) DEFAULT '',
+  `uinfo_id` bigint(20) DEFAULT '0',
+  `category` int(50) DEFAULT '1',
+  `album_id` int(50) DEFAULT '1',
+  `last_scan` bigint(11) DEFAULT '0',
+  `size` int(100) DEFAULT '0',
+  `view_count` int(11) DEFAULT '0',
+  `like_count` int(11) DEFAULT '0',
+  `file_count` int(11) DEFAULT '0',
+  `filenames` varchar(1000) DEFAULT '',
+  `feed_time` bigint(11) DEFAULT '0',
+  `uname` varchar(100) DEFAULT '',
+  `search` int(11) DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13282 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -85,8 +113,8 @@ DROP TABLE IF EXISTS `uinfo`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `uinfo` (
-  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-  `uk` varchar(100) DEFAULT '0',
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `uk` bigint(100) DEFAULT '0',
   `uname` varchar(255) DEFAULT '',
   `avatar_url` varchar(255) DEFAULT '',
   `fans_count` int(11) DEFAULT '0',
@@ -95,8 +123,9 @@ CREATE TABLE `uinfo` (
   `pubshare_count` int(11) DEFAULT '0',
   `search` int(11) DEFAULT '1',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_2` (`uk`),
   KEY `uk` (`uk`)
-) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=50 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -108,4 +137,4 @@ CREATE TABLE `uinfo` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-02-13  2:02:30
+-- Dump completed on 2017-03-17  7:12:52

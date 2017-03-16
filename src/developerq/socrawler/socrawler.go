@@ -1,4 +1,4 @@
-package crawler
+package socrawler
 import (
 	"golang.org/x/net/html"
 	"github.com/Unknwon/goconfig"
@@ -39,7 +39,7 @@ var cfg *goconfig.ConfigFile
 func Init() {
 
 	logSvc := logging.NewLogServcie()
-	logSvc.ConfigDefaultLogger("/tmp/developerq", "crawler", logging.INFO, logging.ROTATE_DAILY)
+	logSvc.ConfigDefaultLogger("/tmp/developerq", "socrawler", logging.INFO, logging.ROTATE_DAILY)
 	logSvc.Serve()
 	//defer logSvc.Stop()
 	Logger = logSvc.GetLogger("default")

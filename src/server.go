@@ -16,8 +16,10 @@ func main() {
 	//go indexer.Start()
 
 	mx := mux.NewRouter()
-	dmx := mx.Host("localhost").Subrouter()
-	bmx := mx.Host("localhostb").Subrouter()
+	//dmx := mx.Host("localhost").Subrouter()
+	//bmx := mx.Host("localhostb").Subrouter()
+	dmx := mx.Host("develoerq.linuxman.cn").Subrouter()
+	bmx := mx.Host("bilisou.linuxman.cn").Subrouter()
 
 	//start developerq
 	ds.Start(dmx)
@@ -25,5 +27,6 @@ func main() {
 	bs.Start(bmx)
 	fmt.Println("start listening at *:8080")
 	http.ListenAndServe("0.0.0.0:8080", mx)
+	select{}
 
 }

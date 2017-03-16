@@ -1,7 +1,6 @@
 package developerq
 
 import (
-
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -22,7 +21,7 @@ import (
 //	"strings"
 	m "developerq/model"
 	u "developerq/utils"
-	c "developerq/crawler"
+	s "developerq/socrawler"
 
 	es "gopkg.in/olivere/elastic.v3"
 	"io/ioutil"
@@ -169,6 +168,7 @@ func InitTemplates() {
 	listArticleTemplate = template.Must(template.New("tmp").Parse(string(header) + string(list) + string(foot)))
 	searchArticleTemplate = template.Must(template.New("tmp").Parse(string(header) + string(search) + string(foot)))
 	showArticleTemplate = template.Must(template.New("tmp").Parse(string(header) + string(show) + string(foot)))
+	//fmt.Println(string(header) + string(show) + string(foot))
 	tagArticleTemplate = template.Must(template.New("tmp").Parse(string(header) + string(tag) + string(foot)))
 	listTagTemplate = template.Must(template.New("tmp").Parse(string(header) + string(listtag) + string(foot)))
 	notFoundTemplate = template.Must(template.New("tmp").Parse(string(header) + string(notfound) + string(foot)))
@@ -402,5 +402,5 @@ func Start(mx *mux.Router) {
 	//not found
 	mx.NotFoundHandler = http.HandlerFunc(NotFound)
 
-	go c.Start()
+	go s.Start()
 }

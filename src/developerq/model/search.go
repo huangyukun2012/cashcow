@@ -4,7 +4,6 @@ import (
 //	"fmt"
 	es "gopkg.in/olivere/elastic.v3"
 //	"encoding/json"
-	"github.com/siddontang/go/log"
 	u "developerq/utils"
 )
 
@@ -46,8 +45,6 @@ func GenerateSearchArticlePageVar(esclient *es.Client, keyword string, page int)
 	if pv.End > 300 {
 		pv.End = 300
 	}
-
-	log.Info("log current = ", pv.Current)
 
 	SetBA(&pv)
 	pv.RandomArticle = GenerateRandomArticle(esclient, 10, "")
