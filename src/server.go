@@ -25,7 +25,7 @@ func main() {
 	dmx = mx.Host("www.developerq.com").Subrouter()
 	ds.Start(dmx)
 
-	dmx := mx.Host("wenti.info").Subrouter()
+	dmx = mx.Host("wenti.info").Subrouter()
 	ds.Start(dmx)
 	dmx = mx.Host("www.wenti.info").Subrouter()
 	ds.Start(dmx)
