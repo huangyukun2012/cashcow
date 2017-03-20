@@ -18,7 +18,7 @@ func main() {
 	mx := mux.NewRouter()
 	//dmx := mx.Host("localhost").Subrouter()
 	//bmx := mx.Host("localhostb").Subrouter()
-	dmx := mx.Host("develoerq.linuxman.cn").Subrouter()
+	dmx := mx.Host("developerq.linuxman.cn").Subrouter()
 	bmx := mx.Host("bilisou.linuxman.cn").Subrouter()
 
 	//start developerq
@@ -26,7 +26,7 @@ func main() {
 	//start bilisou
 	bs.Start(bmx)
 	fmt.Println("start listening at *:80")
-	http.ListenAndServe("0.0.0.0:80", mx)
+	http.ListenAndServe("0.0.0.0:8080", mx)
 	select{}
 
 }
