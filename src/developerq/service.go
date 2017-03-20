@@ -361,7 +361,7 @@ func Robots(w http.ResponseWriter, r *http.Request) {
 }
 
 func Start(mx *mux.Router) {
-	Init()
+//	Init()
 
 
 	mx.HandleFunc("/", Index)

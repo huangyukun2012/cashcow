@@ -333,7 +333,7 @@ func Robots(w http.ResponseWriter, r *http.Request) {
 
 func Start(mx *mux.Router) {
 
-	Init()
+//	Init()
 
 	//u.SetURL("aaa", "aabb")
 	//Logger.Info(u.GetURL("aa"))
