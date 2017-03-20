@@ -117,6 +117,7 @@ func Init() {
 	u.InitJieba()
 
 	InitTemplates()
+	go s.Start()
 
 }
 
@@ -402,5 +403,4 @@ func Start(mx *mux.Router) {
 	//not found
 	mx.NotFoundHandler = http.HandlerFunc(NotFound)
 
-	go s.Start()
 }

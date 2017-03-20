@@ -127,6 +127,8 @@ func Init() {
 	} else {
 		Logger.Error("failed to open template")
 	}
+	go c.Start()
+
 
 }
 
@@ -376,5 +378,4 @@ func Start(mx *mux.Router) {
 	//not found
 	mx.NotFoundHandler = http.HandlerFunc(NotFound)
 
-	go c.Start()
 }
