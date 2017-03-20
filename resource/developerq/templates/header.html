@@ -1,10 +1,28 @@
-<html class="gr__webmasters_stackexchange_com"><head>
+<html class="gr__webmasters_stackexchange_com">
+<head>
 
-        <title>DeveloperQ - 开发者问题网 - 海量问题解决方案</title>
+
+    {{if eq .Type  "show"}}
+    <title>{{.Article.TitleCNRaw}} - DeveloperQ - 开发者问题网 - 海量问题解决方案</title>
+    {{else if eq .Type  "tag"}}
+    <title>标记有{{.Tag}}的问题 - DeveloperQ - 开发者问题网 - 海量问题解决方案</title>
+    {{else}}
+    <title>DeveloperQ - 开发者问题网 - 海量问题解决方案</title>
+    {{end}}
+
     <link rel="shortcut icon" href="/static/img/quicktime.ico">
 
     <link rel="apple-touch-icon image_src" href="/static/img/quicktime.ico">
     <link rel="stylesheet" type="text/css" href="/static/css/all.css">
+
+    {{if eq .Type  "show"}}
+    <meta name="Description" content="{{.Article.TitleCNRaw}} - DeveloperQ - 开发者问题网 - 海量问题解决方案">
+    <meta name="Keywords" content="{{ range $i, $k := .Article.SeoKeywords}}{{$k}}, {{end}}" />
+    {{else if eq .Type  "tag"}}
+    <meta name="Description" content="标记有{{.Tag}}的问题，遇到IT问题上it问题网，海量问题解决方法，高效技术文档搜索引擎">
+    <meta name="Keywords" content="{{.Tag}},IT问题,黑客,IT技术社区,编程社区,技术问答,技术文章,技术笔记,技术博客,技术活动,程序员,开发者,程序员,极客,编程,代码,开源" />
+    {{end}}
+
 
 <body class="questions-page new-topbar" data-gr-c-s-loaded="true">
 
