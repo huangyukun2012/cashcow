@@ -108,7 +108,7 @@ func SetQuestionDetail(n *html.Node, article *m.Article) {
 			}
 			article.Question = b.String()
 			//translate
-			article.QuestionCN = t.TranslateHTMLNode(n)
+			article.QuestionCN = t.TranslateHTMLNodeWithPrefix(n, "so")
 		}
 	}
 
@@ -174,7 +174,7 @@ func SetAnserDetail(n *html.Node, article *m.Article) {
 			}
 			article.Answer = b.String()
 			//translate
-			article.AnswerCN = t.TranslateHTMLNode(n)
+			article.AnswerCN = t.TranslateHTMLNodeWithPrefix(n, "so")
 			//Logger.Info("answerCN = ", article.AnswerCN)
 		}
 	}
@@ -219,7 +219,7 @@ func SetUnresolvedAnswerDetail(n *html.Node, article *m.Article) {
 			}
 			article.Answer = b.String()
 			//translate
-			article.AnswerCN = t.TranslateHTMLNode(n)
+			article.AnswerCN = t.TranslateHTMLNodeWithPrefix(n, "so")
 			//Logger.Info("answerCN = ", article.AnswerCN)
 		}
 	}
@@ -284,7 +284,7 @@ func FindQuestion(n *html.Node, article *m.Article) {
 			if c := n.FirstChild; c != nil && article.Title == "" {
 				article.Title = string(c.Data)
 				//fmt.Println("Title = ", question.Title)
-				article.TitleCN = t.TranslateText(article.Title)
+				article.TitleCN = t.TranslateTextWithPrefix(article.Title, "so")
 				//Logger.Info("TitleCN = ", article.TitleCN)
 			}
 		}
@@ -397,6 +397,7 @@ func CrawlSOQuestion(db *sql.DB, start int) {
 		stmt.Close()
 
 		article := m.Article{}
+		article.Source = "so"
 		fullurl := url
 		Logger.Info("Crawl question = %s", fullurl)
 

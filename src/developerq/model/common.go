@@ -55,6 +55,7 @@ type Article struct {
 	HTitleHighlight  t.HTML
 	HQuestionHighlight  t.HTML
 	SeoKeywords     []string
+	Type            string
 }
 
 var MaxArticle int
@@ -153,11 +154,12 @@ func (article *Article)FillAll() {
 }
 
 func (article *Article)Save(db *sql.DB) error {
-	if article.TitleCN == "" || article.AnswerCN == "" ||article.QuestionCN == "" || article.Title == "" ||article.Question == "" {
+	//if article.TitleCN == "" || article.AnswerCN == "" ||article.QuestionCN == "" || article.Title == "" ||article.Question == "" {
+	if article.TitleCN == "" {
 		return errors.New("Empty article " + article.URL)
 	} else {
 		ext_id := -1
-		rows, err := db.Query("select ext_id from article where ext_id = ?", article.ExtID)
+		rows, err := db.Query("select ext_id from article where ext_id = ? and source = ?", article.ExtID, article.Source)
 		if err == nil {
 			for rows.Next() {
 				rows.Scan(&ext_id)
@@ -170,7 +172,7 @@ func (article *Article)Save(db *sql.DB) error {
 			return err
 		} else {
 			Logger.Info("update article ext_id = %d", article.ExtID)
-			_, err := db.Exec("update article set uk= ?,update_time = ?, title = ?, question = ?, answer = ?, tags = ?, url = ?,  view_count = ?, like_count = ?, source = ?, flag = ?, title_cn = ?, question_cn = ?, answer_cn = ?, vote_count = ?, question_raw = ?, question_cn_raw = ?, answer_raw = ?, answer_cn_raw = ?, title_raw = ?, title_cn_raw = ?, scan_time = ? where ext_id = ?", article.UK, article.UpdateTime, article.Title, article.Question, article.Answer, article.Tags, article.URL, article.ViewCount, 1, article.Source, 0, article.TitleCN, article.QuestionCN, article.AnswerCN, article.VoteCount, article.QuestionRaw, article.QuestionCNRaw, article.AnswerRaw, article.AnswerCNRaw, article.TitleRaw, article.TitleCNRaw, article.ScanTime, article.ExtID)
+			_, err := db.Exec("update article set uk= ?,update_time = ?, title = ?, question = ?, answer = ?, tags = ?, url = ?,  view_count = ?, like_count = ?, flag = ?, title_cn = ?, question_cn = ?, answer_cn = ?, vote_count = ?, question_raw = ?, question_cn_raw = ?, answer_raw = ?, answer_cn_raw = ?, title_raw = ?, title_cn_raw = ?, scan_time = ? where ext_id = ? and source = ?", article.UK, article.UpdateTime, article.Title, article.Question, article.Answer, article.Tags, article.URL, article.ViewCount, 1,  0, article.TitleCN, article.QuestionCN, article.AnswerCN, article.VoteCount, article.QuestionRaw, article.QuestionCNRaw, article.AnswerRaw, article.AnswerCNRaw, article.TitleRaw, article.TitleCNRaw, article.ScanTime, article.ExtID, article.Source)
 			return err
 		}
 	}

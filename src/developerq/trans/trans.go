@@ -14,7 +14,7 @@ import (
 //	"net/http"
 )
 
-
+/*
 func TranslateText(input string) string {
 	cmd := exec.Command("rm", "input")
 	cmd.Run()
@@ -72,31 +72,35 @@ func TranslateHTMLNode(n *html.Node) string {
 	}
 	return output
 }
+*/
 
-
-func TranslateTextGH(input string) string {
-	cmd := exec.Command("rm", "ghinput")
+func TranslateTextWithPrefix(input string, prefix string) string {
+	cmd := exec.Command("rm", prefix + "_input")
 	cmd.Run()
 
 	binput := []byte(input)
-	err := ioutil.WriteFile("ghinput", binput, 0644)
+	err := ioutil.WriteFile(prefix + "_input", binput, 0644)
 	if err != nil {
 		return ""
 	}
-	cmd = exec.Command("rm", "ghoutput")
+
+	cmd = exec.Command("rm", prefix + "_output")
 	cmd.Run()
 
-	cmd = exec.Command("php", "resource/developerq/t.php")
+	cmd = exec.Command("php", "resource/developerq/t.php",  prefix)
+	//fmt.Printf("%+v\n", cmd)
 	cmd.Run()
-	b, err := ioutil.ReadFile("ghoutput")
+	//fmt.Printf("%+v\n", cmd)
+	b, err := ioutil.ReadFile(prefix + "_output")
 	output := string(b)
 	//unescape json
 	output, _ = strconv.Unquote(output)
+	//fmt.Println(output)
 	return output
 }
 
 
-func TranslateHTMLNodeGH(n *html.Node) string {
+func TranslateHTMLNodeWithPrefix(n *html.Node, prefix string) string {
 	output := ""
 	//for batch trans
 	pending := ""
@@ -116,7 +120,7 @@ func TranslateHTMLNodeGH(n *html.Node) string {
 			//when node is not <p> trans it, then add htmlraw
 			if pending != "" {
 				//d.Logger.Info("translation called")
-				o := TranslateTextGH(pending)
+				o := TranslateTextWithPrefix(pending, prefix)
 				if o == "" {
 					output = output + pending
 				} else {

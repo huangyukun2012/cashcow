@@ -162,8 +162,11 @@ function translate($sl, $tl, $q, $param = 't?client=webapp', $method = 'get')
     return $output;
 }
 
-$q = file_get_contents('./input', true);
-file_put_contents("output", "");
+$inputfile = "{$argv[1]}_input";
+echo $inputfile;
+$q = file_get_contents($inputfile, true);
+echo $q;
+
 
 $sl = 'en';
 $tl = 'zh-CN';
@@ -195,6 +198,8 @@ if ( $type == 'json' ) {
     exit;
 }
 
-echo file_put_contents("output", $translate);
+echo $translate;
+
+echo file_put_contents("{$argv[1]}_output", $translate);
 
 ?>
