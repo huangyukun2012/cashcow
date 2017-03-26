@@ -56,7 +56,7 @@
             <br class="cbt">
 
             <div class="pager fl">
-
+                <a href="/tag/{{$.Tag}}/1"> <span class="page-numbers">首页</span> </a>
                 {{ range $i, $b := .Before }}
                 <a href="/tag/{{$.Tag}}/{{$b}}"> <span class="page-numbers">{{$b}}</span> </a>
                 {{end}}
@@ -66,7 +66,7 @@
                 {{ range $i, $b := .After }}
                 <a href="/tag/{{$.Tag}}/{{$b}}"> <span class="page-numbers">{{$b}}</span> </a>
                 {{end}}
-
+                <a href="/tag/{{$.Tag}}/{{$.End}}"> <span class="page-numbers">末页</span> </a>
             </div>
             
         </div>

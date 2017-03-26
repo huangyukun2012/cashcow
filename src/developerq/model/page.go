@@ -3,7 +3,7 @@ package model
 
 import (
 //	"fmt"
-	u "developerq/utils"
+//	u "developerq/utils"
 )
 
 
@@ -40,6 +40,8 @@ type PageVar struct {
 }
 
 func SetBA(pv *PageVar) {
+	left := 5
+	right := 5
 	if(pv.Current > 2) {
 		pv.Previous = pv.Current - 1;
 	}
@@ -47,6 +49,22 @@ func SetBA(pv *PageVar) {
 		pv.Next = pv.Current + 1
 	}
 
+	pl := pv.Current - left
+	pr := pv.Current + 1
+
+	for ; pl < pv.Current; pl ++ {
+		if pl > 0 {
+			pv.Before = append(pv.Before, pl)
+		} else {
+			right = right + 1
+		}
+	}
+
+	for ; pr < pv.Current + right && pr <pv.End; pr ++ {
+		pv.After = append(pv.After, pr)
+	}
+
+/*
 	pp := pv.Current - u.NAVMAX
 
 	if pp < 0 {
@@ -61,5 +79,6 @@ func SetBA(pv *PageVar) {
 	for ; ((pv.Current + u.NAVMAX) >= pp) && (pp <= pv.End); pp ++ {
 		pv.After = append(pv.After, pp)
 	}
+*/
 
 }

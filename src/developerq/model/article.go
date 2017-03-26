@@ -263,7 +263,7 @@ func ListArticlePage(db *sql.DB, esclient *es.Client, page int) *PageVar {
 
 	count := GetArticleCount(db)
 	pv.End = count / 20
-	where := fmt.Sprintf(" limit %d, 20 order by scan_time desc", (page - 1) * 20)
+	where := fmt.Sprintf(" order by scan_time desc limit %d, 20;", (page - 1) * 20)
 	pv.ListArticle = GetArticles(db, where)
 
 	if len(pv.ListArticle) == 0 {

@@ -52,7 +52,7 @@
             <br class="cbt">
 
             <div class="pager fl">
-
+                <a href="/listreadme/1"> <span class="page-numbers">首页</span> </a>
                 {{ range $i, $b := .Before }}
                 <a href="/listreadme/{{$b}}"> <span class="page-numbers">{{$b}}</span> </a>
                 {{end}}
@@ -62,7 +62,7 @@
                 {{ range $i, $b := .After }}
                 <a href="/listreadme/{{$b}}"> <span class="page-numbers">{{$b}}</span> </a>
                 {{end}}
-
+                <a href="/listreadme/{{$.End}}"> <span class="page-numbers">末页</span> </a>
             </div>
             
         </div>

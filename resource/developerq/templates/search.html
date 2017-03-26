@@ -77,7 +77,7 @@
             <br class="cbt">
             
             <div class="pager fl">
-
+                <a href="/search?page=1&q={{$.Keyword}}"> <span class="page-numbers">首页</span> </a>
                 {{ range $i, $b := .Before }}
                 <a href="/search?page={{$b}}&q={{$.Keyword}}"> <span class="page-numbers">{{$b}}</span> </a>
                 {{end}}
@@ -87,6 +87,7 @@
                 {{ range $i, $b := .After }}
                 <a href="/search?page={{$b}}&q={{$.Keyword}}"> <span class="page-numbers">{{$b}}</span> </a>
                 {{end}}
+                <a href="/search?page={{$.End}}&q={{$.Keyword}}"> <span class="page-numbers">末页</span> </a>
 
             </div>
 

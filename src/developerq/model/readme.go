@@ -144,7 +144,7 @@ func GetSideBarReadMe(db *sql.DB) []ReadMe {
 }
 
 func GetReadMes(db *sql.DB, where string) []ReadMe {
-	sql := "select uk, url, update_time, name, title, title_cn, language, fork, follow from readme order by update_time" + where;
+	sql := "select uk, url, update_time, name, title, title_cn, language, fork, follow from readme order by update_time desc" + where;
 	rows, err := db.Query(sql)
 	readmes := []ReadMe{}
 	if err != nil {
