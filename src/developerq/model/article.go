@@ -302,10 +302,12 @@ func ListArticlePage(db *sql.DB, esclient *es.Client, page int) *PageVar {
 	}
 
 	pv.End = int(size) / 20
+
 	pv.Current = page
 
 	SetBA(&pv)
 	pv.RandomArticle = GenerateRandomArticle(esclient, 10, "")
+	pv.SideBarReadMe = GetSideBarReadMe(db)
 	//	pv.RandomUsers = GenerateRandomUsers(esclient, 24)
 	//	pv.Keywords = GenerateRandomKeywords(esclient, 30)
 	return &pv
