@@ -18,7 +18,10 @@
 
     <link rel="apple-touch-icon image_src" href="/static/img/quicktime.ico">
     <link rel="stylesheet" type="text/css" href="/static/css/all.css">
+
+    {{if eq .Type  "readme"}}
     <link rel="stylesheet" type="text/css" href="/static/css/gh.css">
+    {{end}}
 
     {{if eq .Type  "show"}}
     <meta name="Description" content="{{.Article.TitleCNRaw}} - DeveloperQ - 开发者问题网 - 海量问题解决方案">
