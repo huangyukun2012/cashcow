@@ -38,7 +38,7 @@ schema = "linuxman"
 table = "article"
 index = "developerq_article"
 type = "0"
-filter = ["uk", "tags", "title_raw", "title_cn_raw", "question_raw", "question_cn_raw", "answer_raw", "answer_cn_raw"]
+#filter = ["uk", "tags", "title_raw", "title_cn_raw", "question_raw", "question_cn_raw", "answer_raw", "answer_cn_raw"]
 
 # Below is for special rule mapping
 [[rule]]
