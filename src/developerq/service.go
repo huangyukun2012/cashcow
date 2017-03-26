@@ -237,6 +237,12 @@ func Index(w http.ResponseWriter, r *http.Request) {
 }
 
 
+func Dummy(w http.ResponseWriter, r *http.Request) {
+	return
+}
+
+
+
 
 func ListArticle(w http.ResponseWriter, r *http.Request) {
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
@@ -483,6 +489,10 @@ func Start(mx *mux.Router) {
 	//readme
 	mx.HandleFunc("/readme/{uk}", ShowReadMe)
 	mx.HandleFunc("/readme/{uk}/", ShowReadMe)
+
+	//img
+	mx.HandleFunc("/img/{img}", Dummy)
+	mx.HandleFunc("/img/{img}/", Dummy)
 
 
 	//server static
