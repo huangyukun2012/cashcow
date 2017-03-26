@@ -58,13 +58,13 @@
             <div class="pager fl">
 
                 {{ range $i, $b := .Before }}
-                <a href="/tag/{{.Tag}}/{{$b}}"> <span class="page-numbers">{{$b}}</span> </a>
+                <a href="/tag/{{$.Tag}}/{{$b}}"> <span class="page-numbers">{{$b}}</span> </a>
                 {{end}}
 
                 <span class="page-numbers current">{{.Current}}</span>
 
                 {{ range $i, $b := .After }}
-                <a href="/tag/{{.Tag}}/{{$b}}"> <span class="page-numbers">{{$b}}</span> </a>
+                <a href="/tag/{{$.Tag}}/{{$b}}"> <span class="page-numbers">{{$b}}</span> </a>
                 {{end}}
 
             </div>
