@@ -54,9 +54,6 @@
 
             <div class="pager fl">
 
-                <a href="/list/1"> <span class="page-numbers">首页</span> </a>
-                <a href="/list/{{.Previous}}"> <span class="page-numbers">上一页</span> </a>
-
                 {{ range $i, $b := .Before }}
                 <a href="/list/{{$b}}"> <span class="page-numbers">{{$b}}</span> </a>
                 {{end}}
@@ -67,98 +64,6 @@
                 <a href="/list/{{$b}}"> <span class="page-numbers">{{$b}}</span> </a>
                 {{end}}
 
-                <a href="/list/{{.Next}}"> <span class="page-numbers">下一页</span> </a>
-
-                <a href="/list/{{.End}}"> <span class="page-numbers">末页</span> </a>
-
             </div>
             
         </div>
-        <div id="sidebar">
-            <div class="module" id="questions-count">
-                <div class="-details">
-                    <div class="summarycount al">26,427</div>
-                    <p>questions</p>
-                </div>
-
-
-            </div>
-
-            <div class="module community-bulletin" data-tracker="cb=1">
-                <div class="related">
-                    <div class="bulletin-title">
-                        Featured on Meta
-                    </div>
-                    <hr>
-                    <div class="spacer">
-                        <div class="bulletin-item-type">
-                            <a href="http://meta.stackexchange.com/questions/291741/we-will-no-longer-be-hosting-blog-overflow?cb=1" class="question-hyperlink">
-                                <div class="favicon favicon-stackexchangemeta" title="Meta Stack Exchange"></div>                </a>
-                        </div>
-                        <div class="bulletin-item-content">
-                            <a href="http://meta.stackexchange.com/questions/291741/we-will-no-longer-be-hosting-blog-overflow?cb=1" class="question-hyperlink">We will no longer be hosting Blog Overflow</a>
-                        </div>
-                        <br class="cbt">
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="module" id="interesting-tags">
-
-                <h4 id="h-interesting-tags">Favorite Tags</h4>
-                <a id="edit-interesting">edit</a>
-                <div id="interestingTags"></div>
-                <span id="add-interesting"></span>
-                <a id="addInterestingTag">Add a favorite tag</a><br>
-                <p id="tag-subscriptions" class="ar dno" style="margin-top: 10px;"><a href="http://stackexchange.com/filters">advanced tag subscriptions »</a></p>
-                <div id="ignored-wrapper" class="dno">
-                    <h4 id="h-ignored-tags">Ignored Tags</h4>
-
-                    <div id="ignoredTags">
-                    </div>
-                    <span id="add-ignored"></span>
-                    <a id="addIgnoredTag">Add an ignored tag</a>
-                    <div class="dno">
-
-                        <div><input type="radio" name="hideIgnored" id="hideIgnoredTrue"><label for="hideIgnoredTrue">&nbsp;Hide questions in your ignored tags</label></div>
-                        <div><input type="radio" name="hideIgnored" id="hideIgnoredFalse" checked="checked"><label for="hideIgnoredFalse">&nbsp;Gray out questions in your ignored tags</label></div>
-                    </div>
-                </div>
-                <p id="tag-pref-prefs" class="ar dno" style="margin-top: 10px;"><a href="/users/preferences/75723">set tag preferences »</a></p>
-            </div>
-
-
-            <div class="module js-gps-related-tags" id="related-tags">
-
-                <h4 id="h-related-tags">Related Tags</h4>
-                <div>
-                    <a href="/questions/tagged/seo" class="post-tag no-tag-menu js-gps-track" title="show questions tagged 'seo'" rel="tag">seo</a>&nbsp;<span class="item-multiplier"><span class="item-multiplier-x">×</span>&nbsp;<span class="item-multiplier-count">6680</span></span>
-                </div>
-
-
-            </div>
-
-            <div id="hot-network-questions" class="module tex2jax_ignore">
-                <h4>
-                    <a href="//stackexchange.com/questions?tab=hot" class="js-gps-track" data-gps-track="posts_hot_network.click({ item_type:1, location:9 })">
-                        最新博客
-                    </a>
-                </h4>
-                <ul>
-                    <li>
-                        <div class="favicon favicon-physics" title="Physics Stack Exchange"></div><a href="http://physics.stackexchange.com/questions/315765/is-weight-a-scalar-or-a-vector" class="js-gps-track" data-gps-track="site.switch({ item_type:9, target_site:151 }); posts_hot_network.click({ item_type:2, location:9 })">
-                        这是有一个最新博客
-                    </a>
-
-                    </li>
-
-                </ul>
-
-
-            </div>
-        </div>
-
-    </div>
-</div>
-

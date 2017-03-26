@@ -1,4 +1,4 @@
-package main
+package ghcrawler
 import (
 	"golang.org/x/net/html"
 	"github.com/Unknwon/goconfig"
@@ -116,7 +116,7 @@ func FindReadMe(n *html.Node, readme *m.ReadMe) {
 		}
 		readme.Content = b.String()
 		//translate
-		readme.ContentCN = t.TranslateHTMLNodeGH(n)
+		readme.ContentCN = t.TranslateHTMLNodeWithPrefix(n, "gh")
 
 	} else {
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
@@ -148,7 +148,7 @@ func CrawlGHReadMe(db *sql.DB, start int) {
 	for {
 		readme := m.ReadMe{}
 
-		rows, err := db.Query("select url, name, description, stars, fork, follow, langurage from githuburl where flag=0 and id > ? limit 1", start)
+		rows, err := db.Query("select url, name, description, stars, fork, follow, language from githuburl where flag=0 and id > ? limit 1", start)
 		if err != nil {
 			Logger.Error(err.Error())
 			return
@@ -168,7 +168,7 @@ func CrawlGHReadMe(db *sql.DB, start int) {
 		doc, err := GetHTMLNodeFromURL(readme.URL)
 		//trans
 		readme.Title = readme.Description
-		readme.TitleCN = t.TranslateTextGH(readme.Title)
+		readme.TitleCN = t.TranslateTextWithPrefix(readme.Title, "gh")
 		if err != nil {
 			Logger.Error("Failed with url %s, %s", readme.URL, err.Error())
 			//mark 3 when curl failed
@@ -185,8 +185,8 @@ func CrawlGHReadMe(db *sql.DB, start int) {
 		FindReadMe(doc, &readme)
 
 
-		//readme.FillAll()
-		fmt.Printf("%+v\n", readme)
+		readme.FillAll()
+		//fmt.Printf("%+v\n", readme)
 		err = readme.Save(db)
 
 		if err != nil {
@@ -214,7 +214,7 @@ func CrawlGHReadMe(db *sql.DB, start int) {
 func Start() {
 	Init()
 	//CrawlSEURL(db, arg2, int(arg3), int(arg4))
-	//CrawlSOQuestion(db, 1)
+	CrawlGHReadMe(db, 1)
 }
 
 
@@ -306,14 +306,14 @@ func CrawlGHURL(star int) {
 
 				//item.Url = "https://github.com/" + item.FullName
 				fmt.Printf("%+v\n", item)
-				_, err = db.Exec("insert into githuburl (url, name, description, stars, fork, follow, langurage) values (?, ?, ?, ?, ?, ?, ?)", item.Url, item.Name, item.Description, item.Stars, item.Fork, item.Follow, item.Language)
+				_, err = db.Exec("insert into githuburl (url, name, description, stars, fork, follow, language) values (?, ?, ?, ?, ?, ?, ?)", item.Url, item.Name, item.Description, item.Stars, item.Fork, item.Follow, item.Language)
 				fmt.Println("Insert URL == " + item.Url)
 				if err != nil {
 					fmt.Println(err.Error())
 				}
 			}
 			//sleep for paging
-			time.Sleep(15*time.Second)
+			time.Sleep(1*time.Second)
 		}
 
 		if first {

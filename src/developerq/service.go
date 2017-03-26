@@ -23,6 +23,7 @@ import (
 	u "developerq/utils"
 	s "developerq/socrawler"
 	r "developerq/rhcrawler"
+	g "developerq/ghcrawler"
 
 	es "gopkg.in/olivere/elastic.v3"
 	"io/ioutil"
@@ -44,6 +45,8 @@ var listArticleTemplate *template.Template
 var searchArticleTemplate *template.Template
 var tagArticleTemplate *template.Template
 var listTagTemplate *template.Template
+var listReadMeTemplate *template.Template
+var showReadMeTemplate *template.Template
 var showArticleTemplate *template.Template
 var notFoundTemplate *template.Template
 
@@ -120,6 +123,7 @@ func Init() {
 	InitTemplates()
 	go s.Start()
 	go r.Start()
+	go g.Start()
 
 }
 
@@ -161,6 +165,21 @@ func InitTemplates() {
 		Logger.Error(err.Error())
 	}
 
+	sidebar, err := ioutil.ReadFile("resource/developerq/templates/sidebar.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
+	listreadme, err := ioutil.ReadFile("resource/developerq/templates/listreadme.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
+	showreadme, err := ioutil.ReadFile("resource/developerq/templates/readme.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
 
 	notfound, err := ioutil.ReadFile("resource/developerq/templates/notfound.html")
 	if err != nil {
@@ -168,13 +187,16 @@ func InitTemplates() {
 	}
 
 
-	listArticleTemplate = template.Must(template.New("tmp").Parse(string(header) + string(list) + string(foot)))
-	searchArticleTemplate = template.Must(template.New("tmp").Parse(string(header) + string(search) + string(foot)))
-	showArticleTemplate = template.Must(template.New("tmp").Parse(string(header) + string(show) + string(foot)))
+	listArticleTemplate = template.Must(template.New("tmp").Parse(string(header) + string(list) + string(sidebar) + string(foot)))
+	searchArticleTemplate = template.Must(template.New("tmp").Parse(string(header) + string(search) + string(sidebar) + string(foot)))
+	showArticleTemplate = template.Must(template.New("tmp").Parse(string(header) + string(show) + string(sidebar) + string(foot)))
 	//fmt.Println(string(header) + string(show) + string(foot))
-	tagArticleTemplate = template.Must(template.New("tmp").Parse(string(header) + string(tag) + string(foot)))
-	listTagTemplate = template.Must(template.New("tmp").Parse(string(header) + string(listtag) + string(foot)))
-	notFoundTemplate = template.Must(template.New("tmp").Parse(string(header) + string(notfound) + string(foot)))
+	tagArticleTemplate = template.Must(template.New("tmp").Parse(string(header) + string(tag) + string(sidebar) + string(foot)))
+	listTagTemplate = template.Must(template.New("tmp").Parse(string(header) + string(listtag) + string(sidebar) + string(foot)))
+	listReadMeTemplate = template.Must(template.New("tmp").Parse(string(header) + string(listreadme) + string(sidebar) + string(foot)))
+	showReadMeTemplate = template.Must(template.New("tmp").Parse(string(header) + string(showreadme) + string(sidebar) + string(foot)))
+
+	notFoundTemplate = template.Must(template.New("tmp").Parse(string(header) + string(notfound) + string(sidebar) + string(foot)))
 }
 
 
@@ -208,7 +230,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	if err == nil && pv != nil {
 		render(w, listArticleTemplate, pv)
 	} else {
-		pv := m.GenerateListArticlePageVar(esclient, 1)
+		pv := m.ListArticlePage(db, esclient, 1)
 		SetURL("home", pv)
 		render(w, listArticleTemplate, pv)
 	}
@@ -237,7 +259,7 @@ func ListArticle(w http.ResponseWriter, r *http.Request) {
 		Logger.Error(err.Error())
 		pp = 1
 	}
-	pv = m.GenerateListArticlePageVar(esclient, pp)
+	pv = m.ListArticlePage(db, esclient, pp)
 
 	if pv != nil {
 		render(w, listArticleTemplate, pv)
@@ -247,9 +269,40 @@ func ListArticle(w http.ResponseWriter, r *http.Request) {
 }
 
 
+func ListReadMe(w http.ResponseWriter, r *http.Request) {
+	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
+
+	pv, err := GetURL(r.URL.Path)
+	if err == nil && pv != nil {
+		Logger.Info("load %s from cache", url)
+		render(w, listReadMeTemplate, pv)
+		return
+	}
+
+	vars := mux.Vars(r)
+	p := vars["page"]
+	if p == "" {
+		p = "1"
+	}
+
+	pp, err:=strconv.Atoi(p)
+	if err != nil {
+		Logger.Error(err.Error())
+		pp = 1
+	}
+	pv = m.ListReadMePage(db, esclient, pp)
+
+	if pv != nil {
+		render(w, listReadMeTemplate, pv)
+	}
+
+	SetURL(r.URL.Path, pv)
+}
+
+
 func NotFound(w http.ResponseWriter, r *http.Request) {
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
-	pv := m.GenerateListArticlePageVar(esclient, 1)
+	pv := m.ListArticlePage(db, esclient, 1)
 	pv.Type = "lost"
 	w.WriteHeader(http.StatusNotFound)
 	if pv != nil {
@@ -281,7 +334,7 @@ func TagArticle(w http.ResponseWriter, r *http.Request) {
 		Logger.Info(err.Error())
 		pp = 1
 	}
-	pv = m.GenerateListTagArticlePageVar(esclient, tag,  pp)
+	pv = m.ListTagArticlePage(db, esclient, tag,  pp)
 	if pv != nil {
 		render(w, tagArticleTemplate, pv)
 	}
@@ -294,6 +347,7 @@ func SearchArticle(w http.ResponseWriter, r *http.Request) {
 
 	keyword := r.URL.Query().Get("q")
 	page := r.URL.Query().Get("page")
+//	sort := r.URL.Query().Get("sort")
 
 	pv, err := GetURL(r.URL.Path + "###" + keyword + "###" + page)
 	if err == nil && pv != nil {
@@ -311,7 +365,7 @@ func SearchArticle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	m.KeywordHit(db,keyword)
-	pv = m.GenerateSearchArticlePageVar(esclient, keyword, pp)
+	pv = m.SearchArticlePage(db, esclient, keyword, pp)
 	if pv != nil {
 		render(w, searchArticleTemplate, pv)
 	}
@@ -338,7 +392,7 @@ func ShowArticle(w http.ResponseWriter, r *http.Request) {
 		uk = 0
 	}
 
-	pv = m.GenerateShowArticlePageVar(esclient, int64(uk))
+	pv = m.ShowArticlePage(db, esclient, int64(uk))
 	//update viewcount
 	m.ViewArticle(db, int64(uk))
 	if pv != nil {
@@ -346,6 +400,36 @@ func ShowArticle(w http.ResponseWriter, r *http.Request) {
 	}
 	SetURL(r.URL.Path, pv)
 }
+
+
+func ShowReadMe(w http.ResponseWriter, r *http.Request) {
+	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
+
+	pv, err := GetURL(r.URL.Path)
+	if err == nil && pv != nil {
+		Logger.Info("load %s from cache", url )
+		render(w, showReadMeTemplate, pv)
+		return
+	}
+
+	// break down the variables for easier assignment
+	vars := mux.Vars(r)
+	ukk := vars["uk"]
+	uk, err:=strconv.Atoi(ukk)
+	if err != nil {
+		Logger.Info(err.Error() )
+		uk = 0
+	}
+
+	pv = m.ShowReadMePage(db, esclient, int64(uk))
+	//update viewcount
+	//m.ViewArticle(db, int64(uk))
+	if pv != nil {
+		render(w, showReadMeTemplate, pv)
+	}
+	SetURL(r.URL.Path, pv)
+}
+
 
 func render(w http.ResponseWriter, t *template.Template, data interface{}) {
 	/*if err != nil {
@@ -375,6 +459,12 @@ func Start(mx *mux.Router) {
 	mx.HandleFunc("/list/{page}", ListArticle)
 	mx.HandleFunc("/list/{page}/", ListArticle)
 
+	//list readme
+	mx.HandleFunc("/listreadme", ListReadMe)
+	mx.HandleFunc("/listreadme/", ListReadMe)
+	mx.HandleFunc("/listreadme/{page}", ListReadMe)
+	mx.HandleFunc("/listreadme/{page}/", ListReadMe)
+
 
 	//tag
 	mx.HandleFunc("/tag/{tag}", TagArticle)
@@ -385,9 +475,15 @@ func Start(mx *mux.Router) {
 	//search
 	mx.HandleFunc("/search", SearchArticle)
 
-	//file
+	//article
 	mx.HandleFunc("/article/{uk}", ShowArticle)
 	mx.HandleFunc("/article/{uk}/", ShowArticle)
+
+
+	//readme
+	mx.HandleFunc("/readme/{uk}", ShowReadMe)
+	mx.HandleFunc("/readme/{uk}/", ShowReadMe)
+
 
 	//server static
 	mx.PathPrefix("/static").Handler(http.FileServer(http.Dir("resource/developerq/")))

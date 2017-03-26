@@ -6,6 +6,10 @@
     <title>{{.Article.TitleCNRaw}} - DeveloperQ - 开发者问题网 - 海量问题解决方案</title>
     {{else if eq .Type  "tag"}}
     <title>标记有{{.Tag}}的问题 - DeveloperQ - 开发者问题网 - 海量问题解决方案</title>
+    {{else if eq .Type  "listreadme"}}
+    <title>Github项目 - DeveloperQ - 开发者问题网 - 海量问题解决方案</title>
+    {{else if eq .Type  "readme"}}
+    <title>{{.ReadMe.Name}} - DeveloperQ - 开发者问题网 - 海量问题解决方案</title>
     {{else}}
     <title>DeveloperQ - 开发者问题网 - 海量问题解决方案</title>
     {{end}}
@@ -14,6 +18,7 @@
 
     <link rel="apple-touch-icon image_src" href="/static/img/quicktime.ico">
     <link rel="stylesheet" type="text/css" href="/static/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/gh.css">
 
     {{if eq .Type  "show"}}
     <meta name="Description" content="{{.Article.TitleCNRaw}} - DeveloperQ - 开发者问题网 - 海量问题解决方案">
@@ -21,6 +26,13 @@
     {{else if eq .Type  "tag"}}
     <meta name="Description" content="标记有{{.Tag}}的问题，遇到IT问题上开发者问题网，海量问题解决方法，高效技术文档搜索引擎">
     <meta name="Keywords" content="{{.Tag}},IT问题,黑客,IT技术社区,编程社区,技术问答,技术文章,技术笔记,技术博客,技术活动,程序员,开发者,程序员,极客,编程,代码,开源" />
+    {{else if eq .Type  "readme"}}
+    <meta name="Description" content="{{.ReadMe.Name}}, {{.ReadMe.TitleCN}}">
+    <meta name="Keywords" content="{{ range $i, $k := .ReadMe.SeoKeywords}}{{$k}}, {{end}}" />
+    {{else}}
+    <meta name="Description" content="DeveloperQ，遇到IT问题上开发者问题网，海量问题解决方法，高效技术文档搜索引擎">
+    <meta name="Keywords" content="IT问题,黑客,IT技术社区,编程社区,技术问答,技术文章,技术笔记,技术博客,技术活动,程序员,开发者,程序员,极客,编程,代码,开源" />
+    
     {{end}}
 
     <script>
@@ -118,7 +130,7 @@
                     </li>
 
                     <li>
-                        <a id="nav-users" href="/users" class="js-gps-track" data-gps-track="top_nav.click({is_current:false, location:3, destination:3})">
+                        <a id="nav-users" href="/listreadme" class="js-gps-track" data-gps-track="top_nav.click({is_current:false, location:3, destination:3})">
                             github项目
                         </a>
                     </li>

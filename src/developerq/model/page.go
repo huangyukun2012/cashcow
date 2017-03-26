@@ -3,7 +3,6 @@ package model
 
 import (
 //	"fmt"
-//	"github.com/siddontang/go/log"
 	u "developerq/utils"
 )
 
@@ -24,6 +23,11 @@ type PageVar struct {
 	//ListTagArticle     []Article
 	//for 404
 	RandomArticle     []Article
+
+	ReadMe            ReadMe
+	ListReadMe        []ReadMe
+
+	SideBarReadMe        []ReadMe
 
 	//for paging
 	Current       int

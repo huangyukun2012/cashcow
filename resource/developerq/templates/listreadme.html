@@ -3,40 +3,38 @@
 
         <div id="mainbar">
             <div class="subheader">
-                <h1 id="h-all-questions">共找到 <b>{{.TotalFound}}</b> 条标记有 "<b>{{.Tag}}"</b> 的问题.</h1>
+                <h1 id="h-all-questions">所有Github项目</h1>
 
                 <div id="tabs">
                     <a class="youarehere" href="/questions?sort=newest" data-nav-xhref="" title="The most recently asked questions" data-value="newest" data-shortcut="N">
                         最新</a>
                     <a href="/questions?sort=featured" data-nav-xhref="" title="Questions with open bounties" data-value="featured" data-shortcut="E">
                         <span class="bounty-indicator-tab">1</span>            最热</a>
-                    <a href="/questions?sort=frequent" data-nav-xhref="" title="Questions with the most links" data-value="frequent" data-shortcut="F">
-                        最常见</a>
-                    <a href="/questions?sort=votes" data-nav-xhref="" title="Questions with the most votes" data-value="votes" data-shortcut="V">
-                        尚未回答</a>
                 </div>
 
             </div>
 
             <div id="questions">
-                {{ range $i, $a := .ListArticle}}
+                {{ range $i, $a := .ListReadMe}}
                     <div class="question-summary narrow">
-                        <div onclick="window.location.href='/article/{{$a.UK}}'" class="cp">
+                        <div onclick="window.location.href='/readme/{{$a.UK}}'" class="cp">
                             <div class="views">
-                                <div class="mini-counts"><span title="8 views">{{$a.ViewCount}}</span></div>
-                                <div>访问</div>
+                                <div class="mini-counts"><span title="views">{{$a.ForkStr}}</span></div>
+                                <div>Fork</div>
                             </div>
                             <div class="votes">
-                                <div class="mini-counts"><span title="0 votes">{{$a.VoteCount}}</span></div>
-                                <div>采纳</div>
+                                <div class="mini-counts"><span title="votes">{{$a.FollowStr}}</span></div>
+                                <div>Follow</div>
                             </div>
                         </div>
 
                         <div class="summary">
-
-                            <h3><a href="/article/{{$a.UK}}" class="question-hyperlink" title="$a.QuestionCNRaw">{{$a.TitleCN}}</a></h3>
+                            <h3><a href="/readme/{{$a.UK}}" class="question-hyperlink" title="$a.QuestionCNRaw">{{$a.Name}}</a></h3>
+<div class="excerpt">
+                            {{$a.HTitleCN}}
+                        </div>          
                             <div class="tags t-jquery t-css t-jquery-ui">
-                              {{ range $i, $t := $a.TagsList}}
+                              {{ range $i, $t := $a.LangList}}
                                 <a href="/tag/{{$t}}" class="post-tag">{{$t}}</a>
                                 {{end}}
                             </div>
@@ -47,8 +45,6 @@
                     </div>
                     {{end}}
 
-
-
                 <br class="cbt">
 
             </div>
@@ -58,13 +54,13 @@
             <div class="pager fl">
 
                 {{ range $i, $b := .Before }}
-                <a href="/tag/{{.Tag}}/{{$b}}"> <span class="page-numbers">{{$b}}</span> </a>
+                <a href="/listreadme/{{$b}}"> <span class="page-numbers">{{$b}}</span> </a>
                 {{end}}
 
                 <span class="page-numbers current">{{.Current}}</span>
 
                 {{ range $i, $b := .After }}
-                <a href="/tag/{{.Tag}}/{{$b}}"> <span class="page-numbers">{{$b}}</span> </a>
+                <a href="/listreadme/{{$b}}"> <span class="page-numbers">{{$b}}</span> </a>
                 {{end}}
 
             </div>

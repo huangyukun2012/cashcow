@@ -1,7 +1,7 @@
 package model
 
 import (
-//	"fmt"
+	"fmt"
 	"time"
 	"errors"
 	"database/sql"
@@ -12,7 +12,7 @@ import (
 	h "github.com/jaytaylor/html2text"
 	"logging"
 	"github.com/russross/blackfriday"
-
+	es "gopkg.in/olivere/elastic.v3"
 )
 
 var Logger *logging.Logger
@@ -69,6 +69,8 @@ func (article * Article) FillHtml()*Article {
 	article.AnswerCN = strings.Replace(article.AnswerCN, "</ ", "</", -1)
 
 	article.HTitleCN = t.HTML(blackfriday.MarkdownCommon([]byte(article.TitleCN)))
+	//fmt.Println("titlecn ==== ", article.TitleCN)
+	//fmt.Println("htitlecn ==== ", article.HTitleCN)
 	article.HQuestionCN = t.HTML(blackfriday.MarkdownCommon([]byte(article.QuestionCN)))
 	article.HAnswerCN = t.HTML(blackfriday.MarkdownCommon([]byte(article.AnswerCN)))
 
@@ -148,9 +150,7 @@ func (article *Article)FillAll() {
 	article.AnswerRaw, _ = h.FromString(article.Answer)
 	article.AnswerCNRaw, _ = h.FromString(article.AnswerCN)
 	article.TitleRaw, _ = h.FromString(article.Title)
-
 	article.TitleCNRaw, _ = h.FromString(article.TitleCN)
-
 }
 
 func (article *Article)Save(db *sql.DB) error {
@@ -195,10 +195,164 @@ func ViewArticle(db *sql.DB, uk int64) {
 	count := 1
 	rows, _ := db.Query("select view_count from article where uk = ?", uk)
 	for rows.Next() {
-		rows.Scan(&count)
+		rows.Scan(&uk)
 		count = count + 1;
 	}
 	stmt, _ := db.Prepare("update article set view_count = ?  where uk = ?")
-	stmt.Exec(count, count)
+	stmt.Exec(count, uk)
 	stmt.Close()
+}
+
+func GetArticleCount(db *sql.DB) int{
+	count := 0
+	rows, _ := db.Query("select count(id) from article")
+	for rows.Next() {
+		rows.Scan(&count)
+	}
+	return count
+}
+
+func GetArticles(db *sql.DB, where string) []Article {
+	sql := "select uk,update_time, title, question, answer, tags, url,  view_count, source, flag, title_cn, question_cn, answer_cn, vote_count, question_raw, question_cn_raw, answer_raw, answer_cn_raw,title_raw, title_cn_raw, scan_time, ext_id from article  " + where;
+	rows, err := db.Query(sql)
+	articles := []Article{}
+	if err != nil {
+		fmt.Println(err.Error())
+		Logger.Error(err.Error())
+		return articles
+	}
+
+	for rows.Next() {
+		article := Article{}
+		rows.Scan( &article.UK, &article.UpdateTime, &article.Title, &article.Question, &article.Answer, &article.Tags, &article.URL, &article.ViewCount, &article.Source, &article.Flag, &article.TitleCN, &article.QuestionCN, &article.AnswerCN, &article.VoteCount, &article.QuestionRaw, &article.QuestionCNRaw, &article.AnswerRaw, &article.AnswerCNRaw, &article.TitleRaw, &article.TitleCNRaw, &article.ScanTime, &article.ExtID)
+		article.FillHtml()
+		articles = append(articles, article)
+	}
+	return articles
+}
+
+func ShowArticlePage(db *sql.DB, esclient *es.Client, uk int64)	*PageVar{
+	pv := PageVar{}
+	pv.Type = "show"
+
+	where := fmt.Sprintf("where uk = %d order by scan_time desc;", uk)
+
+	as := GetArticles(db, where)
+
+	if len(as) == 0 {
+		pv.Type = "lost"
+		pv.RandomArticle = GenerateRandomArticle(esclient, 10, "")
+	} else {
+		pv.Article = as[0]
+		pv.RandomArticle = GenerateRandomArticle(esclient, 10, pv.Article.TitleRaw)
+	}
+	pv.SideBarReadMe = GetSideBarReadMe(db)
+	return &pv
+}
+
+
+func ListArticlePage(db *sql.DB, esclient *es.Client, page int) *PageVar {
+	pv := PageVar{}
+	pv.Type = "list"
+
+	if page <= 0  {
+		pv.Type = "lost"
+		pv.RandomArticle = GenerateRandomArticle(esclient, 10, "")
+		return nil
+	}
+
+	count := GetArticleCount(db)
+	pv.End = count / 20
+	where := fmt.Sprintf(" limit %d, 20", (page - 1) * 20)
+	pv.ListArticle = GetArticles(db, where)
+
+	if len(pv.ListArticle) == 0 {
+		pv.Type = "lost"
+		pv.RandomArticle = GenerateRandomArticle(esclient, 10, "")
+		return &pv
+	}
+
+	pv.Current = page
+
+	SetBA(&pv)
+	pv.SideBarReadMe = GetSideBarReadMe(db)
+	return &pv
+}
+
+func ListTagArticlePage(db *sql.DB, esclient *es.Client, tag string, page int) *PageVar {
+	if page <= 0 || page > 300 {
+		return nil
+	}
+
+	pv := PageVar{}
+	pv.Type = "tag"
+	pv.Tag = tag
+
+	//boolQuery := es.NewBoolQuery()
+
+	query := es.NewMatchQuery("tags", tag)
+
+	start := u.PAGEMAX * (page - 1)
+	if start <= 0 {
+		start = 1
+	}
+	var size int64
+	pv.ListArticle, size = SearchArticle(esclient, query, start, u.PAGEMAX, "vote_count")
+
+	if len(pv.ListArticle) == 0 {
+		pv.Type = "lost"
+		pv.RandomArticle = GenerateRandomArticle(esclient, 10, "")
+		return &pv
+	}
+
+	pv.End = int(size) / 20 + 1
+	if pv.End > 300 {
+		pv.End = 300
+	}
+	pv.Current = page
+	pv.TotalFound = size
+	SetBA(&pv)
+	pv.SideBarReadMe = GetSideBarReadMe(db)
+	return &pv
+}
+
+
+
+func SearchArticlePage(db *sql.DB, esclient *es.Client, keyword string, page int) *PageVar {
+	if page <= 0 || page > 300 {
+		return nil
+	}
+
+	pv := PageVar{}
+	pv.Type = "search"
+	pv.Keyword = keyword
+
+	boolQuery := es.NewBoolQuery()
+	boolQuery.Should(es.NewMatchQuery("title_raw", keyword))
+	boolQuery.Should(es.NewMatchQuery("title_cn_raw", keyword))
+	boolQuery.Should(es.NewMatchQuery("question_raw", keyword))
+	boolQuery.Should(es.NewMatchQuery("question_cn_raw", keyword))
+	boolQuery.Should(es.NewMatchQuery("answer_raw", keyword))
+	boolQuery.Should(es.NewMatchQuery("answer_cn_raw", keyword))
+
+
+	start := u.PAGEMAX * (page - 1)
+	if start <= 0 {
+		start = 1
+	}
+	var size int64
+	pv.SearchArticle, size = SearchArticle(esclient, boolQuery, start, u.PAGEMAX, "")
+
+	pv.TotalFound = size
+
+	pv.End = int(size) / 20 + 1
+	pv.Current = page
+	if pv.End > 300 {
+		pv.End = 300
+	}
+
+	SetBA(&pv)
+	pv.RandomArticle = GenerateRandomArticle(esclient, 10, "")
+	pv.SideBarReadMe = GetSideBarReadMe(db)
+	return &pv
 }
