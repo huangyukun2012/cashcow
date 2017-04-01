@@ -165,6 +165,7 @@ func (article *Article)Save(db *sql.DB) error {
 				rows.Scan(&ext_id)
 			}
 		}
+		rows.Close()
 
 		if ext_id == -1 {
 			Logger.Info("Insert article ext_id = %d", article.ExtID)
@@ -188,6 +189,7 @@ func GetArticleMaxMinID(db *sql.DB) (int, int) {
 	for rows.Next() {
 		err = rows.Scan(&max, &min)
 	}
+	rows.Close()
 	return max, min
 }
 
@@ -198,6 +200,7 @@ func ViewArticle(db *sql.DB, uk int64) {
 		rows.Scan(&uk)
 		count = count + 1;
 	}
+	rows.Close()	
 	stmt, _ := db.Prepare("update article set view_count = ?  where uk = ?")
 	stmt.Exec(count, uk)
 	stmt.Close()
@@ -209,6 +212,7 @@ func GetArticleCount(db *sql.DB) int{
 	for rows.Next() {
 		rows.Scan(&count)
 	}
+	rows.Close()
 	return count
 }
 
@@ -228,6 +232,7 @@ func GetArticles(db *sql.DB, where string) []Article {
 		article.FillHtml()
 		articles = append(articles, article)
 	}
+	rows.Close()
 	return articles
 }
 

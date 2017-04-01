@@ -22,8 +22,8 @@ import (
 	m "developerq/model"
 	u "developerq/utils"
 	s "developerq/socrawler"
-	r "developerq/rhcrawler"
-	g "developerq/ghcrawler"
+	//r "developerq/rhcrawler"
+	//g "developerq/ghcrawler"
 
 	es "gopkg.in/olivere/elastic.v3"
 	"io/ioutil"
@@ -122,8 +122,8 @@ func Init() {
 
 	InitTemplates()
 	go s.Start()
-	go r.Start()
-	go g.Start()
+	//go r.Start()
+	//go g.Start()
 
 }
 

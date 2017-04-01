@@ -62,6 +62,7 @@ func (readme *ReadMe)Save(db *sql.DB) error {
 				rows.Scan(&url)
 			}
 		}
+		rows.Close()
 		fmt.Println("update time = ", readme.UpdateTime)
 		fmt.Println("url time = ", readme.URL)
 
@@ -135,6 +136,7 @@ func GetReadMeCount(db *sql.DB) int{
 	for rows.Next() {
 		rows.Scan(&count)
 	}
+	rows.Close()
 	return count
 }
 
@@ -159,6 +161,7 @@ func GetReadMes(db *sql.DB, where string) []ReadMe {
 		readme.FillHtml()
 		readmes = append(readmes, readme)
 	}
+	rows.Close()
 	return readmes
 }
 
@@ -179,6 +182,7 @@ func GetReadMe(db *sql.DB, uk int64) *ReadMe {
 		readme.FillHtml()
 		return &readme
 	}
+	rows.Close()
 	return nil
 }
 
