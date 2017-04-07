@@ -86,7 +86,7 @@ func Init() {
 	if err := db.Ping(); err != nil {
 		panic("Error Connection database...")
 	}
-	db.SetMaxOpenConns(50)
+	db.SetMaxOpenConns(200)
 	db.SetMaxIdleConns(30)
 
 	u.LISTMAX = 300
