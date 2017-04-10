@@ -78,8 +78,8 @@ func Init() {
 		panic("数据库连接出错,请检查配置账号密码是否正确")
 	}
 
-	db.SetMaxOpenConns(50)
-	db.SetMaxIdleConns(30)
+	db.SetMaxOpenConns(500)
+	db.SetMaxIdleConns(200)
 	u.InitRedis()
 }
 
