@@ -26,9 +26,15 @@ func main() {
 	ds.Start(dmx)
 
 	dmx = mx.Host("wenti.info").Subrouter()
-	ds.Start(dmx)
+	dmx.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "http://www.developerq.com", http.StatusMovedPermanently)
+	})
+
 	dmx = mx.Host("www.wenti.info").Subrouter()
-	ds.Start(dmx)
+	dmx.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "http://www.developerq.com", http.StatusMovedPermanently)
+	})
+
 
 
 	bmx := mx.Host("bilisou.com").Subrouter()
