@@ -9,6 +9,9 @@ import (
 	//"indexer"
 )
 
+func RedirectPage(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, "http://www.developerq.com" + r.URL.Path, http.StatusMovedPermanently)
+}
 
 func main() {
 
@@ -26,16 +29,10 @@ func main() {
 	ds.Start(dmx)
 
 	dmx = mx.Host("wenti.info").Subrouter()
-	dmx.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "http://www.developerq.com", http.StatusMovedPermanently)
-	})
+	dmx.NotFoundHandler = http.HandlerFunc(RedirectPage)
 
 	dmx = mx.Host("www.wenti.info").Subrouter()
-	dmx.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "http://www.developerq.com", http.StatusMovedPermanently)
-	})
-
-
+	dmx.NotFoundHandler = http.HandlerFunc(RedirectPage)
 
 	bmx := mx.Host("bilisou.com").Subrouter()
 	bs.Start(bmx)
