@@ -14,11 +14,13 @@ type PageVar struct {
 	Tags              []string
 	//for show
 	Article           Article
+	Blog              Blog
 	//for search
 	SearchArticle     []Article
 	TotalFound        int64
 	//for list
 	ListArticle       []Article
+	ListBlog          []Blog
 	//for tag
 	//ListTagArticle     []Article
 	//for 404
@@ -28,6 +30,7 @@ type PageVar struct {
 	ListReadMe        []ReadMe
 
 	SideBarReadMe        []ReadMe
+	SideBarBlog        []Blog
 
 	//for paging
 	Current       int
