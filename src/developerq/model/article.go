@@ -252,6 +252,7 @@ func ShowArticlePage(db *sql.DB, esclient *es.Client, uk int64)	*PageVar{
 		pv.RandomArticle = GenerateRandomArticle(esclient, 10, pv.Article.TitleRaw)
 	}
 	pv.SideBarReadMe = GetSideBarReadMe(db)
+	pv.SideBarBlog = GetSideBarBlog(db)
 	return &pv
 }
 
@@ -313,6 +314,7 @@ func ListArticlePage(db *sql.DB, esclient *es.Client, page int) *PageVar {
 	SetBA(&pv)
 	pv.RandomArticle = GenerateRandomArticle(esclient, 10, "")
 	pv.SideBarReadMe = GetSideBarReadMe(db)
+	pv.SideBarBlog = GetSideBarBlog(db)
 	//	pv.RandomUsers = GenerateRandomUsers(esclient, 24)
 	//	pv.Keywords = GenerateRandomKeywords(esclient, 30)
 	return &pv
@@ -352,6 +354,7 @@ func ListTagArticlePage(db *sql.DB, esclient *es.Client, tag string, page int) *
 	pv.TotalFound = size
 	SetBA(&pv)
 	pv.SideBarReadMe = GetSideBarReadMe(db)
+	pv.SideBarBlog = GetSideBarBlog(db)
 	return &pv
 }
 
@@ -393,5 +396,6 @@ func SearchArticlePage(db *sql.DB, esclient *es.Client, keyword string, page int
 	SetBA(&pv)
 	pv.RandomArticle = GenerateRandomArticle(esclient, 10, "")
 	pv.SideBarReadMe = GetSideBarReadMe(db)
+	pv.SideBarBlog = GetSideBarBlog(db)
 	return &pv
 }

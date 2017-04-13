@@ -1,4 +1,4 @@
-package main
+package weixin
 import (
 	"golang.org/x/net/html"
 	"github.com/Unknwon/goconfig"
@@ -10,18 +10,17 @@ import (
 //	"strconv"
 	"strings"
 	"io/ioutil"
+	"io"
 	"net/http"
 	"logging"
 //	"encoding/json"
-	t "developerq/trans"
+//	t "developerq/trans"
 	m "developerq/model"
 	u "developerq/utils"
-//	"os"
+	"os"
 )
 
 var Logger *logging.Logger
-
-
 
 
 const WEIXIN_SEARCH_URL = "http://weixin.sogou.com/weixin?usip=null&query=%s&from=tool&ft=&tsn=1&et=&interation=null&type=2&wxid=&page=%d&ie=utf8"
@@ -103,26 +102,123 @@ func checkErr(err error) {
 }
 
 
+func DownloadImage(url string, filename string) error {
+	res, err := http.Get(url)
+	Logger.Info("Download image " + url + " " + filename)
+	if err != nil {
+		Logger.Info("failed to download, " + err.Error())
+		return err
+	}
+	file, err := os.Create("imgpool/" + filename + ".jpg")
+	if err != nil {
+		Logger.Info("failed to create file" + err.Error())
+		return err
+	}
+	io.Copy(file, res.Body)
+	return nil
+}
+
+func FindImageAndDownload(n *html.Node, blog *m.Blog) {
+
+	if n.Type == html.ElementNode && n.Data == "img" {
+		Logger.Info("found image!!!")
+		newurl := ""
+		flag := true
+
+		for i, a := range n.Attr {
+			if a.Key == "data-src" {
+				url := a.Val
+
+				t := time.Now()
+				filename := fmt.Sprintf("%d", int64(t.UnixNano()))
+				err := DownloadImage(url, filename)
+				if err != nil {
+					return
+				}
+				newurl = "/imgpool/" + filename + ".jpg"
+
+			}
+			if a.Key == "src" {
+				n.Attr[i].Val = newurl
+				flag = false
+			}
+		}
+		if flag {
+			ta := html.Attribute{}
+			ta.Key = "src"
+			ta.Val = newurl
+			n.Attr = append(n.Attr,ta)
+		}
+	}
+
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		FindImageAndDownload(c, blog)
+	}
+}
+
+
 
 
 func FindBlog(n *html.Node, blog *m.Blog) {
-	// title
-	if n.Type == html.ElementNode && n.Data == "article" {
-		fmt.Println("find article")
-		b := new(bytes.Buffer)
-		if err := html.Render(b, n); err != nil {
-			Logger.Error(err.Error())
-		}
-		blog.Content = b.String()
-		//translate
-		blog.ContentCN = t.TranslateHTMLNodeWithPrefix(n, "gh")
 
+	if n.Type == html.ElementNode && n.Data == "h2" {
+		for _, a := range n.Attr {
+			if a.Key == "class" 	&&  a.Val == "rich_media_title" {
+				Logger.Info("find title")
+				if c := n.FirstChild; c.Data != "" {
+					b := new(bytes.Buffer)
+					if err := html.Render(b, c); err != nil {
+						Logger.Error(err.Error())
+					}
+					blog.Title = b.String()
+				}
+			}
+		}
+
+	}
+
+	if n.Type == html.ElementNode && n.Data == "div" {
+		for _, a := range n.Attr {
+			if a.Key == "class" && a.Val == "rich_media_content " {
+				FindImageAndDownload(n, blog)
+				b := new(bytes.Buffer)
+				if err := html.Render(b, n); err != nil {
+					Logger.Error(err.Error())
+				}
+				blog.Content = b.String()
+				//blog.Content = strings.Replace(blog.Content, "data-src", "src", -1)
+			}
+		}
+
+	}
+
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		FindBlog(c, blog)
+	}
+}
+
+func FindBlogURL(n *html.Node, blogs *[]m.Blog) {
+	// title
+	if n.Type == html.ElementNode && n.Data == "h3" {
+		blog := m.Blog{}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			if c.Type == html.ElementNode && c.Data == "a" {
+				for _, a := range c.Attr {
+					if a.Key == "href" {
+						blog.URL = a.Val
+					}
+				}
+
+			}
+		}
+		*blogs = append(*blogs, blog)
 	} else {
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			FindBlog(c, blog)
+			FindBlogURL(c, blogs)
 		}
 	}
 }
+
 
 func GetHTMLNodeFromURL(url string)( *html.Node, error) {
 	resp, err := http.Get(url)
@@ -141,64 +237,11 @@ func GetHTMLNodeFromURL(url string)( *html.Node, error) {
 	return doc, err
 }
 
-var blogkeywords = []string{"linux", "redis",}
-/*
-func CrawlBlog(db *sql.DB, start int) {
-
-	for {
-		blog := m.Blog{}
-
-
-		doc, err := GetHTMLNodeFromURL(blog.URL)
-		//trans
-		blog.Title = blog.Description
-		blog.TitleCN = t.TranslateTextWithPrefix(blog.Title, "gh")
-		if err != nil {
-			Logger.Error("Failed with url %s, %s", blog.URL, err.Error())
-			//mark 3 when curl failed
-			stmt, _ := db.Prepare("update githuburl set flag=3 where url=?")
-			stmt.Exec(blog.URL)
-			stmt.Close()
-			Logger.Info("Finished blog %s", blog.URL)
-			//return
-			continue
-		} else {
-			Logger.Info("Downloaded url %s", blog.URL)
-		}
-		Logger.Info("Parsing blog = %s", blog.URL)
-		FindBlog(doc, &blog)
-
-
-		blog.FillAll()
-		//fmt.Printf("%+v\n", blog)
-		err = blog.Save(db)
-
-		if err != nil {
-			Logger.Error("Failed at blog %s, err = %s", blog.URL, err.Error())
-			//mark 4 when insert failed
-			stmt, _ := db.Prepare("update githuburl set flag=4 where url=?")
-			stmt.Exec(blog.URL)
-			stmt.Close()
-			continue
-		}
-		//mark 1 when it's done
-		stmt, _ = db.Prepare("update githuburl set flag=1 where url=?")
-		stmt.Exec(blog.URL)
-		stmt.Close()
-		Logger.Info("Finished blog %s", blog.URL)
-
-		//deley 2 minutes
-		time.Sleep(time.Minute*2)
-	}
-
-
-}
-*/
 
 func Start() {
-//	Init()
+	Init()
 	//CrawlSEURL(db, arg2, int(arg3), int(arg4))
-//	CrawlGHBlog(db, 1)
+	CrawlBlog()
 }
 
 
@@ -232,27 +275,62 @@ func HttpGet(url string, headers map[string]string) (result []byte, err error) {
 }
 
 func CrawlBlog() {
-	for _, keyword := range blogkeywords {
-		page := 1
+	for true {
+		var blogkeywords = []string{}
+		sql := "select keyword from blogseed where flag = 0"
 
-		for page < 4 {
-
-			var url = fmt.Sprintf(WEIXIN_SEARCH_URL, keyword, page)
-			page = page + 1
-			fmt.Println(url)
-			result, err := HttpGet(url, nil)
-			if err != nil {
-				//log.Info(err.Error())
-				fmt.Println(err.Error())
+		rows, err := db.Query(sql)
+		if err != nil {
+			Logger.Error(err.Error())
+			return
+		}
+		var key string
+		for rows.Next() {
+			rows.Scan( &key)
+			if key != "" {
+				blogkeywords = append(blogkeywords, key)
 			}
+		}
+		rows.Close()
 
-			fmt.Println(string(result))
+		for _, keyword := range blogkeywords {
+			page := 1
 
-			//parse search result
+			for page < 3 {
+				blogs := []m.Blog{}
 
+				var url = fmt.Sprintf(WEIXIN_SEARCH_URL, keyword, page)
+				page = page + 1
+				doc, err := GetHTMLNodeFromURL(url)
 
-			//sleep for paging
-			time.Sleep(2*time.Second)
+				if err != nil {
+					Logger.Error(err.Error())
+				}
+
+				Logger.Info(url)
+
+				FindBlogURL(doc, &blogs)
+
+				for _, blog := range blogs {
+					doc, err := GetHTMLNodeFromURL(blog.URL)
+					blog.Tag = keyword
+
+					if err != nil {
+						Logger.Error(err.Error())
+					}
+					FindBlog(doc, &blog)
+					//fmt.Printf("%+v", blog)
+					blog.FillAll()
+					err = blog.Save(db)
+					if err != nil {
+						Logger.Error(err.Error())
+					}
+					time.Sleep(20*time.Second)
+				}
+
+				time.Sleep(2*time.Minute)
+			}
+			time.Sleep(4*time.Minute)
 		}
 	}
 }

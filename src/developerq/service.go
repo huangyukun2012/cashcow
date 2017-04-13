@@ -24,6 +24,7 @@ import (
 	s "developerq/socrawler"
 	//r "developerq/rhcrawler"
 	//g "developerq/ghcrawler"
+	w "weixin"
 
 	es "gopkg.in/olivere/elastic.v3"
 	"io/ioutil"
@@ -48,6 +49,9 @@ var listTagTemplate *template.Template
 var listReadMeTemplate *template.Template
 var showReadMeTemplate *template.Template
 var showArticleTemplate *template.Template
+var listBlogTemplate *template.Template
+var showBlogTemplate *template.Template
+
 var notFoundTemplate *template.Template
 
 
@@ -124,6 +128,7 @@ func Init() {
 	go s.Start()
 	//go r.Start()
 	//go g.Start()
+	go w.Start()
 
 }
 
@@ -180,6 +185,16 @@ func InitTemplates() {
 		Logger.Error(err.Error())
 	}
 
+	listblog, err := ioutil.ReadFile("resource/developerq/templates/listblog.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
+	showblog, err := ioutil.ReadFile("resource/developerq/templates/blog.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
 
 	notfound, err := ioutil.ReadFile("resource/developerq/templates/notfound.html")
 	if err != nil {
@@ -195,6 +210,9 @@ func InitTemplates() {
 	listTagTemplate = template.Must(template.New("tmp").Parse(string(header) + string(listtag) + string(sidebar) + string(foot)))
 	listReadMeTemplate = template.Must(template.New("tmp").Parse(string(header) + string(listreadme) + string(sidebar) + string(foot)))
 	showReadMeTemplate = template.Must(template.New("tmp").Parse(string(header) + string(showreadme) + string(sidebar) + string(foot)))
+
+	listBlogTemplate = template.Must(template.New("tmp").Parse(string(header) + string(listblog) + string(sidebar) + string(foot)))
+	showBlogTemplate = template.Must(template.New("tmp").Parse(string(header) + string(showblog) + string(sidebar) + string(foot)))
 
 	notFoundTemplate = template.Must(template.New("tmp").Parse(string(header) + string(notfound) + string(sidebar) + string(foot)))
 }
@@ -304,6 +322,38 @@ func ListReadMe(w http.ResponseWriter, r *http.Request) {
 
 	SetURL(r.URL.Path, pv)
 }
+
+
+func ListBlog(w http.ResponseWriter, r *http.Request) {
+	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
+
+	pv, err := GetURL(r.URL.Path)
+	if err == nil && pv != nil {
+		Logger.Info("load %s from cache", url)
+		render(w, listBlogTemplate, pv)
+		return
+	}
+
+	vars := mux.Vars(r)
+	p := vars["page"]
+	if p == "" {
+		p = "1"
+	}
+
+	pp, err:=strconv.Atoi(p)
+	if err != nil {
+		Logger.Error(err.Error())
+		pp = 1
+	}
+	pv = m.ListBlogPage(db, esclient, pp)
+
+	if pv != nil {
+		render(w, listBlogTemplate, pv)
+	}
+
+	SetURL(r.URL.Path, pv)
+}
+
 
 
 func NotFound(w http.ResponseWriter, r *http.Request) {
@@ -436,6 +486,35 @@ func ShowReadMe(w http.ResponseWriter, r *http.Request) {
 	SetURL(r.URL.Path, pv)
 }
 
+func ShowBlog(w http.ResponseWriter, r *http.Request) {
+	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
+
+	pv, err := GetURL(r.URL.Path)
+	if err == nil && pv != nil {
+		Logger.Info("load %s from cache", url )
+		render(w, showBlogTemplate, pv)
+		return
+	}
+
+	// break down the variables for easier assignment
+	vars := mux.Vars(r)
+	ukk := vars["uk"]
+	uk, err:=strconv.Atoi(ukk)
+	if err != nil {
+		Logger.Info(err.Error() )
+		uk = 0
+	}
+
+	pv = m.ShowBlogPage(db, esclient, int64(uk))
+	//update viewcount
+	//m.ViewArticle(db, int64(uk))
+	if pv != nil {
+		render(w, showBlogTemplate, pv)
+	}
+	SetURL(r.URL.Path, pv)
+}
+
+
 
 func render(w http.ResponseWriter, t *template.Template, data interface{}) {
 	/*if err != nil {
@@ -472,6 +551,14 @@ func Start(mx *mux.Router) {
 	mx.HandleFunc("/listreadme/{page}/", ListReadMe)
 
 
+	//list readme
+	mx.HandleFunc("/listblog", ListBlog)
+	mx.HandleFunc("/listblog/", ListBlog)
+	mx.HandleFunc("/listblog/{page}", ListBlog)
+	mx.HandleFunc("/listblog/{page}/", ListBlog)
+
+
+
 	//tag
 	mx.HandleFunc("/tag/{tag}", TagArticle)
 	mx.HandleFunc("/tag/{tag}/", TagArticle)
@@ -490,6 +577,11 @@ func Start(mx *mux.Router) {
 	mx.HandleFunc("/readme/{uk}", ShowReadMe)
 	mx.HandleFunc("/readme/{uk}/", ShowReadMe)
 
+
+	//blog
+	mx.HandleFunc("/blog/{uk}", ShowBlog)
+	mx.HandleFunc("/blog/{uk}/", ShowBlog)
+
 	//img
 	mx.HandleFunc("/img/{img}", Dummy)
 	mx.HandleFunc("/img/{img}/", Dummy)
@@ -497,6 +589,10 @@ func Start(mx *mux.Router) {
 
 	//server static
 	mx.PathPrefix("/static").Handler(http.FileServer(http.Dir("resource/developerq/")))
+
+	//server static
+	mx.PathPrefix("/imgpool").Handler(http.FileServer(http.Dir("")))
+
 
 	//admin
 	mx.HandleFunc("/admin", ShowArticle)

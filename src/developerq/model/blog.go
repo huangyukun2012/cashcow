@@ -29,6 +29,7 @@ type Blog struct {
 	Content     string
 	Tag        string
 	UpdateTime  int64
+	UpdateTimeStr string
 	Author      string
 	HTitle        t.HTML
 	HContent       t.HTML
@@ -42,27 +43,14 @@ func (blog *Blog)Save(db *sql.DB) error {
 		return errors.New("Empty blog " + blog.URL)
 	} else {
 		url := "empty"
-		rows, err := db.Query("select url from blog where url = ?", blog.URL)
-		if err == nil {
-			for rows.Next() {
-				rows.Scan(&url)
-			}
+		if blog.Title == "" {
+			return errors.New("Empty blog " + blog.URL)
 		}
-		rows.Close()
-		fmt.Println("update time = ", blog.UpdateTime)
-		fmt.Println("url time = ", blog.URL)
-
 
 		Logger.Info("url = %s", url)
-		if url != blog.URL {
-			Logger.Info("Insert blog url = %s", blog.URL)
-			_, err := db.Exec("INSERT into blog (uk, title, content,  url, tag, name,  update_time, author) values (?,?,?,?,?,?,?,?)", blog.UK, blog.Title,  blog.Content, blog.URL, blog.Tag,  blog.UpdateTime, blog.Author)
-			return err
-		} else {
-			Logger.Info("update blog url = %s", blog.URL)
-			_, err := db.Exec("update blog set uk = ?, title = ?, content = ?, tag = ?,   update_time = ?, author = ? where url = ?",blog.UK, blog.Title, blog.Content,  blog.Tag,  blog.UpdateTime, blog.Author, blog.URL )
-			return err
-		}
+		Logger.Info("Insert blog url = %s", blog.URL)
+		_, err := db.Exec("INSERT into blog (uk, title, content,  url, tag,  update_time, author) values (?,?,?,?,?,?,?)", blog.UK, blog.Title,  blog.Content, blog.URL, blog.Tag,  blog.UpdateTime, blog.Author)
+		return err
 	}
 
 }
@@ -91,6 +79,7 @@ func (blog * Blog) FillHtml()*Blog {
 			blog.SeoKeywords = append(blog.SeoKeywords, keyword)
 		}
 	}
+	blog.UpdateTimeStr = u.IntToDateStr(blog.UpdateTime/1000000000)
 
 	return blog
 }
@@ -107,10 +96,32 @@ func GetBlogCount(db *sql.DB) int{
 	return count
 }
 
+
 func GetSideBarBlog(db *sql.DB) []Blog {
-	where := fmt.Sprintf(" limit 0, 20")
+	sql := "select count(id) from blog"
+	rows, err := db.Query(sql)
+	if err != nil {
+		fmt.Println(err.Error())
+		Logger.Error(err.Error())
+		return nil
+	}
+	var size int
+	for rows.Next() {
+		rows.Scan( &size)
+	}
+	rows.Close()
+
+
+	if size <= 0 {
+		size = 1
+	}
+	rand.Seed(time.Now().UnixNano())
+	start := rand.Intn(size )
+
+	where := fmt.Sprintf(" limit %d, 10", start)
 	return GetBlogs(db, where)
 }
+
 
 func GetBlogs(db *sql.DB, where string) []Blog {
 	sql := "select uk, url, update_time, title, abstract from blog order by update_time desc" + where;
@@ -179,6 +190,7 @@ func ListBlogPage(db *sql.DB,esclient *es.Client, page int) *PageVar {
 
 	SetBA(&pv)
 	pv.SideBarBlog = GetSideBarBlog(db)
+	pv.SideBarReadMe = GetSideBarReadMe(db)
 	return &pv
 }
 
@@ -200,6 +212,7 @@ func ShowBlogPage(db *sql.DB,esclient *es.Client, uk int64) *PageVar {
 	pv.Blog = *blog
 	pv.RandomArticle = GenerateRandomArticle(esclient, 10, pv.Blog.Title)
 	pv.SideBarBlog = GetSideBarBlog(db)
+	pv.SideBarReadMe = GetSideBarReadMe(db)
 	return &pv
 }
 

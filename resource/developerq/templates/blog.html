@@ -1,0 +1,35 @@
+
+<div id="content">
+    <div id="mainbar">
+    <div id="question-header">
+        <div>
+            <h1 itemprop="name"><a href="/blog/{{.Blog.UK}}" class="question-hyperlink">{{.Blog.Title}}</a>
+            </h1>
+        </div>
+
+
+    </div>
+    <article class="markdown-body entry-content" itemprop="text">
+        {{.Blog.HContent}}
+    </article>
+    <br class="cbt">
+    <hr>
+
+
+
+            <br class="cbt">
+            <br class="cbt">
+
+            <hr>
+            <div>
+                <h2>相关问题推荐</h2>
+                {{ range $i, $a := .RandomArticle}}
+                <div class="summary">
+                    <h3><a href="/article/{{$a.UK}}" class="question-hyperlink" title="$a.QuestionCNRaw">{{$a.TitleCN}}</a>
+                    </h3>
+                </div>
+                {{end}}
+            </div>
+            </div>
+
+            

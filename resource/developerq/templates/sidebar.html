@@ -36,6 +36,26 @@
 
             <div id="hot-network-questions" class="module tex2jax_ignore">
                 <h4>
+                        最新技术博客
+                </h4>
+                <ul>
+                {{ range $i, $a := .SideBarBlog}}
+
+                    <li>
+                        <div class="favicon favicon-physics" title="Physics Stack Exchange"></div>
+<a href="/blog/{{$a.UK}}" class="js-gps-track">
+                        {{$a.Title}}
+                    </a>
+                    </li>
+                {{end}}
+
+                </ul>
+
+
+            </div>
+
+            <div id="hot-network-questions" class="module tex2jax_ignore">
+                <h4>
                         最新Github项目
                 </h4>
                 <ul>

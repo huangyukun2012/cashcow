@@ -38,6 +38,7 @@ type ReadMe struct {
 	FollowStr   string
 	Language    string
 	UpdateTime  int64
+	UpdateTimeStr string
 	Flag        int
 	LangList    []string
 
@@ -123,6 +124,7 @@ func (readme * ReadMe) FillHtml()*ReadMe {
 	//convert viewcount/voteconnt
 	readme.ForkStr = u.ConvertNumber(int64(readme.Fork))
 	readme.FollowStr = u.ConvertNumber(int64(readme.Follow))
+	readme.UpdateTimeStr = u.IntToDateStr(readme.UpdateTime/1000000000)
 
 	//Logger.Info("keyword = ", readme.SeoKeywords)
 	return readme
@@ -141,7 +143,27 @@ func GetReadMeCount(db *sql.DB) int{
 }
 
 func GetSideBarReadMe(db *sql.DB) []ReadMe {
-	where := fmt.Sprintf(" limit 0, 20")
+	sql := "select count(id) from readme"
+	rows, err := db.Query(sql)
+	if err != nil {
+		fmt.Println(err.Error())
+		Logger.Error(err.Error())
+		return nil
+	}
+	var size int
+	for rows.Next() {
+		rows.Scan( &size)
+	}
+	rows.Close()
+
+
+	if size <= 0 {
+		size = 1
+	}
+	rand.Seed(time.Now().UnixNano())
+	start := rand.Intn(size )
+
+	where := fmt.Sprintf(" limit %d, 10", start)
 	return GetReadMes(db, where)
 }
 
@@ -212,6 +234,7 @@ func ListReadMePage(db *sql.DB,esclient *es.Client, page int) *PageVar {
 
 	SetBA(&pv)
 	pv.SideBarReadMe = GetSideBarReadMe(db)
+	pv.SideBarBlog = GetSideBarBlog(db)
 	return &pv
 }
 
@@ -233,6 +256,7 @@ func ShowReadMePage(db *sql.DB,esclient *es.Client, uk int64) *PageVar {
 	pv.ReadMe = *readme
 	pv.RandomArticle = GenerateRandomArticle(esclient, 10, pv.ReadMe.Name)
 	pv.SideBarReadMe = GetSideBarReadMe(db)
+	pv.SideBarBlog = GetSideBarBlog(db)
 	return &pv
 }
 

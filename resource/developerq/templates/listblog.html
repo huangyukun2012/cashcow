@@ -1,0 +1,55 @@
+
+    <div id="content">
+
+        <div id="mainbar">
+            <div class="subheader">
+                <h1 id="h-all-questions">所有Blog</h1>
+
+                <div id="tabs">
+                    <a class="youarehere" href="/listblog?sort=newest" data-nav-xhref="" title="The most recently asked questions" data-value="newest" data-shortcut="N">
+                        最新</a>
+                    <a href="/listblog?sort=featured" data-nav-xhref="" title="Questions with open bounties" data-value="featured" data-shortcut="E">
+                        <span class="bounty-indicator-tab">1</span>            最热</a>
+                </div>
+
+            </div>
+
+            <div id="questions">
+                {{ range $i, $a := .ListBlog}}
+                    <div class="question-summary narrow">
+                        
+                        <div class="summary">
+                            <h3><a href="/blog/{{$a.UK}}" class="question-hyperlink" >{{$a.Title}}</a></h3>
+                        </div>          
+                        <div class="tags t-jquery t-css t-jquery-ui">
+                            <a href="/tag/{{$a.Tag}}" class="post-tag">{{$a.Tag}}</a>
+                        </div>
+                            
+                        <div class="started">
+                            <a class="started-link">更新时间 <span class="relativetime">{{$a.UpdateTimeStr}}</span></a>
+                        </div>
+                    </div>
+            
+                    {{end}}
+
+                <br class="cbt">
+
+            </div>
+
+            <br class="cbt">
+
+            <div class="pager fl">
+                <a href="/listblog/1"> <span class="page-numbers">首页</span> </a>
+                {{ range $i, $b := .Before }}
+                <a href="/listblog/{{$b}}"> <span class="page-numbers">{{$b}}</span> </a>
+                {{end}}
+
+                <span class="page-numbers current">{{.Current}}</span>
+
+                {{ range $i, $b := .After }}
+                <a href="/listblog/{{$b}}"> <span class="page-numbers">{{$b}}</span> </a>
+                {{end}}
+                <a href="/listblog/{{$.End}}"> <span class="page-numbers">末页</span> </a>
+            </div>
+            
+        </div>
