@@ -12,21 +12,20 @@ import (
 	"database/sql"
 	"github.com/Unknwon/goconfig"
 	"strconv"
-	"bytes"
+	//"bytes"
 	"strings"
-	u "bilisou/utils"
+	u "utils"
 	//"model"
 )
 
 var db *sql.DB
 var err error
 var username, password, url, address, redis_Pwd, mode, logLevel, redis_db string
-var redis_Database int
 var ConfError error
 var cfg *goconfig.ConfigFile
 var Logger *logging.Logger
 
-func init() {
+func Init(dbc *sql.DB) {
 
 	logSvc := logging.NewLogServcie()
 	logSvc.ConfigDefaultLogger("/tmp/bilisou", "crawler", logging.INFO, logging.ROTATE_DAILY)
@@ -63,10 +62,8 @@ func init() {
 	if ConfError != nil {
 		redis_db = "0"
 	}
-	redis_Database, ConfError = strconv.Atoi(redis_db)
-	if ConfError != nil {
-		redis_Database = 0
-	}
+	db = dbc
+	/*
 	var dataSourceName bytes.Buffer
 	dataSourceName.WriteString(username)
 	dataSourceName.WriteString(":")
@@ -82,6 +79,7 @@ func init() {
 	}
 	db.SetMaxOpenConns(50)
 	db.SetMaxIdleConns(30)
+	*/
 }
 
 var hasIndexKeys []string
@@ -98,7 +96,8 @@ type sharedata struct {
 	Shareid string
 }
 
-func Start() {
+func Start(dbc *sql.DB) {
+	Init(dbc)
 	var id int64
 	var flag int
 	var uk int64
@@ -165,28 +164,6 @@ func sliceKeyExist(s []string, key string) bool {
 	return false
 }
 
-/*
-func record(rows *sql.Rows) map[string]interface{} {
-	columns, _ := rows.Columns()
-	scanArgs := make([]interface{}, len(columns))
-	values := make([]interface{}, len(columns))
-	for i := range values {
-		scanArgs[i] = &values[i]
-	}
-	for rows.Next() {
-		err = rows.Scan(scanArgs...)
-		record := make(map[string]interface{})
-		for i, col := range values {
-			if col != nil {
-				record[columns[i]] = string(col.([]byte))
-			}
-		}
-		fmt.Println(record)
-		return record
-	}
-	return nil
-}
-*/
 
 func GetFollow(uk int64, start int, index bool) {
 	Logger.Info("Into uk: %d start: %d", uk, start)
@@ -349,7 +326,10 @@ func IndexResource(uk int64) {
 		result, _ := HttpGet(real_url, nil)
 
 		yd, err := GetData(result)
-		u.CheckErr(err)
+		if err != nil {
+			return
+		}
+		//u.CheckErr(err)
 		if yd == nil {
 			Logger.Warn("No Data for URL ", real_url)
 
@@ -391,7 +371,10 @@ func IndexResource(uk int64) {
 				//result, _ := HttpGet(real_url, headers)
 				result, _ := HttpGet(real_url, nil)
 				yd, err = GetData(result)
-				u.CheckErr(err)
+				if err != nil {
+					return
+				}
+				//u.CheckErr(err)
 				if yd != nil {
 					ok := InsertShare(yd, uk, yd.Uinfo.Uname)
 					if !ok {
@@ -436,7 +419,10 @@ func InsertShare(yd *yundata, uk int64, uname interface{}) bool{
 		time.Sleep(time.Second*5)
 		if strings.Compare(v.Feed_type, "share") == 0 {
 			_, err := db.Exec("insert into sharedata(title,share_id,uinfo_id,category, data_id, filenames, feed_time, file_count, size, last_scan, uk, uname) values(?,?,?,?,?,?,?,?,?,?,?,?)", v.Title, v.Shareid, uinfoId, v.Category, v.Data_id, filenames, v.Feed_time, len(v.Filelist), size, ls, uk, uname)
-			u.CheckErr(err)
+			if err != nil {
+				return false
+			}
+			//u.CheckErr(err)
 			if err != nil {
 				Logger.Warn("Failed to insert data %s, %s", v.Data_id, err.Error())
 				return false
@@ -444,7 +430,10 @@ func InsertShare(yd *yundata, uk int64, uname interface{}) bool{
 			Logger.Info("insert share %s", v.Data_id)
 		} else if strings.Compare(v.Feed_type, "album") == 0 {
 			_, err := db.Exec("insert into sharedata(title,album_id,uinfo_id,category, data_id, filenames, feed_time, file_count, size, last_scan) values(?,?,?,?,?,?,?,?,?,?)", v.Title, v.Album_id, uinfoId, v.Category, v.Data_id, filenames, v.Feed_time, len(v.Filelist), size, ls)
-			u.CheckErr(err)
+			if err != nil {
+				return false
+			}
+			//u.CheckErr(err)
 			if err != nil {
 				Logger.Warn("Failed to insert data, %s, %s", v.Data_id, err.Error())
 				return false

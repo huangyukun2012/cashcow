@@ -17,7 +17,7 @@ import (
 	"math/rand"
 //	t "html/template"
 	"strings"
-	u "developerq/utils"
+	u "utils"
 
 )
 
@@ -34,6 +34,7 @@ type Blog struct {
 	HTitle        t.HTML
 	HContent       t.HTML
 	SeoKeywords    []string
+	Valid       bool
 }
 
 
@@ -124,7 +125,7 @@ func GetSideBarBlog(db *sql.DB) []Blog {
 
 
 func GetBlogs(db *sql.DB, where string) []Blog {
-	sql := "select uk, url, update_time, title, abstract from blog order by update_time desc" + where;
+	sql := "select uk, url, update_time, title, tag, abstract from blog order by update_time desc" + where;
 	rows, err := db.Query(sql)
 	blogs := []Blog{}
 	if err != nil {
@@ -135,7 +136,7 @@ func GetBlogs(db *sql.DB, where string) []Blog {
 
 	for rows.Next() {
 		blog := Blog{}
-		rows.Scan( &blog.UK, &blog.URL, &blog.UpdateTime,  &blog.Title, &blog.Abstract)
+		rows.Scan( &blog.UK, &blog.URL, &blog.UpdateTime,  &blog.Title, &blog.Tag,  &blog.Abstract)
 		blog.FillHtml()
 		blogs = append(blogs, blog)
 	}

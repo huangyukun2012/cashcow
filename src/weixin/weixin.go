@@ -16,7 +16,7 @@ import (
 //	"encoding/json"
 //	t "developerq/trans"
 	m "developerq/model"
-	u "developerq/utils"
+//	u "utils"
 	"os"
 )
 
@@ -24,8 +24,6 @@ var Logger *logging.Logger
 
 
 const WEIXIN_SEARCH_URL = "http://weixin.sogou.com/weixin?usip=null&query=%s&from=tool&ft=&tsn=1&et=&interation=null&type=2&wxid=&page=%d&ie=utf8"
-
-
 
 
 var db *sql.DB
@@ -37,68 +35,16 @@ var cfg *goconfig.ConfigFile
 var githubusername, githubpassword string
 
 //Mysql
-func Init() {
+func Init(dbc *sql.DB) {
 
 	logSvc := logging.NewLogServcie()
 	logSvc.ConfigDefaultLogger("/tmp/developerq", "weixin", logging.INFO, logging.ROTATE_DAILY)
 	logSvc.Serve()
 	//defer logSvc.Stop()
 	Logger = logSvc.GetLogger("default")
-	m.Logger = Logger
+	//m.Logger = Logger
+	db = dbc
 
-	cfg, ConfError = goconfig.LoadConfigFile("config/developerq.ini")
-	if ConfError != nil {
-		panic("配置文件config.ini不存在,请将配置文件复制到运行目录下")
-	}
-
-	username, ConfError = cfg.GetValue("MySQL", "username")
-	if ConfError != nil {
-		panic("读取数据库username错误")
-	}
-	password, ConfError = cfg.GetValue("MySQL", "password")
-	if ConfError != nil {
-		panic("读取数据库password错误")
-	}
-	url, ConfError = cfg.GetValue("MySQL", "url")
-	if ConfError != nil {
-		panic("读取数据库url错误")
-	}
-
-	githubusername, ConfError = cfg.GetValue("Github", "username")
-	if ConfError != nil {
-		panic("error reading github username")
-	}
-	githubpassword, ConfError = cfg.GetValue("Github", "password")
-	if ConfError != nil {
-		panic("error reading github password")
-	}
-
-	var dataSourceName bytes.Buffer
-	dataSourceName.WriteString(username)
-	dataSourceName.WriteString(":")
-	dataSourceName.WriteString(password)
-	dataSourceName.WriteString("@")
-	dataSourceName.WriteString(url)
-	db, err = sql.Open("mysql", dataSourceName.String())
-	if err != nil {
-		Logger.Error(err.Error())
-	}
-
-	if err := db.Ping(); err != nil {
-		panic("数据库连接出错,请检查配置账号密码是否正确")
-	}
-
-	db.SetMaxOpenConns(50)
-	db.SetMaxIdleConns(30)
-	u.InitRedis()
-}
-
-
-func checkErr(err error) {
-	if err != nil {
-		Logger.Error(err.Error())
-		panic(err.Error())
-	}
 }
 
 
@@ -136,7 +82,6 @@ func FindImageAndDownload(n *html.Node, blog *m.Blog) {
 					return
 				}
 				newurl = "/imgpool/" + filename + ".jpg"
-
 			}
 			if a.Key == "src" {
 				n.Attr[i].Val = newurl
@@ -156,11 +101,7 @@ func FindImageAndDownload(n *html.Node, blog *m.Blog) {
 	}
 }
 
-
-
-
 func FindBlog(n *html.Node, blog *m.Blog) {
-
 	if n.Type == html.ElementNode && n.Data == "h2" {
 		for _, a := range n.Attr {
 			if a.Key == "class" 	&&  a.Val == "rich_media_title" {
@@ -171,6 +112,10 @@ func FindBlog(n *html.Node, blog *m.Blog) {
 						Logger.Error(err.Error())
 					}
 					blog.Title = b.String()
+					if strings.Contains(blog.Title, "招聘") || strings.Contains(blog.Title, "<") ||
+						strings.Contains(blog.Title, ">") {
+						blog.Valid = false
+					}
 				}
 			}
 		}
@@ -179,14 +124,13 @@ func FindBlog(n *html.Node, blog *m.Blog) {
 
 	if n.Type == html.ElementNode && n.Data == "div" {
 		for _, a := range n.Attr {
-			if a.Key == "class" && a.Val == "rich_media_content " {
+			if a.Key == "class" && a.Val == "rich_media_content" && blog.Valid {
 				FindImageAndDownload(n, blog)
 				b := new(bytes.Buffer)
 				if err := html.Render(b, n); err != nil {
 					Logger.Error(err.Error())
 				}
 				blog.Content = b.String()
-				//blog.Content = strings.Replace(blog.Content, "data-src", "src", -1)
 			}
 		}
 
@@ -238,13 +182,10 @@ func GetHTMLNodeFromURL(url string)( *html.Node, error) {
 }
 
 
-func Start() {
-	Init()
-	//CrawlSEURL(db, arg2, int(arg3), int(arg4))
+func Start(dbc *sql.DB) {
+	Init(dbc)
 	CrawlBlog()
 }
-
-
 
 func HttpGet(url string, headers map[string]string) (result []byte, err error) {
 
@@ -314,29 +255,31 @@ func CrawlBlog() {
 				for _, blog := range blogs {
 					doc, err := GetHTMLNodeFromURL(blog.URL)
 					blog.Tag = keyword
+					blog.Valid = true
 
 					if err != nil {
 						Logger.Error(err.Error())
 					}
 					FindBlog(doc, &blog)
 					//fmt.Printf("%+v", blog)
-					blog.FillAll()
-					err = blog.Save(db)
-					if err != nil {
-						Logger.Error(err.Error())
+					if blog.Valid {
+						blog.FillAll()
+						err = blog.Save(db)
+						if err != nil {
+							Logger.Error(err.Error())
+						}
+						time.Sleep(60*time.Second)
 					}
-					time.Sleep(20*time.Second)
 				}
 
 				time.Sleep(2*time.Minute)
 			}
-			time.Sleep(4*time.Minute)
+			time.Sleep(6*time.Minute)
 		}
 	}
 }
 
 func main() {
-	Init()
-	CrawlBlog()
-
+	//Init()
+	//CrawlBlog()
 }

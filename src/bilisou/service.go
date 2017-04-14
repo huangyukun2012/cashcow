@@ -20,9 +20,9 @@ import (
 //	"bufio"
 //	"io"
 //	"strings"
+	u "utils"
 	"logging"
 	m "bilisou/model"
-	u "bilisou/utils"
 	c "bilisou/crawler"
 	es "gopkg.in/olivere/elastic.v3"
 	"io/ioutil"
@@ -51,7 +51,6 @@ func Init() {
 	logSvc.Serve()
 	//	defer logSvc.Stop()
 	Logger = logSvc.GetLogger("default")
-	u.Logger = Logger
 	m.Logger = Logger
 
 
@@ -89,13 +88,6 @@ func Init() {
 	db.SetMaxOpenConns(200)
 	db.SetMaxIdleConns(30)
 
-	u.LISTMAX = 300
-	u.PAGEMAX = 20
-	u.NAVMAX = 5
-	u.RANDMAX = 10
-	u.InitCateMap()
-
-	u.InitJieba()
 
 	//init es
 	esclient, err = es.NewClient()
@@ -117,9 +109,6 @@ func Init() {
 		Logger.Error("读取数据库port错误")
 	}
 
-	///
-	u.InitRedis()
-
 	//templateContent = string(ioutil.ReadFile("templates/index.html"))
 	templ, err := ioutil.ReadFile("resource/bilisou/templates/index.html")
 	if err == nil {
@@ -127,7 +116,7 @@ func Init() {
 	} else {
 		Logger.Error("failed to open template")
 	}
-	go c.Start()
+	go c.Start(db)
 
 
 }

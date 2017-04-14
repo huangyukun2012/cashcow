@@ -14,7 +14,7 @@ import (
 	"logging"
 	t "developerq/trans"
 	m "developerq/model"
-	u "developerq/utils"
+	u "utils"
 )
 
 var Logger *logging.Logger
@@ -36,7 +36,7 @@ var ConfError error
 var cfg *goconfig.ConfigFile
 
 //Mysql
-func Init() {
+func Init(dbc *sql.DB) {
 
 	logSvc := logging.NewLogServcie()
 	logSvc.ConfigDefaultLogger("/tmp/developerq", "socrawler", logging.INFO, logging.ROTATE_DAILY)
@@ -44,43 +44,7 @@ func Init() {
 	//defer logSvc.Stop()
 	Logger = logSvc.GetLogger("default")
 
-
-	cfg, ConfError = goconfig.LoadConfigFile("config/developerq.ini")
-	if ConfError != nil {
-		panic("配置文件config.ini不存在,请将配置文件复制到运行目录下")
-	}
-
-	username, ConfError = cfg.GetValue("MySQL", "username")
-	if ConfError != nil {
-		panic("读取数据库username错误")
-	}
-	password, ConfError = cfg.GetValue("MySQL", "password")
-	if ConfError != nil {
-		panic("读取数据库password错误")
-	}
-	url, ConfError = cfg.GetValue("MySQL", "url")
-	if ConfError != nil {
-		panic("读取数据库url错误")
-	}
-
-	var dataSourceName bytes.Buffer
-	dataSourceName.WriteString(username)
-	dataSourceName.WriteString(":")
-	dataSourceName.WriteString(password)
-	dataSourceName.WriteString("@")
-	dataSourceName.WriteString(url)
-	db, err = sql.Open("mysql", dataSourceName.String())
-	if err != nil {
-		Logger.Error(err.Error())
-	}
-
-	if err := db.Ping(); err != nil {
-		panic("数据库连接出错,请检查配置账号密码是否正确")
-	}
-
-	db.SetMaxOpenConns(50)
-	db.SetMaxIdleConns(10)
-	u.InitRedis()
+	db = dbc
 }
 
 
@@ -381,7 +345,7 @@ func GetHTMLNodeFromURL(url string)( *html.Node, error) {
 }
 
 
-func CrawlSOQuestion(db *sql.DB, start int) {
+func CrawlSOQuestion(start int) {
 
 	for {
 		//update every 2 minute
@@ -487,10 +451,10 @@ func CrawlSEURL(db *sql.DB, hostname string, start int,  end int) {
 	}
 }
 
-func Start() {
-	Init()
-	//CrawlSEURL(db, arg2, int(arg3), int(arg4))
-	CrawlSOQuestion(db, 1)
+func Start(dbc *sql.DB) {
+	Init(dbc)
+
+	CrawlSOQuestion(1)
 }
 
 /*

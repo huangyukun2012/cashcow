@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"database/sql"
 //	"github.com/siddontang/go/log"
-	u "bilisou/utils"
+	u "utils"
 	t "html/template"
 	"logging"
 )
@@ -174,10 +174,10 @@ func GetKeywordMaxMinID(db *sql.DB) (int, int) {
 	var max int
 	var min int
 	sql := "select max(id), min(id) from keyword"
-	rows, err := db.Query(sql)
-	u.CheckErr(err)
+	rows, _ := db.Query(sql)
+	//u.CheckErr(err)
 	for rows.Next() {
-		err = rows.Scan(&max, &min)
+		rows.Scan(&max, &min)
 	}
 	rows.Close()
 	return max, min
@@ -188,10 +188,10 @@ func GetShareMaxMinID(db *sql.DB) (int, int) {
 	var max int
 	var min int
 	sql := "select max(id), min(id) from sharedata"
-	rows, err := db.Query(sql)
-	u.CheckErr(err)
+	rows, _ := db.Query(sql)
+	//u.CheckErr(err)
 	for rows.Next() {
-		err = rows.Scan(&max, &min)
+		rows.Scan(&max, &min)
 	}
 	rows.Close()
 	return max, min
@@ -201,10 +201,10 @@ func GetUserMaxMINID(db *sql.DB) (int, int) {
 	var max int
 	var min int
 	sql := "select max(id), min(id) from uinfo"
-	rows, err := db.Query(sql)
-	u.CheckErr(err)
+	rows, _ := db.Query(sql)
+	//u.CheckErr(err)
 	for rows.Next() {
-		err = rows.Scan(&max, &min)
+		rows.Scan(&max, &min)
 	}
 	rows.Close()
 	return max, min
@@ -215,11 +215,11 @@ func UpdateCategory(db *sql.DB) {
 	for i:=min; i <= max; i ++ {
 		s := "select title from sharedata where id = %d"
 		s = fmt.Sprintf(s, i)
-		rows, err := db.Query(s)
-		u.CheckErr(err)
+		rows, _ := db.Query(s)
+		//u.CheckErr(err)
 		var tt sql.NullString
 		for rows.Next() {
-			err = rows.Scan(&tt)
+			rows.Scan(&tt)
 		}
 		rows.Close()
 		if tt.Valid {

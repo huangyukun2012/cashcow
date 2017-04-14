@@ -8,7 +8,7 @@ import (
 	"math/rand"
 	t "html/template"
 	"strings"
-	u "developerq/utils"
+	u "utils"
 	h "github.com/jaytaylor/html2text"
 	"logging"
 	"github.com/russross/blackfriday"
@@ -185,7 +185,10 @@ func GetArticleMaxMinID(db *sql.DB) (int, int) {
 	var min int
 	sql := "select max(id), min(id) from article"
 	rows, err := db.Query(sql)
-	u.CheckErr(err)
+	if err != nil {
+		return 1, 1
+	}
+
 	for rows.Next() {
 		err = rows.Scan(&max, &min)
 	}

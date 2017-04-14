@@ -4,10 +4,10 @@ import (
 
 	"fmt"
 	"github.com/yanyiwu/gojieba"
-	"logging"
 	//	_ "github.com/go-sql-driver/mysql"
 	//sql "database/sql"
 	//	"io/ioutil"
+	//"logging"
 	//	"regexp"
 	//	"encoding/json"
 	//	"time"
@@ -23,6 +23,7 @@ import (
 	//"utils"
 	"strconv"
 	"time"
+
 )
 
 //global
@@ -37,13 +38,14 @@ var CAT_STR_INT map[string]int
 
 var CAT_INT_STRCN map[int]string
 
-var Logger *logging.Logger
-
+//var Logger *logging.Logger
+/*
 func CheckErr(err error) {
 	if err != nil {
 		Logger.Error("Error...", err.Error())
 	}
 }
+*/
 
 func IntToDateStr(d int64) string {
 	tm := time.Unix(d, 0)
@@ -55,6 +57,46 @@ func IntToStr(v int64) string {
 	s := strconv.FormatInt(v, 10)
 	return s
 }
+
+
+var pmap = map[rune]rune{
+	'，':',',
+	'。':'.',
+	'：':':',
+	'“':'"',
+	'”':'"',
+	'（':'(',
+	'）':')',
+	'！':'!',
+	'《':'<',
+	'》':'>',
+	'／':'/',
+	'？':'?',
+	'；':';',
+	'【':'[',
+	'】':']',
+	'「':'[',
+	'」':']',
+	'—':'_',
+	'、':'\\',
+	'～':'~',
+	'·':'`',
+}
+
+
+func ReplaceCNPunctuation(input string) string {
+	if input == "" {
+		return ""
+	}
+	rs := []rune(input)
+	for k, r := range rs {
+		if v, ok := pmap[r]; ok {
+			rs[k] = v
+		}
+	}
+	return string(rs)
+}
+
 
 func InitCateMap() {
 	CAT_INT_STR = map[int]string{}
@@ -145,9 +187,21 @@ func GetCategoryFromName(name string) int {
 }
 
 
-
 //for seo
-var Jb *gojieba.Jieba
+var Jb * gojieba.Jieba
 func InitJieba() {
 	Jb = gojieba.NewJieba()
+}
+
+
+func ConvertNumber(n int64) string {
+	var str string
+	if n < 10000 {
+		str = fmt.Sprintf("%d", n)
+	} else if n < 1000000 {
+		str = fmt.Sprintf("%.0f", float64(n)/float64(1000)) + "k"
+	} else {
+		str = fmt.Sprintf("%.1f", float64(n)/float64(1000000)) + "m"
+	}
+	return str
 }
