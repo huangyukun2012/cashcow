@@ -147,6 +147,9 @@ func checkKeyExist(key interface{}) bool {
 	id := -1
 	var flag bool
 	rows, err := db.Query("select id from user where uk = ?", key)
+	if err != nil {
+		return false
+	}
 	for rows.Next() {
 		rows.Scan(&id)
 	}
