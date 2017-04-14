@@ -2,7 +2,7 @@
 # user must have replication privilege in MySQL.
 my_addr = "127.0.0.1:3306"
 my_user = "root"
-my_pass = ""
+my_pass = "53GftPuh="
 
 # Elasticsearch address
 es_addr = "127.0.0.1:9200"

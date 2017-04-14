@@ -122,7 +122,6 @@ func Init() {
 	//go r.Start(db)
 	//go g.Start(db)
 	go w.Start(db)
-
 }
 
 func InitTemplates() {

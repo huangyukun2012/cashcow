@@ -124,7 +124,7 @@ func FindBlog(n *html.Node, blog *m.Blog) {
 
 	if n.Type == html.ElementNode && n.Data == "div" {
 		for _, a := range n.Attr {
-			if a.Key == "class" && a.Val == "rich_media_content" && blog.Valid {
+			if a.Key == "class" && a.Val == "rich_media_content " && blog.Valid {
 				FindImageAndDownload(n, blog)
 				b := new(bytes.Buffer)
 				if err := html.Render(b, n); err != nil {
