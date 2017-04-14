@@ -31,7 +31,7 @@
     <meta name="Description" content="{{.ReadMe.Name}}, {{.ReadMe.TitleCN}}">
     <meta name="Keywords" content="{{ range $i, $k := .ReadMe.SeoKeywords}}{{$k}}, {{end}}" />
     {{else if eq .Type  "blog"}}
-    <meta name="Description" content="{{.Blog.Name}}, {{.Blog.Title}}">
+    <meta name="Description" content="{{.Blog.Title}}">
     <meta name="Keywords" content="{{ range $i, $k := .BLog.SeoKeywords}}{{$k}}, {{end}}" />
     {{else}}
     <meta name="Description" content="DeveloperQ，遇到IT问题上开发者问题网，海量问题解决方法，高效技术文档搜索引擎">
