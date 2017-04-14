@@ -15,7 +15,7 @@ import (
 	"encoding/json"
 	t "developerq/trans"
 	m "developerq/model"
-	u "developerq/utils"
+	u "utils"
 	"os"
 )
 
@@ -39,60 +39,15 @@ var cfg *goconfig.ConfigFile
 var githubusername, githubpassword string
 
 //Mysql
-func Init() {
+func Init(dbc *sql.DB) {
 
 	logSvc := logging.NewLogServcie()
 	logSvc.ConfigDefaultLogger("/tmp/developerq", "ghcrawler", logging.INFO, logging.ROTATE_DAILY)
 	logSvc.Serve()
 	//defer logSvc.Stop()
 	Logger = logSvc.GetLogger("default")
-	m.Logger = Logger
+	db = dbc
 
-	cfg, ConfError = goconfig.LoadConfigFile("config/developerq.ini")
-	if ConfError != nil {
-		panic("配置文件config.ini不存在,请将配置文件复制到运行目录下")
-	}
-
-	username, ConfError = cfg.GetValue("MySQL", "username")
-	if ConfError != nil {
-		panic("读取数据库username错误")
-	}
-	password, ConfError = cfg.GetValue("MySQL", "password")
-	if ConfError != nil {
-		panic("读取数据库password错误")
-	}
-	url, ConfError = cfg.GetValue("MySQL", "url")
-	if ConfError != nil {
-		panic("读取数据库url错误")
-	}
-
-	githubusername, ConfError = cfg.GetValue("Github", "username")
-	if ConfError != nil {
-		panic("error reading github username")
-	}
-	githubpassword, ConfError = cfg.GetValue("Github", "password")
-	if ConfError != nil {
-		panic("error reading github password")
-	}
-
-	var dataSourceName bytes.Buffer
-	dataSourceName.WriteString(username)
-	dataSourceName.WriteString(":")
-	dataSourceName.WriteString(password)
-	dataSourceName.WriteString("@")
-	dataSourceName.WriteString(url)
-	db, err = sql.Open("mysql", dataSourceName.String())
-	if err != nil {
-		Logger.Error(err.Error())
-	}
-
-	if err := db.Ping(); err != nil {
-		panic("数据库连接出错,请检查配置账号密码是否正确")
-	}
-
-	db.SetMaxOpenConns(50)
-	db.SetMaxIdleConns(30)
-	u.InitRedis()
 }
 
 
@@ -212,8 +167,8 @@ func CrawlGHReadMe(db *sql.DB, start int) {
 }
 
 
-func Start() {
-	Init()
+func Start(dbc *sql.DB) {
+	Init(dbc)
 	//CrawlSEURL(db, arg2, int(arg3), int(arg4))
 	CrawlGHReadMe(db, 1)
 }

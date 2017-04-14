@@ -20,7 +20,7 @@ import (
 //	"io"
 //	"strings"
 	m "developerq/model"
-	u "developerq/utils"
+	u "utils"
 	s "developerq/socrawler"
 	//r "developerq/rhcrawler"
 	//g "developerq/ghcrawler"
@@ -63,7 +63,7 @@ func Init() {
 	logSvc.Serve()
 //	defer logSvc.Stop()
 	Logger = logSvc.GetLogger("default")
-	u.Logger = Logger
+	//u.Logger = Logger
 	m.Logger = Logger
 
 	cfg, ConfError = goconfig.LoadConfigFile("config/developerq.ini")
@@ -109,11 +109,6 @@ func Init() {
 	db.SetMaxOpenConns(200)
 	db.SetMaxIdleConns(20)
 
-	u.LISTMAX = 300
-	u.PAGEMAX = 20
-	u.NAVMAX = 5
-	u.RANDMAX = 10
-	u.InitCateMap()
 
 	//init es
 	esclient, err = es.NewClient()
@@ -121,14 +116,12 @@ func Init() {
 		Logger.Error("failed to create es client")
 	}
 	m.MaxArticle, m.MinArticle = m.GetArticleMaxMinID(db)
-	u.InitRedis()
-	u.InitJieba()
 
 	InitTemplates()
-	go s.Start()
-	//go r.Start()
-	//go g.Start()
-	go w.Start()
+	go s.Start(db)
+	//go r.Start(db)
+	//go g.Start(db)
+	go w.Start(db)
 
 }
 

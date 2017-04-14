@@ -4,7 +4,7 @@ import (
 //	"fmt"
 	es "gopkg.in/olivere/elastic.v3"
 //	"github.com/siddontang/go/log"
-	u "bilisou/utils"
+	u "utils"
 )
 
 

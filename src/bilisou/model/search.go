@@ -5,7 +5,7 @@ import (
 	es "gopkg.in/olivere/elastic.v3"
 //	"encoding/json"
 //	"github.com/siddontang/go/log"
-	u "bilisou/utils"
+	u "utils"
 )
 
 

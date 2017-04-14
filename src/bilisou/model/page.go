@@ -4,7 +4,7 @@ package model
 import (
 //	"fmt"
 //	"github.com/siddontang/go/log"
-	u "bilisou/utils"
+	u "utils"
 )
 
 

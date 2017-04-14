@@ -17,7 +17,7 @@ import (
 	"math/rand"
 //	t "html/template"
 	"strings"
-	u "developerq/utils"
+	u "utils"
 
 )
 

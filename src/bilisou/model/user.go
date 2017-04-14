@@ -2,7 +2,7 @@ package model
 
 import (
 //	"fmt"
-	u "bilisou/utils"
+	u "utils"
 	es "gopkg.in/olivere/elastic.v3"
 )
 
