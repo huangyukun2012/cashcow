@@ -104,6 +104,7 @@ func CrawlGHReadMe(db *sql.DB, start int) {
 		readme := m.ReadMe{}
 
 		rows, err := db.Query("select url, name, description, stars, fork, follow, language from githuburl where flag=0 and id > ? limit 1", start)
+		defer rows.Close()
 		if err != nil {
 			Logger.Error(err.Error())
 			return
@@ -113,7 +114,6 @@ func CrawlGHReadMe(db *sql.DB, start int) {
 			err = rows.Scan( &readme.URL, &readme.Name, &readme.Description, &readme.Stars, &readme.Fork,& readme.Follow, &readme.Language)
 			checkErr(err)
 		}
-		rows.Close()
 		//mark processing
 		stmt, _ := db.Prepare("update githuburl set flag=2 where url=?")
 		stmt.Exec(readme.URL)

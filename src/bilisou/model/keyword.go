@@ -1,14 +1,14 @@
 package model
 
 import (
-	//"fmt"
+//	"fmt"
 	//	u "utils"
 	//"github.com/siddontang/go/log"
 	"database/sql"
 )
 
 func KeywordHit(db *sql.DB, keyword string) {
-	count := -1
+	count := 0
 	rows, _ := db.Query("select count from keyword where keyword = ?", keyword)
 	for rows.Next() {
 		rows.Scan(&count)
@@ -16,7 +16,7 @@ func KeywordHit(db *sql.DB, keyword string) {
 	}
 	rows.Close()
 
-	if count == -1 {
+	if count >= 1 {
 		stmt, _ := db.Prepare("update keyword set count = ?  where keyword = ?")
 		stmt.Exec(count, keyword)
 		stmt.Close()

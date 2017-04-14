@@ -101,6 +101,7 @@ func GetBlogCount(db *sql.DB) int{
 func GetSideBarBlog(db *sql.DB) []Blog {
 	sql := "select count(id) from blog"
 	rows, err := db.Query(sql)
+	defer rows.Close()
 	if err != nil {
 		fmt.Println(err.Error())
 		Logger.Error(err.Error())
@@ -110,7 +111,6 @@ func GetSideBarBlog(db *sql.DB) []Blog {
 	for rows.Next() {
 		rows.Scan( &size)
 	}
-	rows.Close()
 
 
 	if size <= 0 {
@@ -127,6 +127,7 @@ func GetSideBarBlog(db *sql.DB) []Blog {
 func GetBlogs(db *sql.DB, where string) []Blog {
 	sql := "select uk, url, update_time, title, tag, abstract from blog order by update_time desc" + where;
 	rows, err := db.Query(sql)
+	defer rows.Close()
 	blogs := []Blog{}
 	if err != nil {
 		fmt.Println(err.Error())
@@ -140,7 +141,6 @@ func GetBlogs(db *sql.DB, where string) []Blog {
 		blog.FillHtml()
 		blogs = append(blogs, blog)
 	}
-	rows.Close()
 	return blogs
 }
 
@@ -148,6 +148,7 @@ func GetBlogs(db *sql.DB, where string) []Blog {
 func GetBlog(db *sql.DB, uk int64) *Blog {
 	sql := "select uk, url, update_time, title,  content, abstract from blog  where uk = ?";
 	rows, err := db.Query(sql, uk)
+	defer rows.Close()
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -161,7 +162,6 @@ func GetBlog(db *sql.DB, uk int64) *Blog {
 		blog.FillHtml()
 		return &blog
 	}
-	rows.Close()
 	return nil
 }
 

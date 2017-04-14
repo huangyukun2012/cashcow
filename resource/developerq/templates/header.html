@@ -8,11 +8,13 @@
     <title>Github项目 - DeveloperQ - 开发者问题网 - 海量问题解决方案</title>
     {{else if eq .Type  "readme"}}
     <title>{{.ReadMe.Name}} - DeveloperQ - 开发者问题网 - 海量问题解决方案</title>
+    {{else if eq .Type  "blog"}}
+    <title>{{.Blog.Title}} - DeveloperQ - 开发者问题网 - 海量问题解决方案</title>
     {{else}}
     <title>DeveloperQ - 开发者问题网 - 海量问题解决方案</title>
     {{end}}
 
-    <link rel="shortcut icon" href="/static/img/quicktime.ico">
+    <link href="/static/img/search.ico" rel="shortcut icon">
 
     <link rel="apple-touch-icon image_src" href="/static/img/quicktime.ico">
     <link rel="stylesheet" type="text/css" href="/static/css/all.css">
@@ -119,17 +121,10 @@
             <div class="nav mainnavs">
                 <ul>
                     <li class="youarehere">
-                        <a id="nav-questions" href="/questions" class="js-gps-track" data-gps-track="top_nav.click({is_current:true, location:3, destination:1})">
+                        <a id="nav-questions" href="/list" class="js-gps-track" data-gps-track="top_nav.click({is_current:true, location:3, destination:1})">
                             问题
                         </a>
                     </li>
-
-                    <li>
-                        <a id="nav-tags" href="/tags" class="js-gps-track" data-gps-track="top_nav.click({is_current:false, location:3, destination:2})">
-                            标签
-                        </a>
-                    </li>
-
                     <li>
                         <a id="nav-unanswered" href="/listblog" class="js-gps-track" data-gps-track="top_nav.click({is_current:false, location:3, destination:5})">
                             技术博客

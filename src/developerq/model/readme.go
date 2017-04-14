@@ -58,12 +58,14 @@ func (readme *ReadMe)Save(db *sql.DB) error {
 	} else {
 		url := "empty"
 		rows, err := db.Query("select url from readme where url = ?", readme.URL)
+		defer rows.Close()
 		if err == nil {
 			for rows.Next() {
 				rows.Scan(&url)
 			}
+		} else {
+			return errors.New("dup " + readme.URL)
 		}
-		rows.Close()
 		fmt.Println("update time = ", readme.UpdateTime)
 		fmt.Println("url time = ", readme.URL)
 
@@ -145,6 +147,7 @@ func GetReadMeCount(db *sql.DB) int{
 func GetSideBarReadMe(db *sql.DB) []ReadMe {
 	sql := "select count(id) from readme"
 	rows, err := db.Query(sql)
+	defer rows.Close()
 	if err != nil {
 		fmt.Println(err.Error())
 		Logger.Error(err.Error())
@@ -154,7 +157,6 @@ func GetSideBarReadMe(db *sql.DB) []ReadMe {
 	for rows.Next() {
 		rows.Scan( &size)
 	}
-	rows.Close()
 
 
 	if size <= 0 {
@@ -170,6 +172,7 @@ func GetSideBarReadMe(db *sql.DB) []ReadMe {
 func GetReadMes(db *sql.DB, where string) []ReadMe {
 	sql := "select uk, url, update_time, name, title, title_cn, language, fork, follow from readme order by update_time desc" + where;
 	rows, err := db.Query(sql)
+	defer rows.Close()
 	readmes := []ReadMe{}
 	if err != nil {
 		fmt.Println(err.Error())
@@ -183,7 +186,6 @@ func GetReadMes(db *sql.DB, where string) []ReadMe {
 		readme.FillHtml()
 		readmes = append(readmes, readme)
 	}
-	rows.Close()
 	return readmes
 }
 
@@ -191,6 +193,7 @@ func GetReadMes(db *sql.DB, where string) []ReadMe {
 func GetReadMe(db *sql.DB, uk int64) *ReadMe {
 	sql := "select uk, url, update_time, name, title, title_cn, language, fork, follow, content, content_cn from readme  where uk = ?";
 	rows, err := db.Query(sql, uk)
+	defer rows.Close()
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -204,7 +207,6 @@ func GetReadMe(db *sql.DB, uk int64) *ReadMe {
 		readme.FillHtml()
 		return &readme
 	}
-	rows.Close()
 	return nil
 }
 

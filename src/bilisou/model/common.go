@@ -226,7 +226,6 @@ func UpdateCategory(db *sql.DB) {
 			c := u.GetCategoryFromName(tt.String)
 			us := "update sharedata set category = ? where id = ?"
 			//us = fmt.Sprintf(us, c, i)
-			//db.Query(us)
 			stmt, _ := db.Prepare(us)
 			stmt.Exec(c,i)
 			stmt.Close()

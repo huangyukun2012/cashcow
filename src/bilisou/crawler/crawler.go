@@ -146,7 +146,11 @@ func Start(dbc *sql.DB) {
 func checkKeyExist(key interface{}) bool {
 	id := -1
 	var flag bool
-	err := db.QueryRow("select id from user where uk = ?", key).Scan(&id)
+	rows, err := db.Query("select id from user where uk = ?", key)
+	for rows.Next() {
+		rows.Scan(&id)
+	}
+	rows.Close()
 	if err != nil && id != -1 {
 		Logger.Warn("skip user uk = %s id = %d", key, id)
 		flag = true
@@ -172,6 +176,7 @@ func GetFollow(uk int64, start int, index bool) {
 
 	stmt, _ := db.Prepare("update avaiuk set flag=1 where uk=?")
 	stmt.Exec(uk)
+	stmt.Close()
 
 	if (!flag) {
 		if (index) {

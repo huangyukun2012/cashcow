@@ -160,12 +160,12 @@ func (article *Article)Save(db *sql.DB) error {
 	} else {
 		ext_id := -1
 		rows, err := db.Query("select ext_id from article where ext_id = ? and source = ?", article.ExtID, article.Source)
+		rows.Close()
 		if err == nil {
 			for rows.Next() {
 				rows.Scan(&ext_id)
 			}
 		}
-		rows.Close()
 
 		if ext_id == -1 {
 			Logger.Info("Insert article ext_id = %d", article.ExtID)
@@ -185,6 +185,8 @@ func GetArticleMaxMinID(db *sql.DB) (int, int) {
 	var min int
 	sql := "select max(id), min(id) from article"
 	rows, err := db.Query(sql)
+	defer rows.Close()
+
 	if err != nil {
 		return 1, 1
 	}
@@ -192,7 +194,6 @@ func GetArticleMaxMinID(db *sql.DB) (int, int) {
 	for rows.Next() {
 		err = rows.Scan(&max, &min)
 	}
-	rows.Close()
 	return max, min
 }
 
@@ -203,7 +204,7 @@ func ViewArticle(db *sql.DB, uk int64) {
 		rows.Scan(&uk)
 		count = count + 1;
 	}
-	rows.Close()	
+	rows.Close()
 	stmt, _ := db.Prepare("update article set view_count = ?  where uk = ?")
 	stmt.Exec(count, uk)
 	stmt.Close()
@@ -222,6 +223,7 @@ func GetArticleCount(db *sql.DB) int{
 func GetArticles(db *sql.DB, where string) []Article {
 	sql := "select uk,update_time, title, question, answer, tags, url,  view_count, source, flag, title_cn, question_cn, answer_cn, vote_count, question_raw, question_cn_raw, answer_raw, answer_cn_raw,title_raw, title_cn_raw, scan_time, ext_id from article  " + where;
 	rows, err := db.Query(sql)
+	defer rows.Close()
 	articles := []Article{}
 	if err != nil {
 		fmt.Println(err.Error())
@@ -235,7 +237,6 @@ func GetArticles(db *sql.DB, where string) []Article {
 		article.FillHtml()
 		articles = append(articles, article)
 	}
-	rows.Close()
 	return articles
 }
 

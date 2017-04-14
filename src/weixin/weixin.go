@@ -221,6 +221,7 @@ func CrawlBlog() {
 		sql := "select keyword from blogseed where flag = 0"
 
 		rows, err := db.Query(sql)
+		defer rows.Close()
 		if err != nil {
 			Logger.Error(err.Error())
 			return
@@ -232,7 +233,6 @@ func CrawlBlog() {
 				blogkeywords = append(blogkeywords, key)
 			}
 		}
-		rows.Close()
 
 		for _, keyword := range blogkeywords {
 			page := 1

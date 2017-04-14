@@ -350,16 +350,16 @@ func CrawlSOQuestion(start int) {
 	for {
 		//update every 2 minute
 		rows, _ := db.Query("select url from sourl where flag=0 and id > ? limit 1", start)
+		defer rows.Close()
 		var url string
 		for rows.Next() {
 			err = rows.Scan( &url)
 			checkErr(err)
 		}
-		rows.Close()
 		//mark processing
 		stmt, _ := db.Prepare("update sourl set flag=2 where url=?")
+		defer stmt.Close()
 		stmt.Exec(url)
-		stmt.Close()
 
 		article := m.Article{}
 		article.Source = "so"
@@ -432,11 +432,11 @@ func CrawlSEURL(db *sql.DB, hostname string, start int,  end int) {
 				url = SE_BASE_URL + url
 
 				rows, _ := db.Query("select url  from sourl where url = ?", url)
+				defer rows.Close()
 				scanurl := ""
 				for rows.Next() {
 					err = rows.Scan(&scanurl)
 				}
-				rows.Close()
 				url = fmt.Sprintf(url, hostname)
 				if scanurl == ""  {
 					_, err = db.Exec("INSERT into sourl(url,flag, type) values(?,?,?)", url, 0, hostname)

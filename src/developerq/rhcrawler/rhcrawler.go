@@ -187,11 +187,11 @@ func CrawlRHKB(db *sql.DB, start int) {
 		article.Source = "rh"
 
 		rows, _ := db.Query("select url, ext_id from rhurl where flag=0 and id > ? limit 1", start)
+		defer rows.Close()
 		for rows.Next() {
 			err = rows.Scan(&article.URL, &article.ExtID)
 			checkErr(err)
 		}
-		rows.Close()
 		//mark processing
 		stmt, _ := db.Prepare("update rhurl set flag=2 where url=?")
 		stmt.Exec(article.URL)
