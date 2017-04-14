@@ -30,6 +30,9 @@
     {{else if eq .Type  "readme"}}
     <meta name="Description" content="{{.ReadMe.Name}}, {{.ReadMe.TitleCN}}">
     <meta name="Keywords" content="{{ range $i, $k := .ReadMe.SeoKeywords}}{{$k}}, {{end}}" />
+    {{else if eq .Type  "blog"}}
+    <meta name="Description" content="{{.Blog.Name}}, {{.Blog.Title}}">
+    <meta name="Keywords" content="{{ range $i, $k := .BLog.SeoKeywords}}{{$k}}, {{end}}" />
     {{else}}
     <meta name="Description" content="DeveloperQ，遇到IT问题上开发者问题网，海量问题解决方法，高效技术文档搜索引擎">
     <meta name="Keywords" content="IT问题,黑客,IT技术社区,编程社区,技术问答,技术文章,技术笔记,技术博客,技术活动,程序员,开发者,程序员,极客,编程,代码,开源" />
@@ -99,9 +102,6 @@
 
                     </span>
             </div>
-
-
-
         </div>
     </div>
 </div>
@@ -131,16 +131,17 @@
                     </li>
 
                     <li>
+                        <a id="nav-unanswered" href="/listblog" class="js-gps-track" data-gps-track="top_nav.click({is_current:false, location:3, destination:5})">
+                            技术博客
+                        </a>
+                    </li>
+
+                    <li>
                         <a id="nav-users" href="/listreadme" class="js-gps-track" data-gps-track="top_nav.click({is_current:false, location:3, destination:3})">
                             github项目
                         </a>
                     </li>
 
-                    <li>
-                        <a id="nav-unanswered" href="/listblog" class="js-gps-track" data-gps-track="top_nav.click({is_current:false, location:3, destination:5})">
-                            技术博客
-                        </a>
-                    </li>
                 </ul>
             </div>
             <div class="nav askquestion">

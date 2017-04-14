@@ -14,6 +14,7 @@ func KeywordHit(db *sql.DB, keyword string) {
 		rows.Scan(&count)
 		count = count + 1;
 	}
+	rows.Close()
 
 	if count == -1 {
 		stmt, _ := db.Prepare("update keyword set count = ?  where keyword = ?")

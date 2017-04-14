@@ -179,6 +179,7 @@ func GetKeywordMaxMinID(db *sql.DB) (int, int) {
 	for rows.Next() {
 		err = rows.Scan(&max, &min)
 	}
+	rows.Close()
 	return max, min
 }
 
@@ -192,6 +193,7 @@ func GetShareMaxMinID(db *sql.DB) (int, int) {
 	for rows.Next() {
 		err = rows.Scan(&max, &min)
 	}
+	rows.Close()
 	return max, min
 }
 
@@ -204,6 +206,7 @@ func GetUserMaxMINID(db *sql.DB) (int, int) {
 	for rows.Next() {
 		err = rows.Scan(&max, &min)
 	}
+	rows.Close()
 	return max, min
 }
 
@@ -218,6 +221,7 @@ func UpdateCategory(db *sql.DB) {
 		for rows.Next() {
 			err = rows.Scan(&tt)
 		}
+		rows.Close()
 		if tt.Valid {
 			c := u.GetCategoryFromName(tt.String)
 			us := "update sharedata set category = ? where id = ?"

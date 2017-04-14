@@ -391,6 +391,7 @@ func CrawlSOQuestion(db *sql.DB, start int) {
 			err = rows.Scan( &url)
 			checkErr(err)
 		}
+		rows.Close()
 		//mark processing
 		stmt, _ := db.Prepare("update sourl set flag=2 where url=?")
 		stmt.Exec(url)
@@ -471,6 +472,7 @@ func CrawlSEURL(db *sql.DB, hostname string, start int,  end int) {
 				for rows.Next() {
 					err = rows.Scan(&scanurl)
 				}
+				rows.Close()
 				url = fmt.Sprintf(url, hostname)
 				if scanurl == ""  {
 					_, err = db.Exec("INSERT into sourl(url,flag, type) values(?,?,?)", url, 0, hostname)

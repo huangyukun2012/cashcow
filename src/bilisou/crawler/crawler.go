@@ -134,6 +134,7 @@ func Start() {
 					stmt.Close()
 					GetFollow(uk, 0, true)
 				}
+				rows.Close()
 			}
 
 		}

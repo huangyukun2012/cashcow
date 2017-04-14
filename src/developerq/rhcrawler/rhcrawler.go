@@ -191,6 +191,7 @@ func CrawlRHKB(db *sql.DB, start int) {
 			err = rows.Scan(&article.URL, &article.ExtID)
 			checkErr(err)
 		}
+		rows.Close()
 		//mark processing
 		stmt, _ := db.Prepare("update rhurl set flag=2 where url=?")
 		stmt.Exec(article.URL)

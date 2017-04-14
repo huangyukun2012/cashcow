@@ -158,6 +158,7 @@ func CrawlGHReadMe(db *sql.DB, start int) {
 			err = rows.Scan( &readme.URL, &readme.Name, &readme.Description, &readme.Stars, &readme.Fork,& readme.Follow, &readme.Language)
 			checkErr(err)
 		}
+		rows.Close()
 		//mark processing
 		stmt, _ := db.Prepare("update githuburl set flag=2 where url=?")
 		stmt.Exec(readme.URL)
