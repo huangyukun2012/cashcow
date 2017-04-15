@@ -24,7 +24,7 @@ var Logger *logging.Logger
 
 
 const WEIXIN_SEARCH_URL = "http://weixin.sogou.com/weixin?usip=null&query=%s&from=tool&ft=&tsn=1&et=&interation=null&type=2&wxid=&page=%d&ie=utf8"
-
+const BAIDU_SEARCH_URL = "http://www.baidu.com/s?ie=utf-8&f=3&rsv_bp=1&tn=baidu&wd=\"%s\""
 
 var db *sql.DB
 var err error
@@ -47,6 +47,37 @@ func Init(dbc *sql.DB) {
 
 }
 
+func CheckBlog(title string) bool {
+	if strings.Contains(title, "聘") || strings.Contains(title, "<") ||
+		strings.Contains(title, ">") {
+		return false
+	}
+	return true
+
+	/*
+
+	url := fmt.Sprintf(BAIDU_SEARCH_URL, title)
+	resp, err := http.Get(url)
+	fmt.Println(url)
+	if err != nil {
+		fmt.Println(err.Error())
+		return false
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+
+	text := string(body)
+	fmt.Println(text)
+	if strings.Contains(text, "很抱歉，没有找到与") {
+		fmt.Println("found " + title)
+		return true
+	} else {
+		fmt.Println("skip " + title)
+		return false
+	}
+	*/
+}
 
 func DownloadImage(url string, filename string) error {
 	res, err := http.Get(url)
@@ -63,6 +94,7 @@ func DownloadImage(url string, filename string) error {
 	io.Copy(file, res.Body)
 	return nil
 }
+
 
 func FindImageAndDownload(n *html.Node, blog *m.Blog) {
 
@@ -112,10 +144,8 @@ func FindBlog(n *html.Node, blog *m.Blog) {
 						Logger.Error(err.Error())
 					}
 					blog.Title = b.String()
-					if strings.Contains(blog.Title, "招聘") || strings.Contains(blog.Title, "<") ||
-						strings.Contains(blog.Title, ">") {
-						blog.Valid = false
-					}
+					blog.Title = strings.TrimSpace(blog.Title)
+					blog.Valid =  CheckBlog(blog.Title)
 				}
 			}
 		}
@@ -234,10 +264,21 @@ func CrawlBlog() {
 			}
 		}
 
+		if len(blogkeywords) == 0 {
+			stmt, _ := db.Prepare("update blogseed set flag=0")
+			stmt.Exec()
+			stmt.Close()
+
+		}
+
 		for _, keyword := range blogkeywords {
+			stmt, _ := db.Prepare("update blogseed set flag=1 where keyword=?")
+			stmt.Exec(keyword)
+			stmt.Close()
+
 			page := 1
 
-			for page < 3 {
+			for page < 2 {
 				blogs := []m.Blog{}
 
 				var url = fmt.Sprintf(WEIXIN_SEARCH_URL, keyword, page)
@@ -268,11 +309,13 @@ func CrawlBlog() {
 						if err != nil {
 							Logger.Error(err.Error())
 						}
-						time.Sleep(60*time.Second)
 					}
+					fmt.Println("blog.Title = " + blog.Title)
+					time.Sleep(200*time.Second)
+
 				}
 
-				time.Sleep(2*time.Minute)
+				time.Sleep(3*time.Minute)
 			}
 			time.Sleep(6*time.Minute)
 		}
