@@ -160,7 +160,7 @@ func GetBlogs(db *sql.DB, where string) []Blog {
 
 
 func GetBlog(db *sql.DB, uk int64) *Blog {
-	sql := "select uk, url, update_time, title,  content,  category from blog  where uk = ?";
+	sql := "select uk, url, update_time, title,  category, content  from blog  where uk = ?";
 	rows, err := db.Query(sql, uk)
 	defer rows.Close()
 
@@ -172,7 +172,7 @@ func GetBlog(db *sql.DB, uk int64) *Blog {
 
 	for rows.Next() {
 		blog := Blog{}
-		rows.Scan( &blog.UK, &blog.URL, &blog.UpdateTime,  &blog.Title,  &blog.Content,  &blog.Category)
+		rows.Scan( &blog.UK, &blog.URL, &blog.UpdateTime,  &blog.Title, &blog.Category, &blog.Content)
 		blog.FillHtml()
 		return &blog
 	}

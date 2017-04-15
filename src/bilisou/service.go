@@ -355,10 +355,11 @@ func ListBlog(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	cat := vars["category"]
-	cati, ok:= u.CAT_STR_INT[cat]
-	if !ok {
+	//cati, ok:= u.CAT_STR_INT[cat]
+	cati, err := strconv.Atoi(cat)
+	if err != nil {
 		Logger.Error(err.Error())
-		cati = 0
+		cati = -1
 	}
 
 
