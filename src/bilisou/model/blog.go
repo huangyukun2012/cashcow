@@ -143,10 +143,12 @@ func GetBlogs(db *sql.DB, where string) []Blog {
 	rows, err := db.Query(sql)
 	defer rows.Close()
 	blogs := []Blog{}
+	/*
 	if err != nil {
 		Logger.Error(err.Error())
 		return blogs
 	}
+	*/
 
 	for rows.Next() {
 		blog := Blog{}
