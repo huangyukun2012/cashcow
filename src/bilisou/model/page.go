@@ -3,8 +3,7 @@ package model
 
 import (
 //	"fmt"
-//	"github.com/siddontang/go/log"
-	u "utils"
+//	u "utils"
 )
 
 
@@ -14,6 +13,10 @@ type PageVar struct {
 	Category      string
 	CategoryCN    string
 	Keyword       string
+	Tag           string
+	Blog          Blog
+	ListBlog         []Blog
+	SideBarBlog   []Blog
 
 	//for paging
 	Current       int
@@ -38,7 +41,11 @@ type PageVar struct {
 	Keywords          []Keyword
 }
 
+
+
 func SetBA(pv *PageVar) {
+	left := 5
+	right := 5
 	if(pv.Current > 2) {
 		pv.Previous = pv.Current - 1;
 	}
@@ -46,6 +53,22 @@ func SetBA(pv *PageVar) {
 		pv.Next = pv.Current + 1
 	}
 
+	pl := pv.Current - left
+	pr := pv.Current + 1
+
+	for ; pl < pv.Current; pl ++ {
+		if pl > 0 {
+			pv.Before = append(pv.Before, pl)
+		} else {
+			right = right + 1
+		}
+	}
+
+	for ; pr < pv.Current + right && pr <pv.End; pr ++ {
+		pv.After = append(pv.After, pr)
+	}
+
+	/*
 	pp := pv.Current - u.NAVMAX
 
 	if pp < 0 {
@@ -60,5 +83,6 @@ func SetBA(pv *PageVar) {
 	for ; ((pv.Current + u.NAVMAX) >= pp) && (pp <= pv.End); pp ++ {
 		pv.After = append(pv.After, pp)
 	}
+*/
 
 }

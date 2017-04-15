@@ -6,13 +6,11 @@
       <meta name="Keywords" content="哔哩搜, 百度网盘, {{ range $i, $k := .Share.SeoKeywords}}{{$k}}, {{end}}" />
 
       <title>{{.Share.Title}} - 哔哩搜 - 最快最全的百度网盘搜索引擎</title>
-      <meta name="description" content="">
       <link href="/static/img/search.ico" rel="shortcut icon">
       <link rel="stylesheet" href="http://bdimg.share.baidu.com/static/api/css/share_style0_32.css?v=4413acf0.css">
       <link rel="stylesheet" href="/static/css/style.css">
       <script>
          function search() {
-            console.log("hahah")
             var si = document.getElementById("searchinput");
             window.location.href="/search/all/" + si.value;
          }
@@ -67,6 +65,8 @@
                <div class="item "> <a href="/list/music/">音乐</a> </div>
                <div class="item "> <a href="/list/picture/">图片</a> </div>
                <div class="item "> <a href="/list/other/">其他</a> </div>
+               <div class="item "> <a href="http://blog.bilisou.com/">段子大全</a> </div>
+
             </div>
          </div>
          <div class="main">
@@ -82,8 +82,7 @@
 
 <!--- list page --->
                {{if eq .Type  "list"}}
-               <div class="took">当前位置： 首页</div>
-               <div class="took">最新收录 20 资源</div>
+               <div class="took">当前位置： 第{{.Current}}页</div>
                <div id="res">
                     
                   {{ range $i, $s := .ListShares}}
@@ -386,8 +385,8 @@
          </div>
          <div class="footer">
            
-            <div class="finner"><span class="flink">找资源上哔哩搜，速度最快资源最多的网盘搜索神器，日常必备的网盘搜索工具。</span> <span class="flink">本站仅提供百度云盘资源搜索服务，信息均来源于百度网盘。</span></div>
-            <span><a class="flink" target="_blank" href="http://www.wenti.info" title="IT问题网">IT问题网</a> <a class="flink" target="_blank" href="http://www.piansoso.com/">片搜搜</a> <a class="flink" target="_blank" href="http://linuxman.cn/">Linuxman</a> </span>
+            <div class="finner"><span class="flink">找资源上哔哩搜，速度最快资源最多的网盘搜索神器，日常必备的网盘搜索工具。</span> <span class="flink">本站信息均采集自网络，如有侵权请联系bilisou@gmail.com删除。</span></div>
+            <span><a class="flink" target="_blank" href="http://www.developerq.com" title="开发者问题网">开发者问题网</a> <a class="flink" target="_blank" href="http://blog.bilisou.com" title="哔哩搜搞笑段子">哔哩搜搞笑段子</a></span>
          </div>
       </div>
        </body>

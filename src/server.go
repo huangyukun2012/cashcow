@@ -50,10 +50,15 @@ func main() {
 	dmx = mx.Host("www.wenti.info").Subrouter()
 	dmx.NotFoundHandler = http.HandlerFunc(RedirectPage)
 
+
 	bmx := mx.Host("bilisou.com").Subrouter()
 	bs.Start(bmx)
 	bmx = mx.Host("www.bilisou.com").Subrouter()
 	bs.Start(bmx)
+
+
+	blogmx := mx.Host("blog.bilisou.com").Subrouter()
+	bs.StartBlog(blogmx)
 
 
 	fmt.Println("start listening at *:80")

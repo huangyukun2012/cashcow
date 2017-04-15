@@ -24,7 +24,7 @@ import (
 	s "developerq/socrawler"
 	//r "developerq/rhcrawler"
 	//g "developerq/ghcrawler"
-	w "weixin"
+	w "developerq/weixin"
 
 	es "gopkg.in/olivere/elastic.v3"
 	"io/ioutil"
@@ -543,7 +543,7 @@ func Start(mx *mux.Router) {
 	mx.HandleFunc("/listreadme/{page}/", ListReadMe)
 
 
-	//list readme
+	//list
 	mx.HandleFunc("/listblog", ListBlog)
 	mx.HandleFunc("/listblog/", ListBlog)
 	mx.HandleFunc("/listblog/{page}", ListBlog)
