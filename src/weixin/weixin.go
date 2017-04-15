@@ -271,14 +271,14 @@ func CrawlBlog() {
 
 		}
 
-		for _, keyword := range blogkeywords {
+		for k, keyword := range blogkeywords {
 			stmt, _ := db.Prepare("update blogseed set flag=1 where keyword=?")
 			stmt.Exec(keyword)
 			stmt.Close()
 
 			page := 1
 
-			for page < 2 {
+			for page < 2  && k < 4 {
 				blogs := []m.Blog{}
 
 				var url = fmt.Sprintf(WEIXIN_SEARCH_URL, keyword, page)
