@@ -60,9 +60,9 @@ func (blog *Blog)Save(db *sql.DB) error {
 
 var CatMap = map[int]string {
 	1 : "搞笑段子",
-	2 : "搞笑GIF",
-	3 : "糗事百科",
-	4 : "明星八卦",
+	2 : "糗事百科",
+	3 : "明星八卦",
+	4 : "深度好文",
 	5 : "时事点评",
 	6 : "心灵鸡汤",
 	7 : "养生专家",
