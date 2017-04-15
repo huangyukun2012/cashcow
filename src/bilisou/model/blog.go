@@ -140,7 +140,7 @@ func GetSideBarBlog(db *sql.DB) []Blog {
 func GetBlogs(db *sql.DB, where string) []Blog {
 	sql := "select uk, url, update_time, title, tag,  category, abstract from blog order by update_time desc" + where;
 
-	rows, err := db.Query(sql)
+	rows, _ := db.Query(sql)
 	defer rows.Close()
 	blogs := []Blog{}
 	/*
