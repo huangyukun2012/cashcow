@@ -357,7 +357,9 @@ func ListBlog(w http.ResponseWriter, r *http.Request) {
 	cat := vars["category"]
 	//cati, ok:= u.CAT_STR_INT[cat]
 	cati, err := strconv.Atoi(cat)
+	fmt.Println(cati)
 	if err != nil {
+		fmt.Println(err.Error())
 		Logger.Error(err.Error())
 		cati = -1
 	}

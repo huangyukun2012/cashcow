@@ -101,9 +101,9 @@ func (blog * Blog) FillHtml()*Blog {
 
 
 
-func GetBlogCount(db *sql.DB) int{
+func GetBlogCount(db *sql.DB, where string) int{
 	count := 0
-	rows, _ := db.Query("select count(id) from blog")
+	rows, _ := db.Query("select count(id) from blog " + where)
 	for rows.Next() {
 		rows.Scan(&count)
 	}
@@ -132,14 +132,15 @@ func GetSideBarBlog(db *sql.DB) []Blog {
 	rand.Seed(time.Now().UnixNano())
 	start := rand.Intn(size )
 
-	where := fmt.Sprintf(" limit %d, 10", start)
+	where := fmt.Sprintf("  order by update_time desc limit %d, 10", start)
 	return GetBlogs(db, where)
 }
 
 
 func GetBlogs(db *sql.DB, where string) []Blog {
-	sql := "select uk, url, update_time, title, tag,  category, abstract from blog order by update_time desc" + where;
+	sql := "select uk, url, update_time, title, tag,  category, abstract from blog " + where;
 
+	fmt.Println(sql)
 	rows, _ := db.Query(sql)
 	defer rows.Close()
 	blogs := []Blog{}
@@ -188,18 +189,21 @@ func ListBlogPage(db *sql.DB,esclient *es.Client, page int, category int) *PageV
 	pv.Type = "listblog"
 	pv.CategoryInt = category
 
-	if page <= 0  {
+	if page <= 0 || category < 0 || category > 8  {
 		pv.Type = "lost"
 		pv.SideBarBlog = GetSideBarBlog(db)
 		return nil
 	}
-
-	count := GetBlogCount(db)
-	pv.End = count / 20
-	where := fmt.Sprintf(" limit %d, 20", (page - 1) * 20)
+	where := ""
 	if category != 0 {
-		where = where + fmt.Sprintf(" and category = %d", category)
+		where = fmt.Sprintf(" where category = %d  ", category)
 	}
+	fmt.Println(where)
+	
+	count := GetBlogCount(db, where)
+	pv.End = count / 20
+ 
+	where = where + fmt.Sprintf(" order by update_time desc limit %d, 20", (page - 1) * 20)
 
 	pv.ListBlog = GetBlogs(db, where)
 
