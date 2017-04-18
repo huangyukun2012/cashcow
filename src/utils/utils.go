@@ -211,7 +211,13 @@ var BilisouCount = 0
 var DeveloperqStat = make(map[string]int)
 var DeveloperqCount = 0
 
-func UpdateDeveloperqStat(ipaddr string, log *logging.Logger) {
+func UpdateDeveloperqStat(ipaddrport string, log *logging.Logger) {
+	ss := s.Split(ipaddrport, ":")
+	if len(ss) != 2 {
+		return
+	}
+	ipaddr := ss[0]
+
 	_, ok := DeveloperqStat[ipaddr]
 	if ok {
 		DeveloperqStat[ipaddr] = DeveloperqStat[ipaddr] + 1
@@ -225,7 +231,13 @@ func UpdateDeveloperqStat(ipaddr string, log *logging.Logger) {
 }
 
 
-func UpdateBilisouStat(ipaddr string , log *logging.Logger) {
+func UpdateBilisouStat(ipaddrport string , log *logging.Logger) {
+	ss := s.Split(ipaddrport, ":")
+	if len(ss) != 2 {
+		return
+	}
+	ipaddr := ss[0]
+
 	_, ok := BilisouStat[ipaddr]
 	if ok {
 		BilisouStat[ipaddr] = BilisouStat[ipaddr] + 1
