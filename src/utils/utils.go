@@ -23,6 +23,7 @@ import (
 	//"utils"
 	"strconv"
 	"time"
+	"sync"
 
 )
 
@@ -208,8 +209,11 @@ func ConvertNumber(n int64) string {
 
 var BilisouStat = make(map[string]int)
 var BilisouCount = 0
+var LBilisou sync.Mutex
+
 var DeveloperqStat = make(map[string]int)
 var DeveloperqCount = 0
+var LDeveloperq sync.Mutex
 
 func UpdateDeveloperqStat(ipaddrport string, log *logging.Logger) {
 	ss := s.Split(ipaddrport, ":")
@@ -218,12 +222,15 @@ func UpdateDeveloperqStat(ipaddrport string, log *logging.Logger) {
 	}
 	ipaddr := ss[0]
 
+	LDeveloperq.Lock()
 	_, ok := DeveloperqStat[ipaddr]
 	if ok {
 		DeveloperqStat[ipaddr] = DeveloperqStat[ipaddr] + 1
 	} else {
 		DeveloperqStat[ipaddr] = 1
 	}
+	LDeveloperq.Unlock()
+
 	DeveloperqCount = DeveloperqCount + 1
 	if DeveloperqCount % 1000 == 0 {
 		DumpMap(DeveloperqStat, DeveloperqCount, log)
@@ -239,11 +246,14 @@ func UpdateBilisouStat(ipaddrport string , log *logging.Logger) {
 	ipaddr := ss[0]
 
 	_, ok := BilisouStat[ipaddr]
+	LBilisou.Lock()
 	if ok {
 		BilisouStat[ipaddr] = BilisouStat[ipaddr] + 1
 	} else {
 		BilisouStat[ipaddr] = 1
 	}
+	LBilisou.Unlock()
+
 	BilisouCount = BilisouCount + 1
 	if BilisouCount % 1000 == 0 {
 		DumpMap(BilisouStat, BilisouCount, log)
