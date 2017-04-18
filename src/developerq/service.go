@@ -235,6 +235,7 @@ func GetURL(url string) (*m.PageVar, error){
 
 
 func Index(w http.ResponseWriter, r *http.Request) {
+	u.UpdateDeveloperqStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
 	pv, err := GetURL("home")
 	if err == nil && pv != nil {
@@ -255,6 +256,7 @@ func Dummy(w http.ResponseWriter, r *http.Request) {
 
 
 func ListArticle(w http.ResponseWriter, r *http.Request) {
+	u.UpdateDeveloperqStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
 
 	pv, err := GetURL(r.URL.Path)
@@ -286,6 +288,7 @@ func ListArticle(w http.ResponseWriter, r *http.Request) {
 
 
 func ListReadMe(w http.ResponseWriter, r *http.Request) {
+	u.UpdateDeveloperqStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
 
 	pv, err := GetURL(r.URL.Path)
@@ -317,6 +320,7 @@ func ListReadMe(w http.ResponseWriter, r *http.Request) {
 
 
 func ListBlog(w http.ResponseWriter, r *http.Request) {
+	u.UpdateDeveloperqStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
 
 	pv, err := GetURL(r.URL.Path)
@@ -349,6 +353,7 @@ func ListBlog(w http.ResponseWriter, r *http.Request) {
 
 
 func NotFound(w http.ResponseWriter, r *http.Request) {
+	u.UpdateDeveloperqStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
 	pv := m.ListArticlePage(db, esclient, 1)
 	pv.Type = "lost"
@@ -362,6 +367,7 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 
 
 func TagArticle(w http.ResponseWriter, r *http.Request) {
+	u.UpdateDeveloperqStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
 	pv, err := GetURL(r.URL.Path)
 	if err == nil && pv != nil {
@@ -391,6 +397,7 @@ func TagArticle(w http.ResponseWriter, r *http.Request) {
 }
 
 func SearchArticle(w http.ResponseWriter, r *http.Request) {
+	u.UpdateDeveloperqStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
 
 	keyword := r.URL.Query().Get("q")
@@ -422,6 +429,7 @@ func SearchArticle(w http.ResponseWriter, r *http.Request) {
 }
 
 func ShowArticle(w http.ResponseWriter, r *http.Request) {
+	u.UpdateDeveloperqStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
 
 	pv, err := GetURL(r.URL.Path)
@@ -451,6 +459,7 @@ func ShowArticle(w http.ResponseWriter, r *http.Request) {
 
 
 func ShowReadMe(w http.ResponseWriter, r *http.Request) {
+	u.UpdateDeveloperqStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
 
 	pv, err := GetURL(r.URL.Path)
@@ -479,6 +488,7 @@ func ShowReadMe(w http.ResponseWriter, r *http.Request) {
 }
 
 func ShowBlog(w http.ResponseWriter, r *http.Request) {
+	u.UpdateDeveloperqStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
 
 	pv, err := GetURL(r.URL.Path)

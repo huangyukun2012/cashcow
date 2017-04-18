@@ -7,7 +7,7 @@ import (
 	//	_ "github.com/go-sql-driver/mysql"
 	//sql "database/sql"
 	//	"io/ioutil"
-	//"logging"
+	"logging"
 	//	"regexp"
 	//	"encoding/json"
 	//	"time"
@@ -204,4 +204,44 @@ func ConvertNumber(n int64) string {
 		str = fmt.Sprintf("%.1f", float64(n)/float64(1000000)) + "m"
 	}
 	return str
+}
+
+var BilisouStat = make(map[string]int)
+var BilisouCount = 0
+var DeveloperqStat = make(map[string]int)
+var DeveloperqCount = 0
+
+func UpdateDeveloperqStat(ipaddr string, log *logging.Logger) {
+	_, ok := DeveloperqStat[ipaddr]
+	if ok {
+		DeveloperqStat[ipaddr] = DeveloperqStat[ipaddr] + 1
+	} else {
+		DeveloperqStat[ipaddr] = 1
+	}
+	DeveloperqCount = DeveloperqCount + 1
+	if DeveloperqCount % 1000 == 0 {
+		DumpMap(DeveloperqStat, DeveloperqCount, log)
+	}
+}
+
+
+func UpdateBilisouStat(ipaddr string , log *logging.Logger) {
+	_, ok := BilisouStat[ipaddr]
+	if ok {
+		BilisouStat[ipaddr] = BilisouStat[ipaddr] + 1
+	} else {
+		BilisouStat[ipaddr] = 1
+	}
+	BilisouCount = BilisouCount + 1
+	if BilisouCount % 1000 == 0 {
+		DumpMap(BilisouStat, BilisouCount, log)
+	}
+}
+
+func DumpMap(stat map[string]int, count int, log *logging.Logger) {
+	log.Info("Total Request Count = %d", count)
+	log.Info("IP Count = %d", len(stat))
+	for key, value := range stat {
+		log.Info("[%s] = %d", key, value)
+	}
 }
