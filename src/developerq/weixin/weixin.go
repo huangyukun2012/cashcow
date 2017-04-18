@@ -138,7 +138,7 @@ func FindBlog(n *html.Node, blog *m.Blog) {
 		for _, a := range n.Attr {
 			if a.Key == "class" 	&&  a.Val == "rich_media_title" {
 				Logger.Info("find title")
-				if c := n.FirstChild; c.Data != "" {
+				if c := n.FirstChild; c != nil && c.Data != "" {
 					b := new(bytes.Buffer)
 					if err := html.Render(b, c); err != nil {
 						Logger.Error(err.Error())
@@ -300,6 +300,7 @@ func CrawlBlog() {
 
 					if err != nil {
 						Logger.Error(err.Error())
+						continue
 					}
 					FindBlog(doc, &blog)
 					//fmt.Printf("%+v", blog)
