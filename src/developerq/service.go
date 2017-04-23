@@ -24,7 +24,7 @@ import (
 	s "developerq/socrawler"
 	//r "developerq/rhcrawler"
 	//g "developerq/ghcrawler"
-	w "developerq/weixin"
+	//w "developerq/weixin"
 
 	es "gopkg.in/olivere/elastic.v3"
 	"io/ioutil"
@@ -121,7 +121,7 @@ func Init() {
 	go s.Start(db)
 	//go r.Start(db)
 	//go g.Start(db)
-	go w.Start(db)
+	//go w.Start(db)
 }
 
 func InitTemplates() {

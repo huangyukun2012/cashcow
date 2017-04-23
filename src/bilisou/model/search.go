@@ -20,35 +20,43 @@ func GenerateSearchPageVar(esclient *es.Client, category int, keyword string, pa
 
 	boolQuery := es.NewBoolQuery()
 
-	query := es.NewMatchQuery("title", keyword)
+	query := es.NewMultiMatchQuery(keyword, "title", "filenames")
+	//query := es.NewMultiMatchQuery(keyword, "title")
+	//query := es.NewSimpleQueryStringQuery(keyword)
 	boolQuery.Should(query)
 
+	/*
 	if category != 0 {
 		boolQuery.Must(es.NewTermQuery("category", category))
 	}
+	*/
 
 	start := u.PAGEMAX * (page - 1)
 	if start <= 0 {
 		start = 1
 	}
 	var size int64
-	pv.SearchShares, size = SearchShare(esclient, boolQuery, start, u.PAGEMAX, "")
-	//log.Info(pv.SearchShares
+	var time int64
+
+	pv.SearchShares, size, time= SearchShare(esclient, boolQuery, start, u.PAGEMAX, "")
+	if size > 1000 {
+		size = 1000
+	}
+	pv.SearchTime = time
+	pv.SearchResult = size
 
 	if len(pv.SearchShares) == 0 {
 		pv.Type = "lost"
 	}
 
 	pv.End = int(size) / 20 + 1
-	if pv.End > 30000 {
-		pv.End = 30000
-	}
+
 	pv.Current = page
 
 	SetBA(&pv)
 	SetCategory(&pv, category)
 
-	pv.RandomUsers = GenerateRandomUsers(esclient, 24)
-	pv.Keywords = GenerateRandomKeywords(esclient, 30)
+//	pv.RandomUsers = GenerateRandomUsers(esclient, 24)
+//	pv.Keywords = GenerateRandomKeywords(esclient, 30)
 	return &pv
 }

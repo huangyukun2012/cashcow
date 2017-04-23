@@ -24,7 +24,8 @@ import (
 	"logging"
 	m "bilisou/model"
 	c "bilisou/crawler"
-	w "bilisou/weixin"
+//	w "bilisou/weixin"
+//	b "bilisou/bt"
 	es "gopkg.in/olivere/elastic.v3"
 	"io/ioutil"
 )
@@ -42,8 +43,17 @@ var redis_Database int
 var ConfError error
 var esclient *es.Client
 var cfg *goconfig.ConfigFile
-var templateContent *template.Template
+
+//var templateContent *template.Template
 var blogTemplate *template.Template
+
+var showTemplate *template.Template
+var listTemplate *template.Template
+var searchTemplate *template.Template
+var homeTemplate *template.Template
+var lostTemplate *template.Template
+
+
 var Logger *logging.Logger
 
 func Init() {
@@ -96,8 +106,8 @@ func Init() {
 	if err != nil {
 		Logger.Error("failed to create es client")
 	}
-	m.TotalShares = m.GetTotalShares(esclient)
-	m.TotalUsers = m.GetTotalUsers(esclient)
+//	m.TotalShares = m.GetTotalShares(esclient)
+//	m.TotalUsers = m.GetTotalUsers(esclient)
 
 	m.MAX_USER, m.MIN_USER = m.GetUserMaxMINID(db)
 	m.MAX_SHARE, m.MIN_SHARE = m.GetShareMaxMinID(db)
@@ -111,23 +121,19 @@ func Init() {
 		Logger.Error("读取数据库port错误")
 	}
 
+	InitTemplates()
 
-	templ, err := ioutil.ReadFile("resource/bilisou/templates/index.html")
-	if err == nil {
-		templateContent = template.Must(template.New("tmp").Parse(string(templ)))
-	} else {
-		Logger.Error("failed to open template")
-	}
-
-	templ, err = ioutil.ReadFile("resource/bilisou/templates/blog.html")
+	templ, err := ioutil.ReadFile("resource/bilisou/templates/blog.html")
 	if err == nil {
 		blogTemplate = template.Must(template.New("tmp").Parse(string(templ)))
 	} else {
 		Logger.Error("failed to open template")
 	}
 
+
 	go c.Start(db)
-	go w.Start(db)
+	//go w.Start(db)
+	//go b.Start(db)
 
 
 }
@@ -158,6 +164,41 @@ func GetURL(url string) (*m.PageVar, error){
 }
 
 
+func InitTemplates() {
+	home, err := ioutil.ReadFile("resource/bilisou/templates/home.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
+	list, err := ioutil.ReadFile("resource/bilisou/templates/list.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
+	search, err := ioutil.ReadFile("resource/bilisou/templates/search.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
+	show, err := ioutil.ReadFile("resource/bilisou/templates/show.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
+	lost, err := ioutil.ReadFile("resource/bilisou/templates/404.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
+
+	listTemplate = template.Must(template.New("tmp").Parse(string(list)))
+	searchTemplate = template.Must(template.New("tmp").Parse(string(search)))
+	homeTemplate = template.Must(template.New("tmp").Parse(string(home)))
+	showTemplate = template.Must(template.New("tmp").Parse( string(show)))
+	lostTemplate = template.Must(template.New("tmp").Parse( string(lost)))
+}
+
+
 func SetURLBlog(url string, pv *m.PageVar) error {
 	b, err := json.Marshal(pv)
 	if err != nil {
@@ -185,15 +226,16 @@ func GetURLBlog(url string) (*m.PageVar, error){
 func Index(w http.ResponseWriter, r *http.Request) {
 	u.UpdateBilisouStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s, url = %s", r.RemoteAddr, r.URL)
+	/*
 	pv, err := GetURL("home")
 	if err == nil && pv != nil {
-		render(w, templateContent, pv)
+		render(w, homeTemplate, pv)
 	} else {
 		pv := m.GenerateListPageVar(esclient, 0, 1)
-		SetURL("home", pv)
-		render(w, templateContent, pv)
-	}
-
+	*/
+	pv := m.PageVar{}
+	pv.Keywords = m.GetRandomKeywords(db, 5)
+	render(w, homeTemplate, pv)
 }
 
 
@@ -219,34 +261,29 @@ func ListShare(w http.ResponseWriter, r *http.Request) {
 	pv, err := GetURL(r.URL.Path)
 	if err == nil && pv != nil {
 		Logger.Info("it's from cache %s", url)
-		render(w, templateContent, pv)
+		render(w, listTemplate, pv)
 		return
 	}
 
 	vars := mux.Vars(r)
-	cat := vars["category"]
-	cati, ok:= u.CAT_STR_INT[cat]
-	if !ok {
-		Logger.Error(err.Error())
-		cati = -1
-	}
-
 	p := vars["page"]
 	if p == "" {
 		p = "1"
 	}
+
 	pp, err:=strconv.Atoi(p)
 	if err != nil {
 		Logger.Error(err.Error())
 		return
 	}
-	pv = m.GenerateListPageVar(esclient, cati, pp)
+	pv = m.ListSharePage(db, pp, 0)
 	if pv != nil {
-		render(w, templateContent, pv)
+		render(w, listTemplate, pv)
 	}
 	SetURL(r.URL.Path, pv)
 }
 
+/*
 func ListUsers(w http.ResponseWriter, r *http.Request) {
 	u.UpdateBilisouStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s, url = %s", r.RemoteAddr, r.URL)
@@ -273,6 +310,7 @@ func ListUsers(w http.ResponseWriter, r *http.Request) {
 	}
 	SetURL(r.URL.Path, pv)
 }
+*/
 
 
 func SearchShare(w http.ResponseWriter, r *http.Request) {
@@ -281,17 +319,19 @@ func SearchShare(w http.ResponseWriter, r *http.Request) {
 	pv, err := GetURL(r.URL.Path)
 	if err == nil && pv != nil {
 		Logger.Info("it's from cache %s", url)
-		render(w, templateContent, pv)
+		render(w, searchTemplate, pv)
 		return
 	}
 
 	vars := mux.Vars(r)
+	/*
 	cat := vars["category"]
 	cati, ok:= u.CAT_STR_INT[cat]
 	if !ok {
 		Logger.Error(err.Error())
 		cati = -1
 	}
+	*/
 
 	keyword := vars["keyword"]
 	if keyword == "" {
@@ -309,9 +349,9 @@ func SearchShare(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	m.KeywordHit(db,keyword)
-	pv = m.GenerateSearchPageVar(esclient, cati, keyword, pp)
+	pv = m.GenerateSearchPageVar(esclient, 0, keyword, pp)
 	if pv != nil {
-		render(w, templateContent, pv)
+		render(w, searchTemplate, pv)
 	}
 	SetURL(r.URL.Path, pv)
 }
@@ -322,12 +362,13 @@ func ShowShare(w http.ResponseWriter, r *http.Request) {
 	// break down the variables for easier assignment
 	vars := mux.Vars(r)
 	id := vars["dataid"]
-	sp := m.GenerateSharePageVar(esclient, id)
+	sp := m.ShowSharePage(db, esclient, id)
 	if sp != nil {
-		render(w, templateContent, sp)
+		render(w, showTemplate, sp)
 	}
 }
 
+/*
 func ShowUser(w http.ResponseWriter, r *http.Request) {
 	Logger.Info("ip = %s, url = %s", r.RemoteAddr, r.URL)
 	vars := mux.Vars(r)
@@ -348,7 +389,7 @@ func ShowUser(w http.ResponseWriter, r *http.Request) {
 		render(w, templateContent, pv)
 	}
 }
-
+*/
 
 func ListBlog(w http.ResponseWriter, r *http.Request) {
 	u.UpdateBilisouStat(r.RemoteAddr, Logger)
@@ -426,11 +467,12 @@ func ShowBlog(w http.ResponseWriter, r *http.Request) {
 func NotFound(w http.ResponseWriter, r *http.Request) {
 	u.UpdateBilisouStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s, url = %s", r.RemoteAddr, r.URL)
-	pv := m.GenerateListPageVar(esclient, 0, 1)
+//	pv := m.GenerateListPageVar(esclient, 0, 1)
+	pv := &m.PageVar{}
 	pv.Type = "lost"
 	w.WriteHeader(http.StatusNotFound)
 	if pv != nil {
-		render(w, templateContent, pv)
+		render(w, lostTemplate, pv)
 	}
 	SetURL(r.URL.Path, pv)
 }
@@ -456,7 +498,6 @@ func render(w http.ResponseWriter, t *template.Template, data interface{}) {
 		Logger.Error(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}*/
-
 	if err := t.Execute(w, data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -513,34 +554,35 @@ func Start(mx *mux.Router) {
 
 	mx.HandleFunc("/", Index)
 	//list
-	mx.HandleFunc("/list/{category}", ListShare)
-	mx.HandleFunc("/list/{category}/", ListShare)
-	mx.HandleFunc("/list/{category}/{page}", ListShare)
-	mx.HandleFunc("/list/{category}/{page}/", ListShare)
+	mx.HandleFunc("/list", ListShare)
+	mx.HandleFunc("/list/", ListShare)
+	mx.HandleFunc("/list/{page}", ListShare)
+	mx.HandleFunc("/list/{page}/", ListShare)
 
 	//ulist
+/*
 	mx.HandleFunc("/ulist", ListUsers)
 	mx.HandleFunc("/ulist/", ListUsers)
 	mx.HandleFunc("/ulist/{page}", ListUsers)
 	mx.HandleFunc("/ulist/{page}/", ListUsers)
-
+*/
 	//search
 	mx.HandleFunc("/search/{keyword}", SearchShare)
-	mx.HandleFunc("/search/{category}/{keyword}", SearchShare)
-	mx.HandleFunc("/search/{category}/{keyword}/", SearchShare)
-	mx.HandleFunc("/search/{category}/{keyword}/{page}", SearchShare)
-	mx.HandleFunc("/search/{category}/{keyword}/{page}/", SearchShare)
+	mx.HandleFunc("/search/{keyword}/", SearchShare)
+	mx.HandleFunc("/search/{keyword}/{page}", SearchShare)
+	mx.HandleFunc("/search/{keyword}/{page}/", SearchShare)
 
 	//file
 	mx.HandleFunc("/file/{dataid}", ShowShare)
 	mx.HandleFunc("/file/{dataid}/", ShowShare)
 
+/*
 	//user
 	mx.HandleFunc("/user/{uk}", ShowUser)
 	mx.HandleFunc("/user/{uk}/", ShowUser)
 	mx.HandleFunc("/user/{uk}/{page}", ShowUser)
 	mx.HandleFunc("/user/{uk}/{page}/", ShowUser)
-
+*/
 
 	//server static
 	mx.PathPrefix("/static").Handler(http.FileServer(http.Dir("resource/bilisou/")))

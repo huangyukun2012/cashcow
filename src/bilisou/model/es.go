@@ -16,16 +16,16 @@ var TotalUsers int64
 var TotalKeywords int64
 
 
-func SearchShare(esclient *es.Client, query es.Query, start int, size int, sort string)([]Share, int64) {
+func SearchShare(esclient *es.Client, query es.Query, start int, size int, sort string)([]Share, int64, int64) {
 	searchResult := Search(esclient, "bilisou_sharedata", query, start, size, sort)
 	if searchResult == nil {
-		return nil, 0
+		return nil, 0, 0
 	}
 
 	shares := []Share{}
 	if searchResult.Hits.TotalHits > 0 {
 		for _, hit := range searchResult.Hits.Hits {
-			sd := ShareData{}
+			sd := Share{}
 
 			err := json.Unmarshal(*hit.Source, &sd)
 			if err != nil {
@@ -34,21 +34,22 @@ func SearchShare(esclient *es.Client, query es.Query, start int, size int, sort 
 
 			if hit.Highlight != nil && len(hit.Highlight) != 0 {
 				if hl, found := hit.Highlight["title"]; found {
-					sd.HTitle = hl[0]
-				} else {
-					sd.HTitle = sd.Title
+					sd.Title = hl[0]
 				}
-			} else {
-				sd.HTitle = sd.Title
+
+				//if hl, found := hit.Highlight["filenames"]; found {
+				//	sd.FilenamesRaw = hl[0]
+				//}
 			}
-			s := ShareDataToShare(sd)
-			shares = append(shares, s)
+
+			sd.FillHtml()
+			shares = append(shares, sd)
 		}
 	} else {
-		return nil, 0
+		return nil, 0, 0
 	}
 
-	return shares, searchResult.Hits.TotalHits
+	return shares, searchResult.Hits.TotalHits, searchResult.TookInMillis
 }
 
 func SearchUser(esclient *es.Client, query es.Query, start int, size int)([]User, int64) {
@@ -110,9 +111,17 @@ func Search(esclient *es.Client, index string,  query es.Query, start int, size 
 	hl = hl.PreTags("<mark>").PostTags("</mark>")
 	hl = hl.Encoder("utf-8")
 
+	/*
+	hlf := es.NewHighlight()
+	hlf = hl.Fields(es.NewHighlighterField("filenames"))
+	hlf = hl.PreTags("<mark>").PostTags("</mark>")
+	hlf = hl.Encoder("utf-8")
+	*/
+
 	searchService := esclient.Search().
 		Index(index).
 		Highlight(hl).
+	//	Highlight(hlf).
 		Query(query).
 		From(start).Size(size).
 		Pretty(true)
@@ -133,28 +142,6 @@ func Search(esclient *es.Client, index string,  query es.Query, start int, size 
 	return searchResult
 }
 
-func GetTotalShares(esclient *es.Client) int64 {
-	query:= es.NewMatchAllQuery()
-	var size int64
-	_, size = SearchShare(esclient, query, 1, 1, "")
-	return size
-}
-
-func GetTotalKeywords(esclient *es.Client) int64 {
-	query:= es.NewMatchAllQuery()
-	var size int64
-	_, size = SearchKeyword(esclient, query, 1, 1)
-	return size
-}
-
-
-func GetTotalUsers(esclient *es.Client) int64 {
-	var size int64
-	query:= es.NewMatchAllQuery()
-	_, size = SearchUser(esclient, query, 1, 1)
-	return size
-}
-
 func GenerateRandomShares(esclient *es.Client, category int, size int, keyword string) []Share{
 	boolQuery := es.NewBoolQuery()
 	for i := 0; i < size; i ++ {
@@ -166,37 +153,6 @@ func GenerateRandomShares(esclient *es.Client, category int, size int, keyword s
 	if category != 0 {
 		boolQuery.Must(es.NewTermQuery("category", category))
 	}
-	randomShares, _ := SearchShare(esclient, boolQuery, 0, size, "")
+	randomShares, _, _ := SearchShare(esclient, boolQuery, 0, size, "")
 	return randomShares
-}
-
-
-func GenerateRandomUsers(esclient *es.Client, size int) []User{
-	boolQuery := es.NewBoolQuery()
-	for i := 0; i < size; i ++ {
-		rand.Seed(time.Now().UnixNano())
-		id := rand.Intn(MAX_USER - MIN_USER) + MIN_USER
-		boolQuery.Should(es.NewTermQuery("id", id))
-	}
-	randomUsers, _ := SearchUser(esclient, boolQuery, 0, size)
-	return randomUsers
-}
-
-
-func GenerateRandomKeywords(esclient *es.Client, size int) []Keyword{
-	boolQuery := es.NewBoolQuery()
-	for i := 0; i < size; i ++ {
-		rand.Seed(time.Now().UnixNano())
-		id := rand.Intn(MAX_KEYWORD - MIN_KEYWORD) + MIN_KEYWORD
-		boolQuery.Should(es.NewTermQuery("id", id))
-	}
-	randomKeywords, _ := SearchKeyword(esclient, boolQuery, 0, size)
-	return randomKeywords
-}
-
-
-func GenerateUserShares(esclient *es.Client, uk string, size int) []Share{
-	query := es.NewTermQuery("uk", uk)
-	userShares, _ := SearchShare(esclient, query, 1, size, "")
-	return userShares
 }

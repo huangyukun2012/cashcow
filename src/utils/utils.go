@@ -133,7 +133,12 @@ func InitCateMap() {
 }
 
 func SplitNames(fn string) []string {
-	ss := s.Split(fn, "#i#l#i#s#o#u#")
+	ss := s.Split(fn, "b#i#l#i#s#o#u#")
+	return ss
+}
+
+func SplitItem(fn string) []string {
+	ss := s.Split(fn, "s#i#z#e#")
 	return ss
 }
 
@@ -160,28 +165,28 @@ func SizeToStr(size int64) string {
 func GetCategoryFromName(name string) int {
 	name = s.ToLower(name)
 
-	if s.Contains(name, ".mp4") || s.Contains(name, ".mkv") || s.Contains(name, ".avi") || s.Contains(name, ".wmv") || s.Contains(name, ".mpg") ||s.Contains(name, ".mpeg")  ||s.Contains(name, ".rmvb") ||s.Contains(name, ".mov") ||s.Contains(name, ".flv"){
+	if s.Contains(name, "mp4") || s.Contains(name, "mkv") || s.Contains(name, "avi") || s.Contains(name, "wmv") || s.Contains(name, "mpg") ||s.Contains(name, "mpeg")  ||s.Contains(name, "rmvb") ||s.Contains(name, "mov") ||s.Contains(name, "flv"){
 		return 1
 	}
 
-	if s.Contains(name, ".torrent") {
+	if s.Contains(name, "torrent") {
 		return 2
 	}
 
-	if s.Contains(name, ".apk") || s.Contains(name, ".exe") || s.Contains(name, ".dmg") {
+	if s.Contains(name, "apk") || s.Contains(name, "exe") || s.Contains(name, "dmg") {
 		return 3
 	}
 
-	if s.Contains(name, ".doc") || s.Contains(name, ".ppt") || s.Contains(name, ".xls") || s.Contains(name, ".txt") || s.Contains(name, ".pdf") {
+	if s.Contains(name, "doc") || s.Contains(name, "ppt") || s.Contains(name, "xls") || s.Contains(name, "txt") || s.Contains(name, "pdf") {
 		return 4
 	}
 
 
-	if s.Contains(name, ".wav") || s.Contains(name, ".mp3") || s.Contains(name, ".m4a") || s.Contains(name, ".acc") {
+	if s.Contains(name, "wav") || s.Contains(name, "mp3") || s.Contains(name, "m4a") || s.Contains(name, "acc") {
 		return 5
 	}
 
-	if s.Contains(name, ".bmp") || s.Contains(name, ".jpg") || s.Contains(name, ".jpeg") || s.Contains(name, ".png") || s.Contains(name, ".gif") {
+	if s.Contains(name, "bmp") || s.Contains(name, "jpg") || s.Contains(name, "jpeg") || s.Contains(name, "png") || s.Contains(name, "gif") {
 		return 6
 	}
 	return 7

@@ -287,9 +287,13 @@ func CrawlBlog() {
 
 				if err != nil {
 					Logger.Error(err.Error())
+					continue
 				}
 
 				Logger.Info(url)
+				if doc == nil {
+					continue
+				}
 
 				FindBlogURL(doc, &blogs)
 

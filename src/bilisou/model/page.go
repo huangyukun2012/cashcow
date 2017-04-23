@@ -26,6 +26,8 @@ type PageVar struct {
 	Next   int
 	Before []int
 	After  []int
+	SearchTime int64
+	SearchResult int64
 
 
 	User              User
@@ -38,7 +40,7 @@ type PageVar struct {
 	RandomShares      []Share
 	RandomSharesCategory      []Share
 	RandomSharesSimilar      []Share
-	Keywords          []Keyword
+	Keywords          []string
 }
 
 

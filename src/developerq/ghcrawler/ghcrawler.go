@@ -7,7 +7,7 @@ import (
 	"time"
 	"fmt"
 	"bytes"
-	"strconv"
+//	"strconv"
 	"strings"
 	"io/ioutil"
 	"net/http"
@@ -15,8 +15,8 @@ import (
 	"encoding/json"
 	t "developerq/trans"
 	m "developerq/model"
-	u "utils"
-	"os"
+//	u "utils"
+//	"os"
 )
 
 var Logger *logging.Logger
@@ -304,6 +304,7 @@ func CrawlGHURL(star int) {
 	}
 }
 
+/*
 func main() {
 
 	if(len(os.Args) < 2) {
@@ -326,3 +327,4 @@ func main() {
 		CrawlGHReadMe(db, int(arg2))
 	}
 }
+*/

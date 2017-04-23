@@ -1,0 +1,135 @@
+<html class="bilisou_com">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>最快最全的的BT,种子,迅雷百度网盘搜索引擎-哔哩搜</title>
+    <meta name="keywords" content="bt搜索,种子搜索,bt下载,bt种子搜索器,磁力链接,磁力搜索,sobt">
+    <meta name="description" content="sobt是一个bt种子搜索网站,拥有海量的种子数据,不间断更新,同时具有种子分享,种子下载,收藏等功能。">
+    <link rel="stylesheet" href="/static/css/bilisou.css" type="text/css">
+    <script src="//cdn.bootcss.com/jquery/1.8.3/jquery.min.js"></script>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/Public/static/img/apple_icon.jpg">
+      <script>
+         function search() {
+            var si = document.getElementById("search");
+            window.location.href="/search/" + si.value;
+         }
+         function keysearch(){
+          if (event.keyCode==13)  //回车键的键值为13
+            document.getElementById("searchbutton").click(); //调用登录按钮的登录事件
+         }
+      </script>
+      <script>
+         (function(){
+            var bp = document.createElement('script');
+            var curProtocol = window.location.protocol.split(':')[0];
+            if (curProtocol === 'https') {
+               bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+            }
+            else {
+               bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+            }
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(bp, s);
+         })();
+      </script>
+
+</head>
+<body data-gr-c-s-loaded="true">
+<div id="wrapper">
+
+
+    <div class="top-bar">
+        <span class="first"><a href="/">首页</a></span>
+        <!--<span class="first"><a href="/list/1">列表</a></span>-->
+        <span><span class="highlight-bar"></span><a href="/list" class="selected">列表</a></span>
+        <span class="first"><a href="/">段子</a></span>
+        <span class="first"><a href="/">电影</a></span>
+        <span class="top_fav"><a href="/user/user/login" class="cur_login">登录</a></span>
+        
+    </div>
+   <div class="header-div">
+           <a href="/"> <img src="/static/img/s-log.png" alt="哔哩搜" class="nav-logo"></a><input type="text" id="search"
+                                                                                             title="Search"
+                                                                                             
+                                                                                             autocomplete="off" name="q"
+                                                                                             placeholder="随便搜搜"
+                                                                                             x-webkit-speech="" onkeydown="keysearch()">
+            <input type="submit" id="searchbutton" value="搜 索" class="blue" onclick="search()">
+    </div>
+
+    <div id="sort-bar">
+      <b>全部</b>
+      <a href="/list/" rel="nofollow">视频</a>
+      <a href="/list/" rel="nofollow">软件</a>
+      <a href="/list/" rel="nofollow">视频</a>
+      <a href="/list/" rel="nofollow">软件</a>
+      <a href="/list/" rel="nofollow">视频</a>
+      <a href="/list/" rel="nofollow">软件</a>
+      <a href="/list/" rel="nofollow">视频</a>
+      <a href="/list/" rel="nofollow">软件</a>
+    </div>
+    <div id="content">
+        <div id="wall">
+            <div class="search-statu"><span>共计 {{.End}} 页，当前第 {{.Current}} 页。</span><span></span></div>
+            <div class="row">
+                <div class="search-list col-md-8">
+
+                    {{ range $i, $s := .ListShares}}
+
+                    <div class="search-item">
+                        <div class="item-title"><h3><a href="/file/{{$s.DataID}}" target="_blank">{{$s.HTitle}}</a></h3></div>
+                        <div class="item-bar">
+                            {{if eq $s.Source 0}}
+                            <span>资源类型： <b>百度网盘</b></span>
+                            {{end}}
+                            {{if eq $s.Source 2}}
+                            <span>资源类型： <b>BT种子</b></span>
+                            {{end}}
+                            <span>创建时间： <b>{{$s.LastScanStr}}</b></span>
+                            <span>文件类型： <b>{{$s.CategoryCN}}</b></span>
+                            <span>文件大小：<b>{{$s.SizeStr}}</b></span>
+                            <span>下载热度：<b>{{$s.ViewCount}}</b></span>
+                        </div>
+                    </div>
+                    {{end}}
+
+                    <ul class="pagination">
+                       
+
+                        {{ range $i, $b := .Before }}
+                        <li><a href="/list/{{$b}}">{{$b}}</a></li>
+                        {{ end }}
+
+                        <li class="active"><span>{{.Current}}</span></li>
+                        
+                        {{ range $i, $a := .After }}
+                        <li><a href="/list/{{$a}}">{{$a}}</a></li>
+                        {{ end }}
+                    </ul>
+                </div>
+
+                <div class="search-tips col-md-2">
+                    <div class="search-notice">testing
+                        torrent,testing种子下载,testing迅雷下载相关结果来源于网络蜘蛛，由用户的指令自动获得，本站不承担任何责任！本站已经使用机器人自动屏蔽了99%的违规链接，同时您可以在详情页面进行举报。
+                    </div>
+                    <div id="latest-search"><span class="latest-desc">大家都在搜：</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- footer -->
+<div class="footer"><span>©2017</span><span><a href="http://www.bilisou.com">哔哩搜</a>|<a
+        href="http://blog.bilisou.com">哔哩搜段子</a>|<a href="http://www.developerq.com">开发者问题网</a></span></div>
+<script charset="gbk" type="text/javascript" src="//www.baidu.com/js/opensug.js"></script>
+<script type="text/javascript" src="/static/js/bilisou.js"></script>
+<script src="/Public/static/js/home-common-v2.js?v=20161124"></script>
+<iframe class="bdSug_sd" style="display: none; position: absolute; border-width: 0px;"></iframe>
+<div id="bdSug_1492673055651" class="bdSug_wpr" style="display: none;"></div>
+<!--<script src="https://s1.guidashu.com/function-new.js?v=20161124"></script> -->
+</body>
+</html>

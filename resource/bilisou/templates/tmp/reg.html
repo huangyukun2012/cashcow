@@ -1,0 +1,66 @@
+<html class="gr__sobt5_org"><head><meta charset="utf-8"><title>会员注册 - SOBT</title><meta name="keywords" content=""><meta name="description" content=""><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="http://cdn.bootcss.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet"><link rel="stylesheet" href="/Public/static/css/user.css" type="text/css"><script src="http://cdn.bootcss.com/jquery/2.0.3/jquery.min.js"></script><script src="http://cdn.bootcss.com/bootstrap/3.1.1/js/bootstrap.min.js"></script><script src="/Public/static/plugin/lhgdialog.min.js"></script><link href="http://www.sobt5.org/Public/static/plugin/skins/idialog.css" rel="stylesheet" type="text/css"></head><body class="login-layout login" data-gr-c-s-loaded="true" youdao="bind"><div style="display: none; position: absolute;" class=""><div class="ui_outer"><table class="ui_border"><tbody><tr><td class="ui_lt"></td><td class="ui_t"></td><td class="ui_rt"></td></tr><tr><td class="ui_l"></td><td class="ui_c"><div class="ui_inner"><table class="ui_dialog"><tbody><tr><td colspan="2" class="ui_header"><div class="ui_title_bar"><div class="ui_title" style="cursor: move; display: block;"><span class="ui_title_icon" style="display: none;"></span><b class="ui_title_txt" unselectable="on"></b></div><div class="ui_title_buttons"><a class="ui_min" href="javascript:lhgdialog" title="最小化" style="display: inline-block;"><b class="ui_min_b"></b></a><a class="ui_rese" href="javascript:lhgdialog" title="恢复"><b class="ui_rese_b"></b><b class="ui_rese_t"></b></a><a class="ui_max" href="javascript:lhgdialog" title="最大化" style="display: inline-block;"><b class="ui_max_b"></b></a><a class="ui_res" href="javascript:lhgdialog" title="还原"><b class="ui_res_b"></b><b class="ui_res_t"></b></a><a class="ui_close" href="javascript:lhgdialog" title="关闭(esc键)" style="display: inline-block;">×</a></div></div></td></tr><tr><td class="ui_icon" style="display: none;"><img src="" class="ui_icon_bg"></td><td class="ui_main" style="width: auto; height: auto;"><div class="ui_content" style="padding: 10px;"></div></td></tr><tr><td colspan="2" class="ui_footer"><div class="ui_buttons" style="display: none;"></div></td></tr></tbody></table></div></td><td class="ui_r"></td></tr><tr><td class="ui_lb"></td><td class="ui_b"></td><td class="ui_rb" style="cursor: se-resize;"></td></tr></tbody></table></div></div><div class="login-form"><h1 class="user_title">会员注册 </h1><form action=""><input type="hidden" value="bf8e1e3da2e99dafad9a212d86032492" name="verid"><input type="text" class="form-control" placeholder="邮箱用于找回密码" id="u_email"><input type="text" class="form-control" placeholder="用户名用于登录" id="u_uname"><input type="password" class="form-control" placeholder="密码用于验证" id="u_upwd"><label class="checkbox-inline"><input type="checkbox" id="inlineCheckbox1" name="tk" checked=""><a href="#" data-toggle="modal" data-target="#myModal">阅读服务条款</a></label><hr><button type="button" class="btn btn-primary btn-lg btn-block" id="u_login">注册</button></form><div class="form_tips"><a href="http://www.sobt5.org">首页</a><a href="/user/user/login">登录</a><a href="javascript:;" class="right_a"></a></div></div><!-- /.main-container --><!-- Modal --><div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button><h4 class="modal-title" id="myModalLabel">服务条款</h4></div><div class="modal-body"><ul><li>	鉴于SOBT以非人工检索方式、根据您键入的关键字自动生成到磁力链的链接，除SOBT注明之服务条款外，其他一切因使用SOBT而可能遭致的意外、疏忽、侵权及其造成的损失（包括因下载被搜索链接到的第三方网站内容而感染电脑病毒），SOBT对其概不负责，亦不承担任何法律责任。</li><li>任何通过使用SOBT而搜索链接到的磁力链均系他人制作或提供，您可能从该磁力链上获得资讯及享用服务，SOBT对其合法性概不负责，亦不承担任何法律责任。
+						</li><li>SOBT搜索结果根据您键入的关键字自动搜索获得并生成，SOBT尊重并保护所有使用SOBT用户的个人隐私权，您注册的用户名、电子邮件地址等个人资料，非经您亲自许可或根据相关法律、法规的强制性规定，SOBT不会主动地泄露给第三方。
+						</li><li>任何单位或个人认为通过SOBT搜索链接到的磁力链可能涉嫌侵犯其信息网络传播权，应该及时向SOBT提出书面权利通知，并提供身份证明、权属证明及详细侵权情况证明。
+						</li></ul></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">关闭</button></div></div><!-- /.modal-content --></div><!-- /.modal-dialog --></div><!-- /.modal --><!-- basic scripts --><!-- inline scripts related to this page --><script type="text/javascript">
+			$(function(){
+				$('#u_login').click(function(){
+
+					var auto = $('#inlineCheckbox1').prop('checked');
+					if(!auto){
+						$.dialog({
+						    title:'注册失败',
+	        					    lock: true,
+						    icon: 'error.gif',
+						    titleIcon: 'lhgcore.gif',
+						    content:'请先同意我们的注册条款',
+						    button: [
+						        {
+						            name: '确认',
+						            focus: true
+						        },
+						    ]
+						});
+						return;
+					}
+					var j = $.dialog.tips('注册数据提交中...',10000,'loading.gif');
+					var data = {'uname':$('#u_uname').val(),'upwd':$('#u_upwd').val(),'email':$('#u_email').val()};
+					$.post('/user/uaction/ajax_sign',data,function(res){
+						j.close();
+						if(res.code==1){
+							$.dialog({
+							    title:'注册成功',
+		        					    lock: true,
+							    icon: 'success.gif',
+							    titleIcon: 'lhgcore.gif',
+							    content: '恭喜你注册成功，马上去登陆',
+							    button: [
+							        {
+							            name: '确认',
+							            focus: true,
+							            callback: function () {
+							            	window.location.href="/user/user/login";
+							            }
+							        },
+							    ]
+							});
+						}else{
+
+							$.dialog({
+								    title:'注册失败',
+			        					    lock: true,
+								    icon: 'error.gif',
+								    titleIcon: 'lhgcore.gif',
+								    content: res.msg,
+								    button: [
+								        {
+								            name: '确认',
+								            focus: true
+								        },
+								    ]
+							});
+						}
+					},'json')
+				});
+			})
+
+		</script></body></html>

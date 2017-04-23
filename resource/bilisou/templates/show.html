@@ -1,0 +1,167 @@
+<html class="bilisou_com">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>最快最全的的BT,种子,迅雷百度网盘搜索引擎-哔哩搜</title>
+    <meta name="keywords" content="bt搜索,种子搜索,bt下载,bt种子搜索器,磁力链接,磁力搜索,sobt">
+    <meta name="description" content="sobt是一个bt种子搜索网站,拥有海量的种子数据,不间断更新,同时具有种子分享,种子下载,收藏等功能。">
+    <link rel="stylesheet" href="/static/css/bilisou.css" type="text/css">
+    <script src="//cdn.bootcss.com/jquery/1.8.3/jquery.min.js"></script>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/Public/static/img/apple_icon.jpg">
+      <script>
+         function search() {
+            var si = document.getElementById("search");
+            window.location.href="/search/" + si.value;
+         }
+         function keysearch(){
+          if (event.keyCode==13)  //回车键的键值为13
+            document.getElementById("searchbutton").click(); //调用登录按钮的登录事件
+         }
+      </script>
+      <script>
+         (function(){
+            var bp = document.createElement('script');
+            var curProtocol = window.location.protocol.split(':')[0];
+            if (curProtocol === 'https') {
+               bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+            }
+            else {
+               bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+            }
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(bp, s);
+         })();
+      </script>
+
+</head>
+<body data-gr-c-s-loaded="true">
+<div id="wrapper">
+
+
+    <div class="top-bar">
+        <span class="first"><a href="/">首页</a></span>
+        <!--<span class="first"><a href="/list/1">列表</a></span>-->
+        <span><span class="highlight-bar"></span><a href="/list" class="selected">列表</a></span>
+        <span class="first"><a href="/">段子</a></span>
+        <span class="first"><a href="/">电影</a></span>
+        <span class="top_fav"><a href="/user/user/login" class="cur_login">登录</a></span>
+        
+    </div>
+<div class="header-div">
+    <a href="/" title="哔哩搜"><img src="/static/img/s-log.png" alt="哔哩搜" class="nav-logo"></a><input type="text" id="search"
+                                                                                             title="Search"
+  
+                                                                                             autocomplete="off" name="q"
+                                                                                             placeholder="搜索资源"
+                                                                                             x-webkit-speech="" onkeydown="keysearch()">
+  <input type="submit" id="searchbutton" value="搜 索" class="blue" onclick="search()">
+</div>
+
+    <div id="content">
+        <div id="wall"><h1 class="res-title">{{.Share.Title}}</h1>
+            <div class="fileDetail">
+              <span id="m_link" style="display:none">magnet:?xt=urn:btih:CEE671173382ACD8DD57DAD56E3FB1DC711777A7</span>
+              
+                <p>
+                  {{ range $i, $k := .Keywords }}
+                  <a href="/search/{{$k}}" target="_blank" class="pill">{{$k}}</a>
+                  {{end}}
+                </p> 
+
+                {{if eq .Share.Source 0}}
+              <p> 资源类型：百度网盘</p>
+              <p> 分享用户： <a href="https://pan.baidu.com/share/home?uk={{.Share.UK}}">{{.Share.Uname}}</a></p>
+                {{end}}
+              {{if eq .Share.Source 2}}
+              <p> 资源类型：BT种子</p>
+                {{end}}
+              
+                <p> 文件大小：{{.Share.SizeStr}}</p>
+                <p> 收录时间：{{.Share.LastScanStr}}</p>
+                <p class="link_op"> 链接操作： <a href="javascript:;" onclick="ajaxp('good')">点赞<em id="goodnum">0</em></a><a
+                        href="javascript:;" onclick="report();">dmca/举报</a></p>
+                <p> 点击热度：<span id="hits_num">{{.Share.ViewCount}}</span></p>
+                <p> 资源下载：
+                  {{if eq .Share.Source 2}}
+                  <a  class="download" href=" {{.Share.Link}} ">{{.Share.Link}}</a>&nbsp; 
+                  {{end}}
+
+                  {{if eq .Share.Source 0}}
+                  <a href="https://pan.baidu.com/share/link?uk={{.Share.UK}}&amp;shareid={{.Share.ShareID}}" class="download">百度网盘链接</a>&nbsp; 
+                  {{end}}
+                  
+                  
+                  <!--
+                  <a href="javascript:;" onclick="window.open('http://www.sobt5.com/tool/m2t?hash=CEE671173382ACD8DD57DAD56E3FB1DC711777A7')">下载种子</a>&nbsp;
+                    <a href="#" id="copyi" data-clipboard-target="m_link" class="download">复制链接</a>&nbsp;<a
+                            href="javascript:;" onclick="addfav();">加入收藏</a> &nbsp; <a href="#" target="_blank"
+                                                                                       class="yubo">在线云播</a>&nbsp;
+                    -->
+                </p>
+                <p> 文件列表：共 {{.Share.FileCount}} 个文件</p></div>
+            <script src="/Public/static/plugin/ZeroClipboard/ZeroClipboard.min.js"></script>
+            <script>
+                var clip = new ZeroClipboard($('#copyi'), {moviePath: "/Public/static/plugin/ZeroClipboard/ZeroClipboard.swf"});
+                clip.on('complete', function (client, args) {
+                    alert('复制成功')
+                });
+            </script>
+            <ol>
+
+                {{ range $i, $fn := .Share.BTFilenames}}
+                <li>{{$fn.Name}}&nbsp;&nbsp;<span class="cpill blue-pill">{{$fn.Size}}</span></li>
+                {{end}}
+
+                {{ range $i, $fn := .Share.Filenames}}
+                <li>{{$fn}}</li>
+                {{end}}
+            </ol>
+            <div class="push"></div>
+            <div class="title">
+                  <h4>相关资源推荐</h4>
+               </div>
+            <div>
+              <ol>
+                     {{ range $i, $s := .RandomSharesSimilar}}                     
+                     <li><a href="/file/{{$s.DataID}}/" target="_blank" title="{{$s.Title}}">{{$s.Title}}</a></li>
+                     {{end}}
+                  </ol>
+               </div>
+        </div>
+    </div>
+</div>
+<div id="global-zeroclipboard-html-bridge" class="global-zeroclipboard-container" data-clipboard-ready="true"
+     style="position: absolute; left: -9999px; top: -9999px; width: 15px; height: 15px; z-index: 9999;">
+    <object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" id="global-zeroclipboard-flash-bridge" width="100%"
+            height="100%">
+        <param name="movie" value="/Public/static/plugin/ZeroClipboard/ZeroClipboard.swf?nocache=1492673296614">
+        <param name="allowScriptAccess" value="sameDomain">
+        <param name="scale" value="exactfit">
+        <param name="loop" value="false">
+        <param name="menu" value="false">
+        <param name="quality" value="best">
+        <param name="bgcolor" value="#ffffff">
+        <param name="wmode" value="transparent">
+        <param name="flashvars" value="">
+        <embed src="/Public/static/plugin/ZeroClipboard/ZeroClipboard.swf?nocache=1492673296614" loop="false"
+               menu="false" quality="best" bgcolor="#ffffff" width="100%" height="100%"
+               name="global-zeroclipboard-flash-bridge" allowscriptaccess="always" allowfullscreen="false"
+               type="application/x-shockwave-flash" wmode="transparent"
+               pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="" scale="exactfit">
+    </object>
+</div>
+
+
+<!-- footer -->
+<div class="footer"><span>©2017</span><span><a href="http://www.bilisou.com">哔哩搜</a>|<a
+        href="http://blog.bilisou.com">哔哩搜段子</a>|<a href="http://www.developerq.com">开发者问题网</a></span></div>
+<script charset="gbk" type="text/javascript" src="//www.baidu.com/js/opensug.js"></script>
+<script type="text/javascript" src="/static/js/bilisou.js"></script>
+<script src="/Public/static/js/home-common-v2.js?v=20161124"></script>
+<iframe class="bdSug_sd" style="display: none; position: absolute; border-width: 0px;"></iframe>
+<div id="bdSug_1492673055651" class="bdSug_wpr" style="display: none;"></div>
+<!--<script src="https://s1.guidashu.com/function-new.js?v=20161124"></script> -->
+</body>
+</html>
