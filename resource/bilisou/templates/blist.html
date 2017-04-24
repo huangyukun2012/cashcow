@@ -3,9 +3,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>最快最全的的BT,种子,迅雷百度网盘搜索引擎-哔哩搜</title>
-    <meta name="keywords" content="">
-    <meta name="description" content="">
+    <title>搞笑段子 - 哔哩搜 - 搞笑段子集锦</title>
+
+    <meta name="Description" content="搞笑段子- 哔哩搜 - 搞笑段子集锦，汇集全网笑料">
+    <meta name="Keywords" content="哔哩搜, 百度网盘, 搞笑段子, 深度好文, 百家客" />
+
     <link rel="stylesheet" href="/static/css/bilisou.css" type="text/css">
     <script src="//cdn.bootcss.com/jquery/1.8.3/jquery.min.js"></script>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
@@ -13,7 +15,7 @@
       <script>
          function search() {
             var si = document.getElementById("search");
-            window.location.href="/search/" + si.value;
+            window.location.href="http://www.bilisou.com/search/" + si.value;
          }
          function keysearch(){
           if (event.keyCode==13)  //回车键的键值为13
@@ -41,14 +43,16 @@
 
 
     <div class="top-bar">
-        <span class="first"><a href="/">首页</a></span>
+        <span class="first"><a href="http://www.bilisou.com/">首页</a></span>
         <!--<span class="first"><a href="/list/1">列表</a></span>-->
-        <span><span class="highlight-bar"></span><a href="/list" class="selected">列表</a></span>
-        <span class="first"><a href="http://blog.bilisou.com/">段子</a></span>
+        <span><a href="http://www.bilisou.com/list">列表</a></span>
+        <span><span class="highlight-bar"></span><a href="/"  class="selected">段子</a></span>
         <span class="first"><a href="/">电影</a></span>
         <span class="top_fav"><a href="/login" class="cur_login">登录</a></span>
         
     </div>
+
+
    <div class="header-div">
            <a href="/"> <img src="/static/img/s-log.png" alt="哔哩搜" class="nav-logo"></a><input type="text" id="search"
                                                                                              title="Search"
@@ -59,16 +63,16 @@
             <input type="submit" id="searchbutton" value="搜 索" class="blue" onclick="search()">
     </div>
 
+
     <div id="sort-bar">
-      <b>全部</b>
-      <a href="/list/" rel="nofollow">视频</a>
-      <a href="/list/" rel="nofollow">软件</a>
-      <a href="/list/" rel="nofollow">视频</a>
-      <a href="/list/" rel="nofollow">软件</a>
-      <a href="/list/" rel="nofollow">视频</a>
-      <a href="/list/" rel="nofollow">软件</a>
-      <a href="/list/" rel="nofollow">视频</a>
-      <a href="/list/" rel="nofollow">软件</a>
+      <a href="/list/0" rel="nofollow">所有博文</a>
+      <a href="/list/1" rel="nofollow">搞笑段子</a>
+      <a href="/list/2" rel="nofollow">糗事百科</a>
+      <a href="/list/3" rel="nofollow">明星八卦</a>
+      <a href="/list/4" rel="nofollow">深度好文</a>
+      <a href="/list/5" rel="nofollow">时事点评</a>
+      <a href="/list/6" rel="nofollow">心灵鸡汤</a>
+      <a href="/list/7" rel="nofollow">游戏世界</a>
     </div>
     <div id="content">
         <div id="wall">
@@ -76,44 +80,40 @@
             <div class="row">
                 <div class="search-list col-md-8">
 
-                    {{ range $i, $s := .ListShares}}
+                    {{ range $i, $s := .ListBlog}}
 
                     <div class="search-item">
-                        <div class="item-title"><h3><a href="/file/{{$s.DataID}}" target="_blank">{{$s.HTitle}}</a></h3></div>
+                        <div class="item-title"><h3><a href="/blog/{{$s.UK}}" target="_blank">{{$s.Title}}</a></h3></div>
                         <div class="item-bar">
-                            {{if eq $s.Source 0}}
-                            <span>资源类型： <b>百度网盘</b></span>
-                            {{end}}
-                            {{if eq $s.Source 2}}
-                            <span>资源类型： <b>BT种子</b></span>
-                            {{end}}
-                            <span>创建时间： <b>{{$s.LastScanStr}}</b></span>
-                            <span>文件类型： <b>{{$s.CategoryCN}}</b></span>
-                            <span>文件大小：<b>{{$s.SizeStr}}</b></span>
-                            <span>下载热度：<b>{{$s.ViewCount}}</b></span>
+                            <span>文章类型： <b>{{$s.CategoryStr}}</b></span>
+
+                            <span>创建时间： <b>{{$s.UpdateTimeStr}}</b></span>
+
+                            <span>浏览次数：<b>122</b></span>
                         </div>
                     </div>
                     {{end}}
 
                     <ul class="pagination">
-                       
+
+                        <li><a href="/list/{{.CategoryInt}}/1">首页</a></li>
 
                         {{ range $i, $b := .Before }}
-                        <li><a href="/list/{{$b}}">{{$b}}</a></li>
+                        <li><a href="/list/{{.CategoryInt}}/{{$b}}">{{$b}}</a></li>
                         {{ end }}
 
                         <li class="active"><span>{{.Current}}</span></li>
                         
                         {{ range $i, $a := .After }}
-                        <li><a href="/list/{{$a}}">{{$a}}</a></li>
+                        <li><a href="/list/{{.CategoryInt}}/{{$a}}">{{$a}}</a></li>
                         {{ end }}
+                        <li><a href="/list/{{.CategoryInt}}/{{$.End}}">末页</a></li>
+
                     </ul>
                 </div>
 
                 <div class="search-tips col-md-2">
-                    <div class="search-notice">testing
-                        torrent,testing种子下载,testing迅雷下载相关结果来源于网络蜘蛛，由用户的指令自动获得，本站不承担任何责任！本站已经使用机器人自动屏蔽了99%的违规链接，同时您可以在详情页面进行举报。
-                    </div>
+                    <div class="search-notice">{{.Keyword}}torrent,{{.Keyword}}种子下载,{{.Keyword}}迅雷下载{{.Keyword}}百度网盘下载的相关结果来源于网络，本站不承担任何责任。
                     <div id="latest-search"><span class="latest-desc">大家都在搜：</span></div>
                 </div>
             </div>

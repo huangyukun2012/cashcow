@@ -1,0 +1,140 @@
+<html class="gr__bilisou_com">
+<head>
+    <meta charset="utf-8">
+    <title>会员登录 - Bilisou - 哔哩搜</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="http://cdn.bootcss.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/user.css" type="text/css">
+    <script src="http://cdn.bootcss.com/jquery/2.0.3/jquery.min.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script src="/static/plugin/lhgdialog.min.js"></script>
+    <link href="/static/plugin/skins/idialog.css" rel="stylesheet" type="text/css">
+</head>
+<body class="login-layout login" data-gr-c-s-loaded="true">
+<div style="display: none; position: absolute;" class="">
+    <div class="ui_outer">
+        <table class="ui_border">
+            <tbody>
+            <tr>
+                <td class="ui_lt"></td>
+                <td class="ui_t"></td>
+                <td class="ui_rt"></td>
+            </tr>
+            <tr>
+                <td class="ui_l"></td>
+                <td class="ui_c">
+                    <div class="ui_inner">
+                        <table class="ui_dialog">
+                            <tbody>
+                            <tr>
+                                <td colspan="2" class="ui_header">
+                                    <div class="ui_title_bar">
+                                        <div class="ui_title" style="cursor: move; display: block;"><span
+                                                class="ui_title_icon" style="display: none;"></span><b
+                                                class="ui_title_txt" unselectable="on"></b></div>
+                                        <div class="ui_title_buttons"><a class="ui_min" href="javascript:lhgdialog"
+                                                                         title="最小化" style="display: inline-block;"><b
+                                                class="ui_min_b"></b></a><a class="ui_rese" href="javascript:lhgdialog"
+                                                                            title="恢复"><b class="ui_rese_b"></b><b
+                                                class="ui_rese_t"></b></a><a class="ui_max" href="javascript:lhgdialog"
+                                                                             title="最大化" style="display: inline-block;"><b
+                                                class="ui_max_b"></b></a><a class="ui_res" href="javascript:lhgdialog"
+                                                                            title="还原"><b class="ui_res_b"></b><b
+                                                class="ui_res_t"></b></a><a class="ui_close" href="javascript:lhgdialog"
+                                                                            title="关闭(esc键)"
+                                                                            style="display: inline-block;">×</a></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ui_icon" style="display: none;"><img src="" class="ui_icon_bg"></td>
+                                <td class="ui_main" style="width: auto; height: auto;">
+                                    <div class="ui_content" style="padding: 10px;"></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="ui_footer">
+                                    <div class="ui_buttons" style="display: none;"></div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </td>
+                <td class="ui_r"></td>
+            </tr>
+            <tr>
+                <td class="ui_lb"></td>
+                <td class="ui_b"></td>
+                <td class="ui_rb" style="cursor: se-resize;"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="login-form"><h1 class="user_title">会员登录 </h1>
+    <form action=""><input type="text" class="form-control" placeholder="请输入用户名" id="u_uname"><input type="password"
+                                                                                                     class="form-control"
+                                                                                                     placeholder="请输入密码"
+                                                                                                     id="u_upwd">
+        <hr>
+        <button type="button" class="btn btn-primary btn-lg btn-block" id="u_login">登录</button>
+    </form>
+    <div class="form_tips"><a href="/">首页</a><a href="/register">注册</a><a
+            href="javascript:get_pwd();" class="right_a">忘记密码?</a></div>
+</div><!-- /.main-container --><!-- basic scripts --><!-- inline scripts related to this page -->
+<script type="text/javascript">
+    $(function () {
+        $('#u_login').click(function () {
+            var uname = $('#u_uname').val();
+            var upwd = $('#u_upwd').val();
+            console.log(upwd);
+            var auto = $('#u_auto').prop('checked');
+            var data = {'username': uname, 'password': upwd, 'auto': auto};
+            $.post('/login', data, function (res) {
+                console.log(res);
+                if (res != 'true') {
+                    $.dialog.alert('您输入的密码与用户名不匹配');
+                } else {
+                    //window.location.href = "http://www.bilisou.com/";
+                    console.log(res);
+                }
+            })
+        });
+    })
+    function get_pwd() {
+        $.dialog.prompt('请输入邮箱地址',
+                function (val) {
+                    var j = $.dialog.tips('邮件发送中...', 10000, 'loading.gif');
+                    var data = {'email': val};
+                    $.post('/user/uaction/findPwd', data, function (res) {
+                        j.close();
+                        if (res.code == 1) {
+                            $.dialog({
+                                title: '密码找回成功',
+                                lock: true,
+                                icon: 'success.gif',
+                                titleIcon: 'lhgcore.gif',
+                                content: res.msg,
+                                button: [
+                                    {
+                                        name: '确认',
+                                        focus: true
+                                    },
+                                ]
+                            });
+                        } else {
+                            alert(res.msg);
+                            get_pwd();
+                        }
+                    }, 'json');
+                },
+                '@'
+        );
+
+    }
+</script>
+</body>
+</html>

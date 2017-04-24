@@ -1,0 +1,38 @@
+html,
+body {word-break:break-all;font-family: '微软雅黑';margin: 0}
+#wrap { min-height: 100%;height: auto;margin: 0 auto -60px;background: #F7F7F7}
+.right{float: right}
+.left{float:left}
+.red{color: red}
+.hilight{color:#c00;text-decoration: underline;}
+/* Set the fixed height of the footer here */
+#footer {height: 60px;background-color: #000;}
+/*login*/
+.login{background: #393939;padding: 0 5px;background-image: url(/static/img/user-bg.png);}
+.login-form{background: #fff;max-width: 400px;margin:100px auto;border-radius: 8px;padding: 15px;}
+.user_title{margin: 5px;text-align: center;margin-bottom: 15px;font-size: 24px;}
+.login-form .form-control{margin-bottom: 5px;}
+.form_tips{margin-top: 15px;}
+.form_tips a{padding-left: 10px;}
+.form_tips .right_a{float: right;}
+/*ucenter*/
+.center{background: #393939;padding: 0 5px;background-image: url(../img/user-bg.png);}
+.center-wrap{background: #fff;max-width: 1000px;margin:50px auto;padding: 0px;border-radius: 5px}
+.center-nav{}
+.center-wrap>.navbar{min-height: 40px;border-radius: 5px 5px 0 0;margin-bottom: 0}
+.center-nav .navbar-nav>li>a{padding-top: 11px;padding-bottom: 11px;font-size: 15px}
+.center-nav .navbar-brand{padding: 0px 15px;height: 40px;line-height: 40px;font-size: 16px;}
+.center-nav .navbar-toggle{padding: 8px 10px;margin-top: 4px;margin-bottom: 4px;}
+.center-content{padding: 10px;}
+.welecome{margin: 5px 0 0;font-size: 15px;}
+.center-content hr{margin: 10px 0}
+.login-info{line-height: 30px;}
+.login-info span{color: #666;}
+.user-form>tbody>tr>td,.user-form>tbody>tr>th{border-top: 0px;vertical-align: middle;}
+.checkbox-inline{padding-top: 0}
+.nav>li>a{padding: 5px 15px;}
+.content-wrap{margin: 10px;}
+.avatar-view{margin-bottom: 10px;}
+.avatar-view img{height: 200px;width: 200px;}
+.index-avatar{width: 40px;height: 40px;border-radius: 5px;margin-right: 10px;}
+.u-page{margin: 0;float: right;}

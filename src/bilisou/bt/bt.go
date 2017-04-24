@@ -65,10 +65,10 @@ func FindShareFilenames(n *html.Node, share *m.Share) {
 		if !strings.Contains(tr, "<th>文件名称</th>") {
 			var digitsRegexp = regexp.MustCompile(`<td>(.*)<\/td>[\r\n\s]+<td>[\r\n\s]+(.*)<\/td>`)
 			res := digitsRegexp.FindStringSubmatch(tr)
-			fmt.Printf("res len = %s\n", len(res))
+
 			if len(res) > 2 {
-				share.FilenamesRaw = share.FilenamesRaw + res[1] + "s#i#z#e#" + res[2]
-				share.FilenamesRaw = share.FilenamesRaw + "b#i#l#i#s#o#u#"
+				share.FilenamesRaw = share.FilenamesRaw + res[1] + "@+@+" + res[2]
+				share.FilenamesRaw = share.FilenamesRaw + "#$#$"
 			}
 		}
 	}

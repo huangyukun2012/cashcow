@@ -419,7 +419,7 @@ func InsertShare(yd *yundata, uk int64, uname interface{}) bool{
 		v.Category = u.GetCategoryFromName(v.Title)
 		for _, f := range v.Filelist {
 			size = size + f.Size
-			filenames = filenames + f.Server_filename + "b#i#l#i#s#o#u#"
+			filenames = filenames + f.Server_filename + "#$#$"
 		}
 
 		v.Feed_time = v.Feed_time / 1000

@@ -4,36 +4,36 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>最快最全的的BT,种子,迅雷百度网盘搜索引擎-哔哩搜</title>
-    <meta name="keywords" content="bt搜索,种子搜索,bt下载,bt种子搜索器,磁力链接,磁力搜索,sobt">
-    <meta name="description" content="sobt是一个bt种子搜索网站,拥有海量的种子数据,不间断更新,同时具有种子分享,种子下载,收藏等功能。">
+    <meta name="keywords" content="">
+    <meta name="description" content="">
     <link rel="stylesheet" href="/static/css/bilisou.css" type="text/css">
     <script src="//cdn.bootcss.com/jquery/1.8.3/jquery.min.js"></script>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     <link rel="apple-touch-icon" href="/Public/static/img/apple_icon.jpg">
-      <script>
-         function search() {
+    <script>
+        function search() {
             var si = document.getElementById("search");
-            window.location.href="/search/" + si.value;
-         }
-         function keysearch(){
-          if (event.keyCode==13)  //回车键的键值为13
-            document.getElementById("searchbutton").click(); //调用登录按钮的登录事件
-         }
-      </script>
-      <script>
-         (function(){
+            window.location.href = "/search/" + si.value;
+        }
+        function keysearch() {
+            if (event.keyCode == 13)  //回车键的键值为13
+                document.getElementById("searchbutton").click(); //调用登录按钮的登录事件
+        }
+    </script>
+    <script>
+        (function () {
             var bp = document.createElement('script');
             var curProtocol = window.location.protocol.split(':')[0];
             if (curProtocol === 'https') {
-               bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+                bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
             }
             else {
-               bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+                bp.src = 'http://push.zhanzhang.baidu.com/push.js';
             }
             var s = document.getElementsByTagName("script")[0];
             s.parentNode.insertBefore(bp, s);
-         })();
-      </script>
+        })();
+    </script>
 
 </head>
 <body data-gr-c-s-loaded="true">
@@ -46,31 +46,31 @@
         <span class="first"><a href="/list">列表</a></span>
         <span class="first"><a href="http://blog.bilisou.com/">段子</a></span>
         <span class="first"><a href="/">电影</a></span>
-        <span class="top_fav"><a href="/user/user/login" class="cur_login">登录</a></span>
-        
+        <span class="top_fav"><a href="/login" class="cur_login">登录</a></span>
+
     </div>
-<div class="header-div">
-        
-       <a href="/">      <img src="/static/img/s-log.png" alt="哔哩搜" class="nav-logo"></a>
-<input type="text" id="search" title="Search"
-                                                                               value="{{.Keyword}}"
-                                                                                             autocomplete="off" name="q"
-                                                                                             placeholder="随便搜搜"
-                                                                                             x-webkit-speech=""
-       onkeydown="keysearch()">
-            <input type="submit" id="searchbutton" value="搜 索" class="blue" onclick="search()">
+    <div class="header-div">
+
+        <a href="/"> <img src="/static/img/s-log.png" alt="哔哩搜" class="nav-logo"></a>
+        <input type="text" id="search" title="Search"
+               value="{{.Keyword}}"
+               autocomplete="off" name="q"
+               placeholder="随便搜搜"
+               x-webkit-speech=""
+               onkeydown="keysearch()">
+        <input type="submit" id="searchbutton" value="搜 索" class="blue" onclick="search()">
     </div>
 
     <div id="sort-bar">
-      <b>全部</b>
-      <a href="/list/" rel="nofollow">视频</a>
-      <a href="/list/" rel="nofollow">软件</a>
-      <a href="/list/" rel="nofollow">视频</a>
-      <a href="/list/" rel="nofollow">软件</a>
-      <a href="/list/" rel="nofollow">视频</a>
-      <a href="/list/" rel="nofollow">软件</a>
-      <a href="/list/" rel="nofollow">视频</a>
-      <a href="/list/" rel="nofollow">软件</a>
+        <b>全部</b>
+        <a href="/list/" rel="nofollow">视频</a>
+        <a href="/list/" rel="nofollow">软件</a>
+        <a href="/list/" rel="nofollow">视频</a>
+        <a href="/list/" rel="nofollow">软件</a>
+        <a href="/list/" rel="nofollow">视频</a>
+        <a href="/list/" rel="nofollow">软件</a>
+        <a href="/list/" rel="nofollow">视频</a>
+        <a href="/list/" rel="nofollow">软件</a>
     </div>
     <div id="content">
         <div id="wall">
@@ -102,14 +102,14 @@
                     {{end}}
 
                     <ul class="pagination">
-                       
+
 
                         {{ range $i, $b := .Before }}
                         <li><a href="/search/{{$.Keyword}}/{{$b}}">{{$b}}</a></li>
                         {{ end }}
 
                         <li class="active"><span>{{.Current}}</span></li>
-                        
+
                         {{ range $i, $a := .After }}
                         <li><a href="/search/{{$.Keyword}}/{{$a}}">{{$a}}</a></li>
                         {{ end }}

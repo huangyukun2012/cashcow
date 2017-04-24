@@ -133,12 +133,12 @@ func InitCateMap() {
 }
 
 func SplitNames(fn string) []string {
-	ss := s.Split(fn, "b#i#l#i#s#o#u#")
+	ss := s.Split(fn, "#$#$")
 	return ss
 }
 
 func SplitItem(fn string) []string {
-	ss := s.Split(fn, "s#i#z#e#")
+	ss := s.Split(fn, "@+@+")
 	return ss
 }
 

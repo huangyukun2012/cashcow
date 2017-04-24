@@ -4,6 +4,7 @@ import (
 
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/securecookie"
 	"net/http"
 	"html/template"
 	_ "github.com/go-sql-driver/mysql"
@@ -45,13 +46,19 @@ var esclient *es.Client
 var cfg *goconfig.ConfigFile
 
 //var templateContent *template.Template
-var blogTemplate *template.Template
+//var blogTemplate *template.Template
 
 var showTemplate *template.Template
 var listTemplate *template.Template
 var searchTemplate *template.Template
 var homeTemplate *template.Template
 var lostTemplate *template.Template
+
+var bshowTemplate *template.Template
+var blistTemplate *template.Template
+
+var regPage string
+var loginPage string
 
 
 var Logger *logging.Logger
@@ -123,14 +130,6 @@ func Init() {
 
 	InitTemplates()
 
-	templ, err := ioutil.ReadFile("resource/bilisou/templates/blog.html")
-	if err == nil {
-		blogTemplate = template.Must(template.New("tmp").Parse(string(templ)))
-	} else {
-		Logger.Error("failed to open template")
-	}
-
-
 	go c.Start(db)
 	//go w.Start(db)
 	//go b.Start(db)
@@ -175,6 +174,16 @@ func InitTemplates() {
 		Logger.Error(err.Error())
 	}
 
+	blist, err := ioutil.ReadFile("resource/bilisou/templates/blist.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
+	bshow, err := ioutil.ReadFile("resource/bilisou/templates/bshow.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
 	search, err := ioutil.ReadFile("resource/bilisou/templates/search.html")
 	if err != nil {
 		Logger.Error(err.Error())
@@ -190,12 +199,27 @@ func InitTemplates() {
 		Logger.Error(err.Error())
 	}
 
+	reg, err := ioutil.ReadFile("resource/bilisou/templates/reg.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+	regPage = string(reg)
+
+	login, err := ioutil.ReadFile("resource/bilisou/templates/login.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+	loginPage = string(login)
+
 
 	listTemplate = template.Must(template.New("tmp").Parse(string(list)))
 	searchTemplate = template.Must(template.New("tmp").Parse(string(search)))
 	homeTemplate = template.Must(template.New("tmp").Parse(string(home)))
 	showTemplate = template.Must(template.New("tmp").Parse( string(show)))
 	lostTemplate = template.Must(template.New("tmp").Parse( string(lost)))
+	bshowTemplate = template.Must(template.New("tmp").Parse( string(bshow)))
+	blistTemplate = template.Must(template.New("tmp").Parse( string(blist)))
+
 }
 
 
@@ -226,6 +250,8 @@ func GetURLBlog(url string) (*m.PageVar, error){
 func Index(w http.ResponseWriter, r *http.Request) {
 	u.UpdateBilisouStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s, url = %s", r.RemoteAddr, r.URL)
+	userName := getUserName(r)
+	fmt.Println("user name = " + userName)
 	/*
 	pv, err := GetURL("home")
 	if err == nil && pv != nil {
@@ -244,11 +270,11 @@ func IndexBlog(w http.ResponseWriter, r *http.Request) {
 	Logger.Info("ip = %s, url = %s", r.RemoteAddr, r.URL)
 	pv, err := GetURLBlog("blog home")
 	if err == nil && pv != nil {
-		render(w, blogTemplate, pv)
+		render(w, blistTemplate, pv)
 	} else {
 		pv := m.ListBlogPage(db, esclient, 1, 0)
 		SetURL("blog home", pv)
-		render(w, blogTemplate, pv)
+		render(w, blistTemplate, pv)
 	}
 
 }
@@ -282,36 +308,6 @@ func ListShare(w http.ResponseWriter, r *http.Request) {
 	}
 	SetURL(r.URL.Path, pv)
 }
-
-/*
-func ListUsers(w http.ResponseWriter, r *http.Request) {
-	u.UpdateBilisouStat(r.RemoteAddr, Logger)
-	Logger.Info("ip = %s, url = %s", r.RemoteAddr, r.URL)
-	pv, err := GetURL(r.URL.Path)
-	if err == nil && pv != nil {
-		Logger.Info("it's from cache %s", url)
-		render(w, templateContent, pv)
-		return
-	}
-
-	vars := mux.Vars(r)
-	p := vars["page"]
-	if p == "" {
-		p = "1"
-	}
-	pp, err:=strconv.Atoi(p)
-	if err != nil {
-		Logger.Info(err.Error())
-		return
-	}
-	pv = m.GenerateUlistPageVar(esclient, pp)
-	if pv != nil {
-		render(w, templateContent, pv)
-	}
-	SetURL(r.URL.Path, pv)
-}
-*/
-
 
 func SearchShare(w http.ResponseWriter, r *http.Request) {
 	u.UpdateBilisouStat(r.RemoteAddr, Logger)
@@ -368,29 +364,6 @@ func ShowShare(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-/*
-func ShowUser(w http.ResponseWriter, r *http.Request) {
-	Logger.Info("ip = %s, url = %s", r.RemoteAddr, r.URL)
-	vars := mux.Vars(r)
-	uk := vars["uk"]
-	p := vars["page"]
-	if p == "" {
-		p = "1"
-	}
-
-	pp, err:=strconv.Atoi(p)
-	if err != nil {
-		Logger.Error(err.Error())
-		pp = 1
-	}
-
-	pv := m.GenerateUserPageVar(esclient, uk, pp)
-	if pv != nil {
-		render(w, templateContent, pv)
-	}
-}
-*/
-
 func ListBlog(w http.ResponseWriter, r *http.Request) {
 	u.UpdateBilisouStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
@@ -398,7 +371,7 @@ func ListBlog(w http.ResponseWriter, r *http.Request) {
 	pv, err := GetURLBlog(r.URL.Path)
 	if err == nil && pv != nil {
 		Logger.Info("load blog %s from cache", url)
-		render(w, blogTemplate, pv)
+		render(w, blistTemplate, pv)
 		return
 	}
 
@@ -427,7 +400,7 @@ func ListBlog(w http.ResponseWriter, r *http.Request) {
 	pv = m.ListBlogPage(db, esclient, pp, cati)
 
 	if pv != nil {
-		render(w, blogTemplate, pv)
+		render(w, blistTemplate, pv)
 	}
 
 	SetURLBlog(r.URL.Path, pv)
@@ -441,7 +414,7 @@ func ShowBlog(w http.ResponseWriter, r *http.Request) {
 	pv, err := GetURLBlog(r.URL.Path)
 	if err == nil && pv != nil {
 		Logger.Info("load %s from cache", url )
-		render(w, blogTemplate, pv)
+		render(w, bshowTemplate, pv)
 		return
 	}
 
@@ -458,7 +431,7 @@ func ShowBlog(w http.ResponseWriter, r *http.Request) {
 	//update viewcount
 	//m.ViewArticle(db, int64(uk))
 	if pv != nil {
-		render(w, blogTemplate, pv)
+		render(w, bshowTemplate, pv)
 	}
 	SetURLBlog(r.URL.Path, pv)
 }
@@ -477,6 +450,7 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 	SetURL(r.URL.Path, pv)
 }
 
+/*
 
 func NotFoundBlog(w http.ResponseWriter, r *http.Request) {
 	u.UpdateBilisouStat(r.RemoteAddr, Logger)
@@ -489,6 +463,7 @@ func NotFoundBlog(w http.ResponseWriter, r *http.Request) {
 	}
 	SetURL(r.URL.Path, pv)
 }
+*/
 
 
 
@@ -510,6 +485,100 @@ func Robots(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "User-agent: *\nDisallow:\n")
 }
 
+
+var cookieHandler = securecookie.New(
+	securecookie.GenerateRandomKey(64),
+	securecookie.GenerateRandomKey(32))
+
+func getUserName(request *http.Request) (userName string) {
+	if cookie, err := request.Cookie("session"); err == nil {
+		cookieValue := make(map[string]string)
+		if err = cookieHandler.Decode("session", cookie.Value, &cookieValue); err == nil {
+			userName = cookieValue["name"]
+		}
+	}
+	return userName
+}
+
+func setSession(userName string, response http.ResponseWriter) {
+	value := map[string]string{
+		"name": userName,
+	}
+	if encoded, err := cookieHandler.Encode("session", value); err == nil {
+		cookie := &http.Cookie{
+			Name:  "session",
+			Value: encoded,
+			Path:  "/",
+		}
+		http.SetCookie(response, cookie)
+	}
+}
+
+func clearSession(response http.ResponseWriter) {
+	cookie := &http.Cookie{
+		Name:   "session",
+		Value:  "",
+		Path:   "/",
+		MaxAge: -1,
+	}
+	http.SetCookie(response, cookie)
+}
+
+
+func Login(response http.ResponseWriter, request *http.Request) {
+	if request.Method == "GET" {
+		fmt.Fprintf(response, loginPage)
+		return
+	}
+
+	if request.Method == "POST" {
+
+		fmt.Println("%+v\n", request)
+		name := request.FormValue("username")
+		fmt.Println("get name " +  name)
+		pass := request.FormValue("password")
+		fmt.Println("get password " + pass)
+//		redirectTarget := "/"
+		if name != "" && pass != "" {
+			// .. check credentials ..
+			setSession(name, response)
+//			redirectTarget = "/"
+		}
+		fmt.Fprintf(response, "true")
+		//http.Redirect(response, request, redirectTarget, 302)
+	}
+}
+
+
+func Register(response http.ResponseWriter, request *http.Request) {
+	if request.Method == "GET" {
+		fmt.Fprintf(response, regPage)
+		return
+	}
+
+	if request.Method == "POST" {
+
+		fmt.Println("%+v\n", request)
+		name := request.FormValue("username")
+		fmt.Println("get name " +  name)
+		pass := request.FormValue("password")
+		fmt.Println("get password " + pass)
+		//		redirectTarget := "/"
+		if name != "" && pass != "" {
+			// .. check credentials ..
+			setSession(name, response)
+			//			redirectTarget = "/"
+		}
+		fmt.Fprintf(response, "true")
+		//http.Redirect(response, request, redirectTarget, 302)
+	}
+}
+
+
+func Logout(response http.ResponseWriter, request *http.Request) {
+	clearSession(response)
+	http.Redirect(response, request, "/", 302)
+}
 
 func StartBlog(mx *mux.Router) {
 
@@ -540,8 +609,7 @@ func StartBlog(mx *mux.Router) {
 	mx.HandleFunc("/robots.txt", Robots)
 
 	//not found
-	mx.NotFoundHandler = http.HandlerFunc(NotFoundBlog)
-
+	mx.NotFoundHandler = http.HandlerFunc(NotFound)
 }
 
 
@@ -583,6 +651,14 @@ func Start(mx *mux.Router) {
 	mx.HandleFunc("/user/{uk}/{page}", ShowUser)
 	mx.HandleFunc("/user/{uk}/{page}/", ShowUser)
 */
+
+
+	//mx.HandleFunc("/", indexPageHandler)
+	//mx.HandleFunc("/internal", internalPageHandler)
+
+	mx.HandleFunc("/login", Login)
+	mx.HandleFunc("/register", Register)
+	mx.HandleFunc("/logout", Logout)
 
 	//server static
 	mx.PathPrefix("/static").Handler(http.FileServer(http.Dir("resource/bilisou/")))
