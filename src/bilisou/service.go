@@ -25,8 +25,8 @@ import (
 	"logging"
 	m "bilisou/model"
 	c "bilisou/crawler"
-//	w "bilisou/weixin"
-//	b "bilisou/bt"
+	w "bilisou/weixin"
+	b "bilisou/bt"
 	es "gopkg.in/olivere/elastic.v3"
 	"io/ioutil"
 )
@@ -131,8 +131,8 @@ func Init() {
 	InitTemplates()
 
 	go c.Start(db)
-	//go w.Start(db)
-	//go b.Start(db)
+	go w.Start(db)
+	go b.Start(db)
 
 
 }
@@ -644,13 +644,18 @@ func Start(mx *mux.Router) {
 	mx.HandleFunc("/file/{dataid}", ShowShare)
 	mx.HandleFunc("/file/{dataid}/", ShowShare)
 
-/*
-	//user
-	mx.HandleFunc("/user/{uk}", ShowUser)
-	mx.HandleFunc("/user/{uk}/", ShowUser)
-	mx.HandleFunc("/user/{uk}/{page}", ShowUser)
-	mx.HandleFunc("/user/{uk}/{page}/", ShowUser)
-*/
+
+	mx.HandleFunc("/blist", IndexBlog)
+	mx.HandleFunc("/blist/", IndexBlog)
+	mx.HandleFunc("/blist/{category}", ListBlog)
+	mx.HandleFunc("/blist/{category}/", ListBlog)
+	mx.HandleFunc("/blist/{category}/{page}", ListBlog)
+	mx.HandleFunc("/blist/{category}/{page}/", ListBlog)
+
+	//blog
+	mx.HandleFunc("/blog/{uk}", ShowBlog)
+	mx.HandleFunc("/blog/{uk}/", ShowBlog)
+
 
 
 	//mx.HandleFunc("/", indexPageHandler)

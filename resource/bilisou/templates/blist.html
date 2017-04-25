@@ -65,14 +65,15 @@
 
 
     <div id="sort-bar">
-      <a href="/list/0" rel="nofollow">所有博文</a>
-      <a href="/list/1" rel="nofollow">搞笑段子</a>
-      <a href="/list/2" rel="nofollow">糗事百科</a>
-      <a href="/list/3" rel="nofollow">明星八卦</a>
-      <a href="/list/4" rel="nofollow">深度好文</a>
-      <a href="/list/5" rel="nofollow">时事点评</a>
-      <a href="/list/6" rel="nofollow">心灵鸡汤</a>
-      <a href="/list/7" rel="nofollow">游戏世界</a>
+      <a href="/blist/0" rel="nofollow">所有博文</a>
+      <a href="/blist/1" rel="nofollow">搞笑段子</a>
+      <a href="/blist/2" rel="nofollow">糗事百科</a>
+      <a href="/blist/3" rel="nofollow">明星八卦</a>
+      <a href="/blist/4" rel="nofollow">深度好文</a>
+      <a href="/blist/5" rel="nofollow">时事点评</a>
+      <a href="/blist/6" rel="nofollow">心灵鸡汤</a>
+      <a href="/blist/6" rel="nofollow">心灵鸡汤</a>
+      <a href="/blist/7" rel="nofollow">游戏世界</a>
     </div>
     <div id="content">
         <div id="wall">
@@ -96,18 +97,18 @@
 
                     <ul class="pagination">
 
-                        <li><a href="/list/{{.CategoryInt}}/1">首页</a></li>
+                        <li><a href="/blist/{{.CategoryInt}}/1">首页</a></li>
 
                         {{ range $i, $b := .Before }}
-                        <li><a href="/list/{{.CategoryInt}}/{{$b}}">{{$b}}</a></li>
+                        <li><a href="/blist/{{$.CategoryInt}}/{{$b}}">{{$b}}</a></li>
                         {{ end }}
 
                         <li class="active"><span>{{.Current}}</span></li>
                         
                         {{ range $i, $a := .After }}
-                        <li><a href="/list/{{.CategoryInt}}/{{$a}}">{{$a}}</a></li>
+                        <li><a href="/blist/{{$.CategoryInt}}/{{$a}}">{{$a}}</a></li>
                         {{ end }}
-                        <li><a href="/list/{{.CategoryInt}}/{{$.End}}">末页</a></li>
+                        <li><a href="/blist/{{.CategoryInt}}/{{$.End}}">末页</a></li>
 
                     </ul>
                 </div>
@@ -124,7 +125,7 @@
 
 <!-- footer -->
 <div class="footer"><span>©2017</span><span><a href="http://www.bilisou.com">哔哩搜</a>|<a
-        href="http://blog.bilisou.com">哔哩搜段子</a>|<a href="http://www.developerq.com">开发者问题网</a></span></div>
+        href="http://www.bilisou.com/blist">哔哩搜段子</a>|<a href="http://www.developerq.com">开发者问题网</a></span></div>
 <script charset="gbk" type="text/javascript" src="//www.baidu.com/js/opensug.js"></script>
 <script type="text/javascript" src="/static/js/bilisou.js"></script>
 <!--<script src="/Public/static/js/home-common-v2.js?v=20161124"></script>-->
