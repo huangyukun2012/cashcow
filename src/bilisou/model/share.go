@@ -170,7 +170,7 @@ func (share *Share) Save(db *sql.DB) error {
 
 func GetShareCount(db *sql.DB, where string) int{
 	count := 0
-	rows, _ := db.Query("select count(id) from sharedata " + where)
+	rows, _ := db.Query("select max(id) from sharedata " + where)
 	for rows.Next() {
 		rows.Scan(&count)
 	}
@@ -183,6 +183,7 @@ func GetShareCount(db *sql.DB, where string) int{
 
 func GetShares(db *sql.DB, where string) []Share {
 	sql := "select title, data_id, filenames, size, size_str, last_scan, category, source from sharedata " + where;
+	fmt.Println(sql)
 
 	rows, _ := db.Query(sql)
 	defer rows.Close()
@@ -239,14 +240,14 @@ func ListSharePage(db *sql.DB, page int, category int) *PageVar {
 		return nil
 	}
 	where := ""
-	if category != 0 {
-		where = fmt.Sprintf(" where category = %d  ", category)
-	}
+	//if category != 0 {
+	//	where = fmt.Sprintf(" where category = %d  ", category)
+	//}
 
 	count := GetShareCount(db, where)
 	pv.End = count / 20
 
-	where = where + fmt.Sprintf(" order by last_scan desc limit %d, 20", (page - 1) * 20)
+	where = where + fmt.Sprintf(" where id < %d  order by id desc limit 0, 20", count - (page - 1) * 20)
 
 	pv.ListShares = GetShares(db, where)
 

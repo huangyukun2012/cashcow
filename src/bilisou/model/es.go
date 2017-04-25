@@ -41,13 +41,13 @@ func SearchShare(esclient *es.Client, query es.Query, start int, size int, sort 
 				//	sd.FilenamesRaw = hl[0]
 				//}
 			}
-
-			sd.FillHtml()
-			//trucate the filenames
 			if len(sd.FilenamesRaw) > 180 {
 				sd.FilenamesRaw = sd.FilenamesRaw[0:180] + "..."
 			}
-			shares = append(shares, sd)
+
+			sd.FillHtml()
+			//trucate the filenames
+					shares = append(shares, sd)
 		}
 	} else {
 		return nil, 0, 0
