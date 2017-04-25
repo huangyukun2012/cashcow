@@ -92,8 +92,6 @@ func (share *Share)FillHtml()  {
 	share.CategoryCN = u.CAT_INT_STRCN[int(share.CategoryInt)]
 	share.FeedTimeStr  = u.IntToDateStr(share.FeedTime)
 
-	fmt.Printf("source = %d", share.Source)
-
 	items := u.SplitNames(share.FilenamesRaw)
 	if share.Source == 0 {
 		abs := ""
@@ -186,7 +184,6 @@ func GetShareCount(db *sql.DB, where string) int{
 func GetShares(db *sql.DB, where string) []Share {
 	sql := "select title, data_id, filenames, size, size_str, last_scan, category, source from sharedata " + where;
 
-	fmt.Println(sql)
 	rows, _ := db.Query(sql)
 	defer rows.Close()
 	shares := []Share{}
@@ -214,7 +211,6 @@ func GetShare(db *sql.DB, dataID string) *Share {
 	defer rows.Close()
 
 	if err != nil {
-		fmt.Println(err.Error())
 		Logger.Error(err.Error())
 		return nil
 	}
@@ -246,7 +242,6 @@ func ListSharePage(db *sql.DB, page int, category int) *PageVar {
 	if category != 0 {
 		where = fmt.Sprintf(" where category = %d  ", category)
 	}
-	fmt.Println(where)
 
 	count := GetShareCount(db, where)
 	pv.End = count / 20

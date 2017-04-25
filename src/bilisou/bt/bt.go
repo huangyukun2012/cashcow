@@ -8,17 +8,17 @@ import (
 	"regexp"
 	"fmt"
 	"bytes"
-	"strconv"
+	//"strconv"
 	"strings"
 	"io/ioutil"
 //	"io"
-//	"net/http"
+	"net/http"
 	"logging"
 //	"encoding/json"
 //	t "developerq/trans"
 	m "bilisou/model"
 	u "utils"
-	"os"
+	//"os"
 )
 
 var Logger *logging.Logger
@@ -52,6 +52,23 @@ func GetHTMLNodeFromFile(filename string)( *html.Node, error) {
 		return nil, err
 	}
 	doc, err := html.Parse(strings.NewReader(string(buf)))
+	return doc, err
+}
+
+func GetHTMLNodeFromURL(url string)( *html.Node, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		// handle error
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		// handle error
+		return nil, err
+	}
+	doc, err := html.Parse(strings.NewReader(string(body)))
 	return doc, err
 }
 
@@ -90,7 +107,6 @@ func FindShare(n *html.Node, share *m.Share) {
 			}
 			share.Title = b.String()
 			share.Title = strings.TrimSpace(share.Title)
-			fmt.Println("title = " + share.Title)
 		}
 
 	}
@@ -99,7 +115,6 @@ func FindShare(n *html.Node, share *m.Share) {
 		for _, a := range n.Attr {
 			if a.Key == "href" && strings.Contains(a.Val, "magnet") {
 				share.Link = a.Val
-				fmt.Println("Link = " + share.Link)
 			}
 		}
 	}
@@ -116,14 +131,12 @@ func FindShare(n *html.Node, share *m.Share) {
 				table := b.String()
 				if strings.Contains(table, "<th>文件名称</th>") {
 					FindShareFilenames(n, share)
-					fmt.Println("filename = " + share.FilenamesRaw)
 				} else {
 					rp := regexp.MustCompile(`<td>文件大小<\/td>[\r\n\s]+<td>(.*)<\/td>[\r\n\s]+<\/tr>[\r\n\s]+<tr>[\r\n\s]+<td>创建时间<\/td>`)
 					res := rp.FindStringSubmatch(table)
 					if len(res) > 1 {
 						share.SizeStr = res[1]
 					}
-					fmt.Println("size = " + share.SizeStr)
 				}
 			}
 		}
@@ -150,21 +163,20 @@ func CrawlShare() {
 		for rows.Next() {
 			rows.Scan(&path, &current)
 		}
-		if current > 87000 {
-			return
-		}
+
 		current = current + 1
 		stmt, _ := db.Prepare("update bttrack set current = ?")
 		stmt.Exec(current)
 		stmt.Close()
 
-		filename := path + strconv.Itoa(current) + ".html"
+		///filename := path + strconv.Itoa(current) + ".html"
+		url := fmt.Sprintf("http://192.99.3.150/index/info/id/%d.html", current)
 
-		fmt.Println("process bt file = " + filename)
+		Logger.Info("process bt url = " + url)
 
-		if _, err := os.Stat(filename); err == nil {
+		if true {
 			// path/to/whatever exists
-			doc, err := GetHTMLNodeFromFile(filename)
+			doc, err := GetHTMLNodeFromURL(url)
 			if err != nil {
 				Logger.Error(err.Error())
 				continue
