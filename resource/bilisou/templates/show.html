@@ -11,16 +11,6 @@
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     <link rel="apple-touch-icon" href="/Public/static/img/apple_icon.jpg">
       <script>
-         function search() {
-            var si = document.getElementById("search");
-            window.location.href="/search/" + si.value;
-         }
-         function keysearch(){
-          if (event.keyCode==13)  //回车键的键值为13
-            document.getElementById("searchbutton").click(); //调用登录按钮的登录事件
-         }
-      </script>
-      <script>
          (function(){
             var bp = document.createElement('script');
             var curProtocol = window.location.protocol.split(':')[0];
@@ -46,7 +36,11 @@
         <span><a href="/list">列表</a></span>
         <span class="first"><a href="/blist/">段子</a></span>
         <span class="first"><a href="/">电影</a></span>
+         {{if eq .Username ""}}
         <span class="top_fav"><a href="/login" class="cur_login">登录</a></span>
+        {{else}}
+        <span class="top_fav"><a href="/login" class="cur_login">.Username</a></span>
+        {{end}}
         
     </div>
 <div class="header-div">
@@ -59,7 +53,7 @@
 </div>
 
     <div id="content">
-        <div id="wall"><h1 class="res-title">{{.Share.Title}}</h1>
+        <div id="wall"><h1 class="res-title">{{.Share.HTitle}}</h1>
             <div class="fileDetail">
               <span id="m_link" style="display:none">magnet:?xt=urn:btih:CEE671173382ACD8DD57DAD56E3FB1DC711777A7</span>
               
@@ -124,7 +118,7 @@
             <div>
               <ol>
                      {{ range $i, $s := .RandomSharesSimilar}}                     
-                     <li><a href="/file/{{$s.DataID}}/" target="_blank" title="{{$s.Title}}">{{$s.Title}}</a></li>
+                     <li><a href="/file/{{$s.DataID}}/" target="_blank" title="{{$s.HTitle}}">{{$s.HTitle}}</a></li>
                      {{end}}
                   </ol>
                </div>

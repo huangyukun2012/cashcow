@@ -41,6 +41,8 @@ type PageVar struct {
 	RandomSharesCategory      []Share
 	RandomSharesSimilar      []Share
 	Keywords          []string
+	//for login
+	Username         string
 }
 
 

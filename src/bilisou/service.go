@@ -20,7 +20,7 @@ import (
 //	"os"
 //	"bufio"
 //	"io"
-//	"strings"
+	"strings"
 	u "utils"
 	"logging"
 	m "bilisou/model"
@@ -250,8 +250,7 @@ func GetURLBlog(url string) (*m.PageVar, error){
 func Index(w http.ResponseWriter, r *http.Request) {
 	u.UpdateBilisouStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s, url = %s", r.RemoteAddr, r.URL)
-	userName := getUserName(r)
-	fmt.Println("user name = " + userName)
+
 	/*
 	pv, err := GetURL("home")
 	if err == nil && pv != nil {
@@ -260,6 +259,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		pv := m.GenerateListPageVar(esclient, 0, 1)
 	*/
 	pv := m.PageVar{}
+	pv.Username = getUserName(r)
 	pv.Keywords = m.GetRandomKeywords(db, 5)
 	render(w, homeTemplate, pv)
 }
@@ -269,11 +269,14 @@ func IndexBlog(w http.ResponseWriter, r *http.Request) {
 	u.UpdateBilisouStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s, url = %s", r.RemoteAddr, r.URL)
 	pv, err := GetURLBlog("blog home")
+
 	if err == nil && pv != nil {
+		pv.Username = getUserName(r)
 		render(w, blistTemplate, pv)
 	} else {
 		pv := m.ListBlogPage(db, esclient, 1, 0)
 		SetURL("blog home", pv)
+		pv.Username = getUserName(r)
 		render(w, blistTemplate, pv)
 	}
 
@@ -286,7 +289,7 @@ func ListShare(w http.ResponseWriter, r *http.Request) {
 
 	pv, err := GetURL(r.URL.Path)
 	if err == nil && pv != nil {
-		Logger.Info("it's from cache %s", url)
+		pv.Username = getUserName(r)
 		render(w, listTemplate, pv)
 		return
 	}
@@ -304,6 +307,7 @@ func ListShare(w http.ResponseWriter, r *http.Request) {
 	}
 	pv = m.ListSharePage(db, pp, 0)
 	if pv != nil {
+		pv.Username = getUserName(r)
 		render(w, listTemplate, pv)
 	}
 	SetURL(r.URL.Path, pv)
@@ -315,6 +319,8 @@ func SearchShare(w http.ResponseWriter, r *http.Request) {
 	pv, err := GetURL(r.URL.Path)
 	if err == nil && pv != nil {
 		Logger.Info("it's from cache %s", url)
+		pv.Username = getUserName(r)
+		pv.Username = getUserName(r)
 		render(w, searchTemplate, pv)
 		return
 	}
@@ -345,8 +351,9 @@ func SearchShare(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	m.KeywordHit(db,keyword)
-	pv = m.GenerateSearchPageVar(esclient, 0, keyword, pp)
+	pv = m.GenerateSearchPageVar(esclient, db, 0, keyword, pp)
 	if pv != nil {
+		pv.Username = getUserName(r)
 		render(w, searchTemplate, pv)
 	}
 	SetURL(r.URL.Path, pv)
@@ -358,9 +365,11 @@ func ShowShare(w http.ResponseWriter, r *http.Request) {
 	// break down the variables for easier assignment
 	vars := mux.Vars(r)
 	id := vars["dataid"]
-	sp := m.ShowSharePage(db, esclient, id)
-	if sp != nil {
-		render(w, showTemplate, sp)
+	pv := m.ShowSharePage(db, esclient, id)
+	if pv != nil {
+
+		pv.Username = getUserName(r)
+		render(w, showTemplate, pv)
 	}
 }
 
@@ -369,8 +378,11 @@ func ListBlog(w http.ResponseWriter, r *http.Request) {
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
 
 	pv, err := GetURLBlog(r.URL.Path)
+
 	if err == nil && pv != nil {
 		Logger.Info("load blog %s from cache", url)
+		pv.Username = getUserName(r)
+		pv.Username = getUserName(r)
 		render(w, blistTemplate, pv)
 		return
 	}
@@ -379,13 +391,10 @@ func ListBlog(w http.ResponseWriter, r *http.Request) {
 	cat := vars["category"]
 	//cati, ok:= u.CAT_STR_INT[cat]
 	cati, err := strconv.Atoi(cat)
-	fmt.Println(cati)
 	if err != nil {
-		fmt.Println(err.Error())
 		Logger.Error(err.Error())
 		cati = -1
 	}
-
 
 	p := vars["page"]
 	if p == "" {
@@ -400,6 +409,7 @@ func ListBlog(w http.ResponseWriter, r *http.Request) {
 	pv = m.ListBlogPage(db, esclient, pp, cati)
 
 	if pv != nil {
+		pv.Username = getUserName(r)
 		render(w, blistTemplate, pv)
 	}
 
@@ -412,8 +422,10 @@ func ShowBlog(w http.ResponseWriter, r *http.Request) {
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
 
 	pv, err := GetURLBlog(r.URL.Path)
+
 	if err == nil && pv != nil {
 		Logger.Info("load %s from cache", url )
+		pv.Username = getUserName(r)
 		render(w, bshowTemplate, pv)
 		return
 	}
@@ -431,6 +443,7 @@ func ShowBlog(w http.ResponseWriter, r *http.Request) {
 	//update viewcount
 	//m.ViewArticle(db, int64(uk))
 	if pv != nil {
+		pv.Username = getUserName(r)
 		render(w, bshowTemplate, pv)
 	}
 	SetURLBlog(r.URL.Path, pv)
@@ -440,9 +453,9 @@ func ShowBlog(w http.ResponseWriter, r *http.Request) {
 func NotFound(w http.ResponseWriter, r *http.Request) {
 	u.UpdateBilisouStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s, url = %s", r.RemoteAddr, r.URL)
-//	pv := m.GenerateListPageVar(esclient, 0, 1)
 	pv := &m.PageVar{}
 	pv.Type = "lost"
+	pv.Username = getUserName(r)
 	w.WriteHeader(http.StatusNotFound)
 	if pv != nil {
 		render(w, lostTemplate, pv)
@@ -532,23 +545,49 @@ func Login(response http.ResponseWriter, request *http.Request) {
 	}
 
 	if request.Method == "POST" {
-
-		fmt.Println("%+v\n", request)
 		name := request.FormValue("username")
-		fmt.Println("get name " +  name)
 		pass := request.FormValue("password")
-		fmt.Println("get password " + pass)
-//		redirectTarget := "/"
 		if name != "" && pass != "" {
-			// .. check credentials ..
-			setSession(name, response)
-//			redirectTarget = "/"
+			id := -1
+			r_name := ""
+			r_pass := ""
+			rows, err := db.Query("select id, username, password from user where username = ?", name)
+			defer rows.Close()
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+
+			for rows.Next() {
+				rows.Scan(&id, &r_name, &r_pass)
+			}
+
+			if id != -1 && name == r_name && pass == r_pass {
+
+				ss := strings.Split(request.RemoteAddr, ":")
+				if len(ss) != 2 {
+					return
+				}
+				ipaddr := ss[0]
+
+				stmt, _ := db.Prepare("update user set last_login = ?  where id = ?")
+				stmt.Exec(ipaddr, id)
+				stmt.Close()
+
+				fmt.Fprintf(response, "true")
+				setSession(name, response)
+				return
+			}
 		}
-		fmt.Fprintf(response, "true")
-		//http.Redirect(response, request, redirectTarget, 302)
+		fmt.Fprintf(response, "false")
+		return
 	}
+
 }
 
+type RegMsg struct {
+	Status int
+	Reason string
+}
 
 func Register(response http.ResponseWriter, request *http.Request) {
 	if request.Method == "GET" {
@@ -557,20 +596,57 @@ func Register(response http.ResponseWriter, request *http.Request) {
 	}
 
 	if request.Method == "POST" {
-
-		fmt.Println("%+v\n", request)
-		name := request.FormValue("username")
-		fmt.Println("get name " +  name)
-		pass := request.FormValue("password")
-		fmt.Println("get password " + pass)
-		//		redirectTarget := "/"
-		if name != "" && pass != "" {
-			// .. check credentials ..
-			setSession(name, response)
-			//			redirectTarget = "/"
+		msg := RegMsg{}
+		email := request.FormValue("email")
+		if !strings.Contains(email, ".") && !strings.Contains(email, "@") {
+			msg.Status = 0
+			msg.Reason = "非法邮箱地址"
+			b, _ := json.Marshal(msg)
+			fmt.Fprintf(response, string(b))
+			return
 		}
-		fmt.Fprintf(response, "true")
-		//http.Redirect(response, request, redirectTarget, 302)
+		name := request.FormValue("username")
+		pass := request.FormValue("password")
+		if name != "" && pass != "" {
+			id := -1
+			r_name := ""
+			r_pass := ""
+			rows, err := db.Query("select id, username, password from user where username = ?", name)
+			defer rows.Close()
+			if err != nil {
+				msg.Status = 0
+				msg.Reason = "服务器错误"
+				b, _ := json.Marshal(msg)
+				fmt.Fprintf(response, string(b))
+				return
+			}
+
+			for rows.Next() {
+				rows.Scan(&id, &r_name, &r_pass)
+			}
+
+			if id != -1 {
+				msg.Status = 0
+				msg.Reason = "用户名已经存在，请换一个用户名注册"
+				b, _ := json.Marshal(msg)
+				fmt.Fprintf(response, string(b))
+				return
+			}
+
+			stmt, _ := db.Prepare("insert into user(username, password, email) values(?, ?, ?)")
+			stmt.Exec(name, pass, email)
+			stmt.Close()
+			msg.Status = 1
+			b, _ := json.Marshal(msg)
+			fmt.Fprintf(response, string(b))
+			return
+		}
+		msg.Status = 0
+		msg.Reason = "用户名或密码为空"
+		b, _ := json.Marshal(msg)
+		fmt.Fprintf(response, string(b))
+		return
+
 	}
 }
 
@@ -580,6 +656,8 @@ func Logout(response http.ResponseWriter, request *http.Request) {
 	http.Redirect(response, request, "/", 302)
 }
 
+
+/*
 func StartBlog(mx *mux.Router) {
 
 //	Init()
@@ -611,7 +689,7 @@ func StartBlog(mx *mux.Router) {
 	//not found
 	mx.NotFoundHandler = http.HandlerFunc(NotFound)
 }
-
+*/
 
 func Start(mx *mux.Router) {
 

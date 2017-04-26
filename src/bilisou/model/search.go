@@ -6,10 +6,11 @@ import (
 //	"encoding/json"
 //	"github.com/siddontang/go/log"
 	u "utils"
+	"database/sql"
 )
 
 
-func GenerateSearchPageVar(esclient *es.Client, category int, keyword string, page int) *PageVar {
+func GenerateSearchPageVar(esclient *es.Client, db *sql.DB, category int, keyword string, page int) *PageVar {
 	if page <= 0 {
 		return nil
 	}
@@ -57,6 +58,6 @@ func GenerateSearchPageVar(esclient *es.Client, category int, keyword string, pa
 	SetCategory(&pv, category)
 
 //	pv.RandomUsers = GenerateRandomUsers(esclient, 24)
-//	pv.Keywords = GenerateRandomKeywords(esclient, 30)
+	pv.Keywords = GetRandomKeywords(db, 10)
 	return &pv
 }

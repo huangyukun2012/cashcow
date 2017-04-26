@@ -142,7 +142,9 @@
             var data = {'username': $('#u_uname').val(), 'password': $('#u_upwd').val(), 'email': $('#u_email').val()};
             $.post('/register', data, function (res) {
                 j.close();
-                if (res.code == 1) {
+                console.log(res);
+                console.log(typeof(res));
+                if (res.Status == 1) {
                     $.dialog({
                         title: '注册成功',
                         lock: true,
@@ -166,7 +168,7 @@
                         lock: true,
                         icon: 'error.gif',
                         titleIcon: 'lhgcore.gif',
-                        content: res.msg,
+                        content: res.Reason,
                         button: [
                             {
                                 name: '确认',

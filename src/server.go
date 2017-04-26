@@ -57,8 +57,8 @@ func main() {
 	bs.Start(bmx)
 
 
-	blogmx := mx.Host("blog.bilisou.com").Subrouter()
-	bs.StartBlog(blogmx)
+	//blogmx := mx.Host("blog.bilisou.com").Subrouter()
+	//bs.StartBlog(blogmx)
 
 
 	fmt.Println("start listening at *:80")

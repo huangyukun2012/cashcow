@@ -261,7 +261,7 @@ func ListSharePage(db *sql.DB, page int, category int) *PageVar {
 
 	SetBA(&pv)
 	//pv.SideBarShare = GetSideBarShare(db)
-
+	pv.Keywords = GetRandomKeywords(db, 10)
 	return &pv
 }
 
@@ -282,7 +282,7 @@ func ShowSharePage(db *sql.DB, esclient *es.Client, dataID string) *PageVar {
 	//pv.SideBarShare = GetSideBarShare(db)
 	pv.RandomSharesSimilar = GenerateRandomShares(esclient, 0, 10, pv.Share.Title)
 	pv.Keywords = GetRandomKeywords(db, 6)
-	//fmt.Println(pv.Keywords)
+
 
 	return &pv
 }

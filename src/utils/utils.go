@@ -4,6 +4,7 @@ import (
 
 	"fmt"
 	"github.com/yanyiwu/gojieba"
+	"math/rand"
 	//	_ "github.com/go-sql-driver/mysql"
 	//sql "database/sql"
 	//	"io/ioutil"
@@ -271,4 +272,20 @@ func DumpMap(stat map[string]int, count int, log *logging.Logger) {
 	for key, value := range stat {
 		log.Info("[%s] = %d", key, value)
 	}
+}
+
+func GetRandoms(start int, end int, size int) []int {
+	res := []int{}
+
+	ranges := end - start
+
+	if ranges <= 0 {
+		ranges = 1
+	}
+
+	for i:=0; i<size; i++ {
+		rand.Seed(time.Now().UnixNano())
+		res = append(res, rand.Intn(ranges) + start)
+	}
+	return res
 }

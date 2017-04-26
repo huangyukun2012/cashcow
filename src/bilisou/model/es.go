@@ -56,50 +56,6 @@ func SearchShare(esclient *es.Client, query es.Query, start int, size int, sort 
 	return shares, searchResult.Hits.TotalHits, searchResult.TookInMillis
 }
 
-func SearchUser(esclient *es.Client, query es.Query, start int, size int)([]User, int64) {
-	searchResult := Search(esclient, "bilisou_uinfo", query , start, size, "")
-	if searchResult == nil {
-		return nil, 0
-	}
-	users := []User{}
-	if searchResult.Hits.TotalHits > 0 {
-		for _, hit := range searchResult.Hits.Hits {
-			u := UserInfo{}
-
-			err := json.Unmarshal(*hit.Source, &u)
-			if err != nil {
-				Logger.Error("Failed to read search result, %s", err.Error())
-			}
-			user := UserInfoToUser(u)
-			users = append(users, user)
-		}
-	} else {
-		return nil, 0
-	}
-	return users, searchResult.Hits.TotalHits
-}
-
-
-func SearchKeyword(esclient *es.Client, query es.Query, start int, size int)([]Keyword, int64) {
-	searchResult := Search(esclient, "bilisou_keyword", query , start, size, "count")
-	if searchResult == nil {
-		return nil, 0
-	}
-	keywords := []Keyword{}
-	if searchResult.Hits.TotalHits > 0 {
-		for _, hit := range searchResult.Hits.Hits {
-			k := Keyword{}
-			err := json.Unmarshal(*hit.Source, &k)
-			if err != nil {
-				Logger.Error("Failed to read search result, %s", err.Error())
-			}
-			keywords = append(keywords, k)
-		}
-	} else {
-		return nil, 0
-	}
-	return keywords, searchResult.Hits.TotalHits
-}
 
 func Search(esclient *es.Client, index string,  query es.Query, start int, size int, sort string) *es.SearchResult {
 	// Specify highlighter
@@ -148,15 +104,22 @@ func Search(esclient *es.Client, index string,  query es.Query, start int, size 
 
 func GenerateRandomShares(esclient *es.Client, category int, size int, keyword string) []Share{
 	boolQuery := es.NewBoolQuery()
-	for i := 0; i < size; i ++ {
-		rand.Seed(time.Now().UnixNano())
-		id := rand.Intn(MAX_SHARE - MIN_SHARE) + MIN_SHARE
-		boolQuery.Should(es.NewTermQuery("id", id))
+	if keyword == "" {
+		for i := 0; i < size; i ++ {
+			rand.Seed(time.Now().UnixNano())
+			id := rand.Intn(MAX_SHARE - MIN_SHARE) + MIN_SHARE
+			boolQuery.Should(es.NewTermQuery("id", id))
+		}
+	} else {
+		boolQuery.Should(es.NewMultiMatchQuery(keyword, "title", "filenames"))
 	}
 
 	if category != 0 {
 		boolQuery.Must(es.NewTermQuery("category", category))
 	}
 	randomShares, _, _ := SearchShare(esclient, boolQuery, 0, size, "")
+	if keyword != "" && len(randomShares) != 0{
+		randomShares = randomShares[1:]
+	}
 	return randomShares
 }

@@ -2,9 +2,9 @@ package model
 
 import (
 	"fmt"
-//	u "utils"
-	"math/rand"
-	"time"
+	u "utils"
+//	"math/rand"
+//	"time"
 
 	"database/sql"
 )
@@ -32,7 +32,7 @@ func KeywordHit(db *sql.DB, keyword string) {
 func GetRandomKeywords(db *sql.DB, number int) []string {
 	res := []string{}
 
-	sql := "select count(id) from keyword"
+	sql := "select max(id) from keyword"
 	rows, err := db.Query(sql)
 	defer rows.Close()
 	if err != nil {
@@ -48,10 +48,18 @@ func GetRandomKeywords(db *sql.DB, number int) []string {
 	if size <= 0 {
 		size = 1
 	}
-	rand.Seed(time.Now().UnixNano())
-	start := rand.Intn(size )
 
-	sql = "select keyword from keyword" + fmt.Sprintf(" limit %d, %d", start, number)
+	rand := u.GetRandoms(1, size, number)
+
+	sql = "select keyword from keyword where id in ( "
+	for i, r := range rand {
+		if i == len(rand) - 1 {
+			sql = sql + fmt.Sprintf("%d", r)
+		} else {
+			sql = sql + fmt.Sprintf("%d, ", r)
+		}
+	}
+	sql = sql + " )"
 	rows, err = db.Query(sql)
 	defer rows.Close()
 	if err != nil {

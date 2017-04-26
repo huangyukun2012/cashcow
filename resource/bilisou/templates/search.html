@@ -8,18 +8,8 @@
     <meta name="keywords" content="{{.Keyword}},哔哩搜,bilisou, 百度网盘, 网盘搜索, 迅雷下载，BT下载，福利">
     <link rel="stylesheet" href="/static/css/bilisou.css" type="text/css">
     <script src="//cdn.bootcss.com/jquery/1.8.3/jquery.min.js"></script>
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/static/img/bilisou.ico">
     <link rel="apple-touch-icon" href="/Public/static/img/apple_icon.jpg">
-    <script>
-        function search() {
-            var si = document.getElementById("search");
-            window.location.href = "/search/" + si.value;
-        }
-        function keysearch() {
-            if (event.keyCode == 13)  //回车键的键值为13
-                document.getElementById("searchbutton").click(); //调用登录按钮的登录事件
-        }
-    </script>
     <script>
         (function () {
             var bp = document.createElement('script');
@@ -64,13 +54,12 @@
     <div id="sort-bar">
         <b>全部</b>
         <a href="/list/" rel="nofollow">视频</a>
+        <a href="/list/" rel="nofollow">种子</a>
         <a href="/list/" rel="nofollow">软件</a>
-        <a href="/list/" rel="nofollow">视频</a>
-        <a href="/list/" rel="nofollow">软件</a>
-        <a href="/list/" rel="nofollow">视频</a>
-        <a href="/list/" rel="nofollow">软件</a>
-        <a href="/list/" rel="nofollow">视频</a>
-        <a href="/list/" rel="nofollow">软件</a>
+        <a href="/list/" rel="nofollow">文档</a>
+        <a href="/list/" rel="nofollow">音乐</a>
+        <a href="/list/" rel="nofollow">图片</a>
+        <a href="/list/" rel="nofollow">其他</a>
     </div>
     <div id="content">
         <div id="wall">
@@ -117,10 +106,18 @@
                 </div>
 
                 <div class="search-tips col-md-2">
-                    <div class="search-notice">testing
-                        torrent,testing种子下载,testing迅雷下载相关结果来源于网络蜘蛛，由用户的指令自动获得，本站不承担任何责任！本站已经使用机器人自动屏蔽了99%的违规链接，同时您可以在详情页面进行举报。
+                    <div class="search-notice"><b>{{.Keyword}}</b>
+                        torrent,<b>{{.Keyword}}</b>种子下载,<b>{{.Keyword}}</b>迅雷下载，<b>{{.Keyword}}</b>百度网盘下载相关结果来源于网络内容，由用户的指令自动获得，本站不承担任何责任！
                     </div>
-                    <div id="latest-search"><span class="latest-desc">大家都在搜：</span></div>
+                    <div id="latest-search">
+                        <span class="latest-desc">大家都在搜：</span>
+                        <p>
+                            {{ range $i, $k := .Keywords }}
+                            <a href="/search/{{$k}}" target="_blank" class="pill">{{$k}}</a>
+                            {{end}}
+                        </p> 
+                
+                    </div>
                 </div>
             </div>
         </div>
