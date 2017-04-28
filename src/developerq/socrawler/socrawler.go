@@ -403,7 +403,7 @@ func CrawlSOQuestion(start int) {
 		Logger.Info("Finished article %d", article.ExtID)
 
 		//deley 2 minutes
-		time.Sleep(time.Minute*2)
+		time.Sleep(time.Minute*1)
 	}
 
 
