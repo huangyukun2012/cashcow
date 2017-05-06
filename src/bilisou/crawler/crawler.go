@@ -139,7 +139,7 @@ func Start(dbc *sql.DB) {
 		}
 	}
 	Logger.Info("已经递归爬取完成，请切换新的热门uk或者存储新的热门uk到数据库表avaiuk中")
-	time.Sleep(time.Second * 2)
+	time.Sleep(time.Second * 1)
 
 }
 
@@ -424,7 +424,7 @@ func InsertShare(yd *yundata, uk int64, uname interface{}) bool{
 
 		v.Feed_time = v.Feed_time / 1000
 		ls := time.Now().Unix()
-		time.Sleep(time.Second*5)
+		time.Sleep(time.Second*1)
 		if strings.Compare(v.Feed_type, "share") == 0 {
 			_, err := db.Exec("insert into sharedata(title,share_id,uinfo_id,category, data_id, filenames, feed_time, file_count, size, last_scan, uk, uname) values(?,?,?,?,?,?,?,?,?,?,?,?)", v.Title, v.Shareid, uinfoId, v.Category, v.Data_id, filenames, v.Feed_time, len(v.Filelist), size, ls, uk, uname)
 			if err != nil {
