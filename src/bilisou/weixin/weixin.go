@@ -323,7 +323,7 @@ func CrawlBlog() {
 
 				}
 
-				time.Sleep(3*time.Minute)
+				time.Sleep(10*time.Minute)
 			}
 			time.Sleep(6*time.Minute)
 		}

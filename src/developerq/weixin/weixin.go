@@ -316,11 +316,11 @@ func CrawlBlog() {
 						}
 					}
 					fmt.Println("blog.Title = " + blog.Title)
-					time.Sleep(200*time.Second)
+					time.Sleep(400*time.Second)
 
 				}
 
-				time.Sleep(3*time.Minute)
+				time.Sleep(6*time.Minute)
 			}
 		}
 		time.Sleep(6*time.Minute)

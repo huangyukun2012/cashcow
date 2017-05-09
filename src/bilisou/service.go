@@ -25,7 +25,7 @@ import (
 	"logging"
 	m "bilisou/model"
 	c "bilisou/crawler"
-	w "bilisou/weixin"
+	//w "bilisou/weixin"
 	b "bilisou/bt"
 	es "gopkg.in/olivere/elastic.v3"
 	"io/ioutil"
@@ -131,7 +131,7 @@ func Init() {
 	InitTemplates()
 
 	go c.Start(db)
-	go w.Start(db)
+	//go w.Start(db)
 	go b.Start(db)
 
 
@@ -248,7 +248,6 @@ func GetURLBlog(url string) (*m.PageVar, error){
 
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	u.UpdateBilisouStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s, url = %s", r.RemoteAddr, r.URL)
 
 	/*
@@ -266,7 +265,6 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 
 func IndexBlog(w http.ResponseWriter, r *http.Request) {
-	u.UpdateBilisouStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s, url = %s", r.RemoteAddr, r.URL)
 	pv, err := GetURLBlog("blog home")
 
@@ -284,7 +282,6 @@ func IndexBlog(w http.ResponseWriter, r *http.Request) {
 
 
 func ListShare(w http.ResponseWriter, r *http.Request) {
-	u.UpdateBilisouStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s, url = %s", r.RemoteAddr, r.URL)
 
 	pv, err := GetURL(r.URL.Path)
@@ -314,7 +311,6 @@ func ListShare(w http.ResponseWriter, r *http.Request) {
 }
 
 func SearchShare(w http.ResponseWriter, r *http.Request) {
-	u.UpdateBilisouStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s, url = %s", r.RemoteAddr, r.URL)
 	pv, err := GetURL(r.URL.Path)
 	if err == nil && pv != nil {
@@ -360,7 +356,6 @@ func SearchShare(w http.ResponseWriter, r *http.Request) {
 }
 
 func ShowShare(w http.ResponseWriter, r *http.Request) {
-	u.UpdateBilisouStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s, url = %s", r.RemoteAddr, r.URL)
 	// break down the variables for easier assignment
 	vars := mux.Vars(r)
@@ -374,7 +369,6 @@ func ShowShare(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListBlog(w http.ResponseWriter, r *http.Request) {
-	u.UpdateBilisouStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
 
 	pv, err := GetURLBlog(r.URL.Path)
@@ -418,7 +412,6 @@ func ListBlog(w http.ResponseWriter, r *http.Request) {
 
 
 func ShowBlog(w http.ResponseWriter, r *http.Request) {
-	u.UpdateBilisouStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s url = %s", r.RemoteAddr, r.URL)
 
 	pv, err := GetURLBlog(r.URL.Path)
@@ -451,7 +444,6 @@ func ShowBlog(w http.ResponseWriter, r *http.Request) {
 
 
 func NotFound(w http.ResponseWriter, r *http.Request) {
-	u.UpdateBilisouStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s, url = %s", r.RemoteAddr, r.URL)
 	pv := &m.PageVar{}
 	pv.Type = "lost"
@@ -466,7 +458,6 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 /*
 
 func NotFoundBlog(w http.ResponseWriter, r *http.Request) {
-	u.UpdateBilisouStat(r.RemoteAddr, Logger)
 	Logger.Info("ip = %s, url = %s", r.RemoteAddr, r.URL)
 	pv := m.ListBlogPage(db, esclient, 1, 0)
 	pv.Type = "lost"
