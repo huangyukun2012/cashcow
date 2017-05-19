@@ -27,6 +27,7 @@ import (
 	c "bilisou/crawler"
 	w "bilisou/weixin"
 	//b "bilisou/bt"
+	bili "bilisou/bili"
 	es "gopkg.in/olivere/elastic.v3"
 	"io/ioutil"
 )
@@ -49,6 +50,7 @@ var cfg *goconfig.ConfigFile
 //var blogTemplate *template.Template
 
 var showTemplate *template.Template
+var biliTemplate *template.Template
 var listTemplate *template.Template
 var searchTemplate *template.Template
 var homeTemplate *template.Template
@@ -132,6 +134,7 @@ func Init() {
 
 	go c.Start(db)
 	go w.Start(db)
+	go bili.Start(db)
 	///go b.Start(db)
 
 
@@ -194,6 +197,11 @@ func InitTemplates() {
 		Logger.Error(err.Error())
 	}
 
+	bilis, err := ioutil.ReadFile("resource/bilisou/templates/bili.html")
+	if err != nil {
+		Logger.Error(err.Error())
+	}
+
 	lost, err := ioutil.ReadFile("resource/bilisou/templates/404.html")
 	if err != nil {
 		Logger.Error(err.Error())
@@ -216,6 +224,7 @@ func InitTemplates() {
 	searchTemplate = template.Must(template.New("tmp").Parse(string(search)))
 	homeTemplate = template.Must(template.New("tmp").Parse(string(home)))
 	showTemplate = template.Must(template.New("tmp").Parse( string(show)))
+	biliTemplate = template.Must(template.New("tmp").Parse( string(bilis)))
 	lostTemplate = template.Must(template.New("tmp").Parse( string(lost)))
 	bshowTemplate = template.Must(template.New("tmp").Parse( string(bshow)))
 	blistTemplate = template.Must(template.New("tmp").Parse( string(blist)))
@@ -362,9 +371,14 @@ func ShowShare(w http.ResponseWriter, r *http.Request) {
 	id := vars["dataid"]
 	pv := m.ShowSharePage(db, esclient, id)
 	if pv != nil {
-
 		pv.Username = getUserName(r)
-		render(w, showTemplate, pv)
+		if(pv.Share.Source == 4) {
+			render(w, biliTemplate, pv)
+		} else {
+			render(w, showTemplate, pv)
+		}
+	} else {
+		NotFound(w, r)
 	}
 }
 

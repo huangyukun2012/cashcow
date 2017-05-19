@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>最快最全的的BT搜索,种子搜索,迅雷搜索,百度网盘搜索引擎-哔哩搜</title>
     <meta name="description" content="哔哩搜 - 最快最全的资源搜索引擎">
-    <meta name="keywords" content="哔哩搜,bilisou, 百度网盘, 网盘搜索, 迅雷下载，BT下载，福利">
+    <meta name="keywords" content="哔哩搜,bilisou, 在线视频,百度网盘, 网盘搜索, 迅雷下载，BT下载，福利">
     <link rel="stylesheet" href="/static/css/bilisou.css" type="text/css">
     <script src="//cdn.bootcss.com/jquery/1.8.3/jquery.min.js"></script>
     <link rel="shortcut icon" type="image/x-icon" href="/stat/img/bilisou.ico">
@@ -75,9 +75,14 @@
                             {{if eq $s.Source 2}}
                             <span>资源类型： <b>BT种子</b></span>
                             {{end}}
+                            {{if eq $s.Source 4}}
+                            <span>资源类型： <b>在线视频</b></span>
+                            {{end}}
                             <span>创建时间： <b>{{$s.LastScanStr}}</b></span>
                             <span>文件类型： <b>{{$s.CategoryCN}}</b></span>
+                            {{if ne $s.Source 4}}
                             <span>文件大小：<b>{{$s.SizeStr}}</b></span>
+                            {{end}}
                             <span>下载热度：<b>{{$s.ViewCount}}</b></span>
                         </div>
                     </div>
@@ -124,6 +129,5 @@
 <!--<script src="/Public/static/js/home-common-v2.js?v=20161124"></script>-->
 <iframe class="bdSug_sd" style="display: none; position: absolute; border-width: 0px;"></iframe>
 <div id="bdSug_1492673055651" class="bdSug_wpr" style="display: none;"></div>
-<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1261815337'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s4.cnzz.com/z_stat.php%3Fid%3D1261815337' type='text/javascript'%3E%3C/script%3E"));</script>
 </body>
 </html>

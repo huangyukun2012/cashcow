@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Share.Title}} - 最快最全的的BT搜索,种子搜索,迅雷搜索,百度网盘搜索引擎-哔哩搜</title>
     <meta name="description" content="{{.Share.Title}}, 哔哩搜 - 最快最全的资源搜索引擎">
-    <meta name="keywords" content=" 在线观看, {{ range $i, $k := .Share.SeoKeywords}}{{$k}}, {{end}} ">
+    <meta name="keywords" content="{{ range $i, $k := .Share.SeoKeywords}}{{$k}}, {{end}} ">
     <link rel="stylesheet" href="/static/css/bilisou.css" type="text/css">
     <script src="//cdn.bootcss.com/jquery/1.8.3/jquery.min.js"></script>
     <link rel="shortcut icon" type="image/x-icon" href="/static/img/bilisou.ico">
@@ -54,62 +54,22 @@
     <div id="content">
         <div id="wall"><h1 class="res-title">{{.Share.HTitle}}</h1>
             <div class="fileDetail">
-              <span id="m_link" style="display:none">magnet:?xt=urn:btih:CEE671173382ACD8DD57DAD56E3FB1DC711777A7</span>
+
+
+                <embed height="482" width="706" pluginspage="https://www.adobe.com/shockwave/download/download.cgi?P1_Prod_Version=ShockwaveFlash" allowscriptaccess="always" rel="noreferrer" flashvars="aid={{.Share.ShareID}}&amp;as_wide=1" src="https://static.hdslb.com/play.swf" type="application/x-shockwave-flash" allowfullscreen="true" quality="high" style="width: 706px; height: 484px; ">
+
               
+                </p>
+                <p> 视频内容描述</p>
+                {{.Share.HDescription}}
+              </div>
+            <div class="push"></div>
                 <p>
                   {{ range $i, $k := .Keywords }}
                   <a href="/search/{{$k}}" target="_blank" class="pill">{{$k}}</a>
                   {{end}}
                 </p> 
 
-                {{if eq .Share.Source 0}}
-              <p> 资源类型：百度网盘</p>
-              <p> 分享用户： <a href="https://pan.baidu.com/share/home?uk={{.Share.UK}}">{{.Share.Uname}}</a></p>
-                {{end}}
-              {{if eq .Share.Source 2}}
-              <p> 资源类型：BT种子</p>
-                {{end}}
-              
-                <p> 文件大小：{{.Share.SizeStr}}</p>
-                <p> 收录时间：{{.Share.LastScanStr}}</p>
-                <p class="link_op"> 链接操作： <a href="javascript:;" onclick="ajaxp('good')">点赞<em id="goodnum">0</em></a><a
-                        href="javascript:;" onclick="report();">dmca/举报</a></p>
-                <p> 点击热度：<span id="hits_num">{{.Share.ViewCount}}</span></p>
-                <p> 资源下载：
-                  {{if eq .Share.Source 2}}
-                  <a  class="download" href=" {{.Share.Link}} ">{{.Share.Link}}</a>&nbsp; 
-                  {{end}}
-
-                  {{if eq .Share.Source 0}}
-                  <a href="https://pan.baidu.com/share/link?uk={{.Share.UK}}&amp;shareid={{.Share.ShareID}}" class="download">百度网盘链接</a>&nbsp; 
-                  {{end}}
-                  
-                  
-                  <!--
-                  <a href="javascript:;" onclick="window.open('http://www.sobt5.com/tool/m2t?hash=CEE671173382ACD8DD57DAD56E3FB1DC711777A7')">下载种子</a>&nbsp;
-                    <a href="#" id="copyi" data-clipboard-target="m_link" class="download">复制链接</a>&nbsp;<a
-                            href="javascript:;" onclick="addfav();">加入收藏</a> &nbsp; <a href="#" target="_blank"
-                                                                                       class="yubo">在线云播</a>&nbsp;
-                    -->
-                </p>
-                <p> 文件列表：共 {{.Share.FileCount}} 个文件</p></div>
-            <script src="/Public/static/plugin/ZeroClipboard/ZeroClipboard.min.js"></script>
-            <script>
-                var clip = new ZeroClipboard($('#copyi'), {moviePath: "/Public/static/plugin/ZeroClipboard/ZeroClipboard.swf"});
-                clip.on('complete', function (client, args) {
-                    alert('复制成功')
-                });
-            </script>
-            <ol>
-
-                {{ range $i, $fn := .Share.BTFilenames}}
-                <li>{{$fn.Name}}&nbsp;&nbsp;<span class="cpill blue-pill">{{$fn.Size}}</span></li>
-                {{end}}
-
-                {{ range $i, $fn := .Share.Filenames}}
-                <li>{{$fn}}</li>
-                {{end}}
-            </ol>
             <div class="push"></div>
             <div class="title">
                   <h4>相关资源推荐</h4>

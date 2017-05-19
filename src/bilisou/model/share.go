@@ -74,6 +74,7 @@ type Share struct {
 	HLink     t.HTML
 	Source    int    `json:"source"`
 	Description string `json:"description"`
+	HDescription t.HTML
 
 	Valid bool
 	LastScanStr  string
@@ -88,6 +89,12 @@ type BTFilename struct {
 func (share *Share)FillHtml()  {
 	share.HTitle = t.HTML(share.Title)
 	share.HLink = t.HTML(share.Link)
+	share.HDescription = t.HTML(share.Description)
+
+	if(share.Source == 4) {
+		share.Abstract = share.HDescription
+	}
+
 	share.Category = u.CAT_INT_STR[int(share.CategoryInt)]
 	share.CategoryCN = u.CAT_INT_STRCN[int(share.CategoryInt)]
 	share.FeedTimeStr  = u.IntToDateStr(share.FeedTime)
