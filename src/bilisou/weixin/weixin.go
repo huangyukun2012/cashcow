@@ -282,7 +282,7 @@ func CrawlBlog() {
 
 			page := 1
 
-			for page < 5 {
+			for page < 2 {
 				blogs := []m.Blog{}
 
 				var url = fmt.Sprintf(WEIXIN_SEARCH_URL, keyword, page)

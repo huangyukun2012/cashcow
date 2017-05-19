@@ -25,8 +25,8 @@ import (
 	"logging"
 	m "bilisou/model"
 	c "bilisou/crawler"
-	//w "bilisou/weixin"
-	b "bilisou/bt"
+	w "bilisou/weixin"
+	//b "bilisou/bt"
 	es "gopkg.in/olivere/elastic.v3"
 	"io/ioutil"
 )
@@ -131,8 +131,8 @@ func Init() {
 	InitTemplates()
 
 	go c.Start(db)
-	//go w.Start(db)
-	go b.Start(db)
+	go w.Start(db)
+	///go b.Start(db)
 
 
 }
