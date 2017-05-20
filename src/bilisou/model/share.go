@@ -122,6 +122,8 @@ func (share *Share)FillHtml()  {
 			}
 		}
 		share.Abstract = t.HTML(abs)
+	} else if share.Source == 4 {
+
 	}
 
 	if share.Source == 0 {
@@ -135,10 +137,28 @@ func (share *Share)FillHtml()  {
 	}
 
 	share.LastScanStr = u.IntToDateStr(share.LastScan)
-	if share.Title != "" {
-		keywords := u.Jb.CutForSearch(share.Title, true)
-		for _, keyword := range keywords {
-			share.SeoKeywords = append(share.SeoKeywords, keyword)
+	if share.Source == 4 {
+		keywords := strings.Split(share.FilenamesRaw, ",")
+		//keywords[0] = "bilisou"
+		//keywords[1] = "哔哩搜索"
+		//keywords[2] = "bilibili搜索引擎"
+		if len(keywords) > 5 {
+			keywords = keywords[4:]
+			share.SeoKeywords = keywords
+		} else {
+			if share.Title != "" {
+				keywords := u.Jb.CutForSearch(share.Title, true)
+				for _, keyword := range keywords {
+					share.SeoKeywords = append(share.SeoKeywords, keyword)
+				}
+			}
+		}
+	} else {
+		if share.Title != "" {
+			keywords := u.Jb.CutForSearch(share.Title, true)
+			for _, keyword := range keywords {
+				share.SeoKeywords = append(share.SeoKeywords, keyword)
+			}
 		}
 	}
 	return

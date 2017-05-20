@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.Share.Title}} - 最快最全的的BT搜索,种子搜索,迅雷搜索,百度网盘搜索引擎-哔哩搜</title>
     <meta name="description" content="{{.Share.Title}}, 哔哩搜 - 最快最全的资源搜索引擎">
-    <meta name="keywords" content="{{.Share.FilenamesRaw}}">
+    <meta name="keywords" content="bilibili搜索引擎,在线观看,{{ range $i, $k := .Share.SeoKeywords}}{{$k}}, {{end}} ">
     <link rel="stylesheet" href="/static/css/bilisou.css" type="text/css">
     <script src="//cdn.bootcss.com/jquery/1.8.3/jquery.min.js"></script>
     <link rel="shortcut icon" type="image/x-icon" href="/static/img/bilisou.ico">
@@ -65,7 +65,7 @@
               </div>
             <div class="push"></div>
                 <p>
-                  {{ range $i, $k := .Keywords }}
+                  {{ range $i, $k := .Share.SeoKeywords }}
                   <a href="/search/{{$k}}" target="_blank" class="pill">{{$k}}</a>
                   {{end}}
                 </p> 

@@ -119,12 +119,11 @@ func FindShare(n *html.Node, share *m.Share) {
 
 	if n.Type == html.ElementNode && n.Data == "meta" {
 		for _, a := range n.Attr {
-			fmt.Println(a)
 			if a.Key == "name"  && a.Val == "keywords" {
 				for _, b := range n.Attr {
 					if b.Key == "content" {
 						share.FilenamesRaw = b.Val
-						fmt.Println("share tag = " + share.FilenamesRaw)
+						//fmt.Println("share tag = " + share.FilenamesRaw)
 					}
 				}
 			}
@@ -133,7 +132,7 @@ func FindShare(n *html.Node, share *m.Share) {
 				for _, b := range n.Attr {
 					if b.Key == "content" {
 						share.Description = b.Val
-						fmt.Println("share tag = " + share.Description)
+						//fmt.Println("share tag = " + share.Description)
 					}
 				}
 			}
